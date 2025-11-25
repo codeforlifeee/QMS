@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title> Quotation Format — Editable</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+integrity="sha512-odNMlJ2P0rHepvFvNwRveVdTLPmWQf7BchV7vXgJNRM7uMx3sKm38gTqJ3jFVayFz8y21vKgrrYJQwZJkB+S7w=="
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <style>
+    :root{
+      --accent: black;
+      --muted: #666;
+      font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body{
+      background:#efefef;
+      margin:20px;
+      display:flex;
+      justify-content:center;
+      font-size:14px;
+    }
+    .page{
+      width:800px;
+      background:white;
+      padding-top: 0px;
+      padding-right: 20px;
+      padding-left: 20px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.08);
+      color:#222;
+      box-sizing:border-box;
+    }
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+      gap:16px;
+    }
+    .company h1{
+      margin:0;
+      font-size:20px;
+      color:var(--accent);
+    }
+    .meta{
+      font-size:15px;
+      color:var(--muted);
+    }
+    hr.soft{ border:none; border-top:4px solid var(--accent); margin:14px 0 20px 0; }
+
+    .section{ margin-bottom:16px; }
+    .section h3{
+      margin:0 0 8px 0;
+      font-size:16px;
+      color:var(--accent);
+      border-left:4px solid var(--accent);
+      padding-left:10px;
+    }
+    .itinerary{
+      border:1px dashed #ddd;
+      padding:12px;
+      border-radius:6px;
+      background:#fafafa;
+    }
+    .day{ margin-bottom:12px; }
+    .day h4{ margin:6px 0; font-size:15px; color:#0e5075; }
+
+    footer{
+      margin-top:22px;
+      border-top:1px solid #eee;
+      padding-top:10px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .controls{
+      margin:14px 0;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    button{
+      background:var(--accent);
+      color:white;
+      border:none;
+      padding:8px 12px;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.secondary{ background:#666; }
+
+    [contenteditable="true"]{
+      outline:none;
+      padding:2px;
+    }
+    [contenteditable="true"]:hover{
+      background:#fffbe6;
+    }
+
+    .logo-container {
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    #logoPreview{
+      width:215px;
+      height:100px;
+      object-fit:contain;
+      border:0px solid #ddd;
+      border-radius:6px;
+      background:white;
+      padding:4px;
+    }
+    .website {
+      color:var(--accent);
+      font-weight:600;
+      text-decoration:underline;
+    }
+
+    /* Banner & thumbnails */
+    .banner {
+      width:100%;
+      height:200px;
+      border-radius:10px;
+      overflow:hidden;
+      margin-bottom:12px;
+      border:1px solid #e2e2e2;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f6f9fb;
+    }
+    .banner img { width:100%; height:100%; object-fit:cover; display:block; }
+    .thumbs { display:flex; gap:8px; margin-top:8px; }
+    .thumb { width:32%; height:90px; border-radius:8px; overflow:hidden; border:1px solid #eee; background:#fff; display:flex; align-items:center; justify-content:center; }
+    .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* Day card image */
+    .day-image { width:140px; height:90px; object-fit:cover; border-radius:8px; border:1px solid #ddd; margin-right:10px; }
+
+    /* Day card */
+    .dayCard { display:flex; gap:12px; align-items:flex-start; }
+    .dayCard .dayContent { flex:1; }
+
+    .small-note { font-size:12px; color:var(--muted); }
+    input[type="file"] { display:none; }
+    label.file-btn { background:#eee; color:#333; padding:6px 8px; border-radius:6px; cursor:pointer; display:inline-block; font-size:13px; }
+
+    /* responsive */
+    @media (max-width:860px){
+      .page { width:96%; padding:18px; }
+      .banner { height:160px; }
+      .thumb { height:70px; }
+      .day-image { display:none; }
+    }
+  </style>
+  <style>
+.confirm-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #075056, #075056);
+  color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+  padding: 18px 28px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.confirm-section span {
+  flex: 1;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.book-btn {
+  background: #ff5b04;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.book-btn:hover {
+  background: #ff5b04;
+  transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+
+  <div style="max-width:1100px; width:100%;">
+    <div class="controls">
+      <button id="downloadPdf">Download as PDF</button>
+      <label style="margin-left:auto; font-size:13px; color:#444;">
+        Page title:
+        <input id="pageTitleInput" type="text" value="Central European Splendours — Summer 2026" />
+      </label>
+    </div>
+
+    <div id="printable" class="page">
+
+      <!-- Header -->
+      <header>
+      
+        <div style="flex:1; min-width:260px;">
+          <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
+            <div class="logo-container">
+              <img id="logoPreview" src="C:/Users/akash.verma/Desktop/logo.png" alt="Company Logo" />
+            </div>
+            <div class="company">
+              <h1 id="destTitle" style="font-family: 'The Season', serif;padding-left: 100px;font-size: 50px;color: black;" contenteditable="true">Dubai</h1>
+              
+            </div>
+          </div>
+        </div>
+         <!-- ===== Editable Package Summary (16:9 Banner) ===== -->
+<section style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; border-radius:20px; padding:0px; margin-bottom:20px; ">
+  
+  <!-- Left: Banner Image (16:9) -->
+  <div style="flex:1; min-width:300px; position:relative; width:100%; max-width:450px; aspect-ratio:16/9; overflow:hidden; border-radius:16px; border:2px solid #07505640; cursor:pointer;" onclick="document.getElementById('uploadImage').click()">
+    <img id="packageImage" src="C:/Users/akash.verma/Downloads/photo-1512453979798-5ea266f8880c.jpg" alt="Package Banner" 
+         style="width:100%; height:100%; object-fit:cover;">
+    <input type="file" id="uploadImage" accept="image/*" style="display:none" onchange="previewImage(event)">
+  </div>
+
+  <!-- Right: Text Content -->
+  <div style="flex:1; min-width:250px;">
+    <h1 contenteditable="true" id="packageTitle" contenteditable="false" 
+        style="font-size:24px; color:black; margin-bottom:10px;">
+        Package summary details
+Dubai
+Quatition
+    </h1>
+
+    <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:14px; color:#075056; margin-bottom:10px;">
+      <div><strong>Duration:</strong> <span contenteditable="true">5 Days / 4 Nights</span></div>
+      <br/>
+      <div><strong>Price:</strong> ₹ <span contenteditable="true">35,999</span> per person</div>
+    </div>
+
+    <div style="font-size:14px; color:#075056;">
+      <strong>Places Covered:</strong>
+      <br/> 
+      <span contenteditable="true">Dubai City Tour, Desert Safari, Burj Khalifa, Dhow Cruise</span>
+    </div>
+  </div>
+
+</section>
+
+      </header>
+ <div class="company">
+              <h1 id="packageTitle" style="color: black;" contenteditable="true">3-Star Dubai Supersaver Package - 3N/4D</h1>
+              
+            </div>
+      <hr class="soft" />
+     <div class="confirm-section">
+  <span>To Confirm This Package, Click Here</span>
+  <a id="bookNowBtn" href="#" class="book-btn">Book Now</a>
+</div>
+<br/>
+          <!-- Overview -->
+      <section class="section">
+        <h3>Overview</h3>
+        <div style="background:#e9f7fa; border-left:6px solid #075056; padding:14px; border-radius:8px; color:#075056;">
+          <p contenteditable="true">
+            You start in Paris — the City of Lights — then travel through Switzerland, Austria and Italy. Enjoy guided tours, scenic
+            train rides, alpine vistas, romantic gondola rides in Venice and the timeless history of Rome.
+          </p>
+
+          <div style="background:#c9f1ff; border-radius:8px; padding:12px; margin-top:10px;">
+            <h4 contenteditable="true" style="color:#01579b; margin:0 0 8px 0;">Package Highlights</h4>
+            <ul contenteditable="true" style="margin:0; padding-left:20px;">
+              <li>Paris city tour, Seine River Cruise, Versailles</li>
+              <li>Mt Titlis & Lucerne, Jungfraujoch (optional), Rhine Falls</li>
+              <li>Venice gondola ride, Florence & Pisa, Rome guided tour</li>
+              <li>Swarovski World, scenic long-distance coach transfers</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+ <!-- Accommodation -->
+      <section class="section">
+        <h3>Accommodation Details</h3>
+        <section style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; border-radius:20px; padding:0px; margin-bottom:20px; ">
+  
+  <!-- Left: Banner Image (16:9) -->
+    <div style="flex:1; min-width:250px;">
+    <h1 contenteditable="true" id="packageTitle" contenteditable="false" 
+        style="font-size:24px; color:black; margin-bottom:10px;">
+        Package summary details
+Dubai
+Quatition
+    </h1>
+
+    <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:14px; color:#075056; margin-bottom:10px;">
+     <div><strong>Duration:</strong> <span contenteditable="true">5 Days / 4 Nights</span></div>
+      <br/>
+      <div><strong>Room Catagory:</strong> <span contenteditable="true">5 Days / 4 Nights</span></div>
+      <br/>
+      <div><strong>Meal Plan:</strong> ₹ <span contenteditable="true">35,999</span> per person</div>
+    </div>
+
+    <div style="font-size:14px; color:#075056;">
+      <strong>Note:</strong>
+      <br/> 
+      <span contenteditable="true">Dubai City Tour, Desert Safari, Burj Khalifa, Dhow Cruise</span>
+    </div>
+  </div>
+  
+
+  <!-- Right: Text Content -->
+ <div style="flex:1; min-width:300px; position:relative; width:100%; max-width:450px; aspect-ratio:16/9; overflow:hidden; border-radius:16px; border:2px solid #07505640; cursor:pointer;" onclick="document.getElementById('uploadImage').click()">
+    <img id="packageImage" src="C:/Users/akash.verma/Downloads/photo-1512453979798-5ea266f8880c.jpg" alt="Package Banner" 
+         style="width:100%; height:100%; object-fit:cover;">
+    <input type="file" id="uploadImage" accept="image/*" style="display:none" onchange="previewImage(event)">
+  </div>
+
+</section>
+        <!-- <div style="background:#fffaf0; border-left:6px solid #f57c00; padding:14px; border-radius:8px;">
+          <p  contenteditable="true" style="margin:0 0 6px 0;"><strong>Hotels (or similar):</strong></p>
+          <ul contenteditable="true" style="margin:0; padding-left:20px;">
+            <li>Paris: Mercure Paris CDG Roissy or similar (4*)</li>
+            <li>Geneva: Appart's City or similar (4*)</li>
+            <li>Central Switzerland: Engelberg hotels or similar (4*)</li>
+            <li>Venice / Padova / Arezzo / Rome: Properties as mentioned</li>
+          </ul>
+          <p style="font-size:13px; color:#b36b00; margin-top:8px;">
+            *Hotel names are tentative and subject to availability at booking time.
+          </p>
+        </div> -->
+      </section>
+      <!-- Itinerary with add/delete & per-day images -->
+      <section class="section" id="itinerarySection">
+        <h3>Day-wise Itinerary</h3>
+        <div class="controls" style="margin-bottom:10px;">
+          <button id="addDayBtn" style="background:#0288d1;">+ Add New Day</button>
+        </div>
+
+        <div id="dayContainer">
+          <!-- Day 1 -->
+          <div class="dayCard" style="background:#e4eef0; border-left:6px solid #f57c00; padding:14px; border-radius:8px; margin-bottom:10px;">
+            <div style="display:flex; width:100%; gap:12px;">
+              <img src="https://images.unsplash.com/photo-1488747279002-c8523379faaa?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9c8a1bf8a2f3b7f6b3b2c2d1a0f6e4d8" alt="Day image" class="day-image" id="dayImg1">
+              <div class="dayContent">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <h4 contenteditable="true" style="color:#e65100; margin:0;">Day 1: Arrive in Paris</h4>
+                  <div>
+                    <label class="file-btn" for="dayImgUpload1">Change image</label>
+                    <button class="deleteDayBtn" style="background:#d32f2f; margin-left:8px;">Delete</button>
+                  </div>
+                </div>
+                <p contenteditable="true" style="margin-top:8px;">
+                  Arrive in Paris. Meet and greet at airport, private transfer to hotel. Evening Seine River Cruise and overnight in Paris.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day 2 -->
+          <div class="dayCard" style="background:#e4eef0; border-left:6px solid #f57c00; padding:14px; border-radius:8px; margin-bottom:10px;">
+            <div style="display:flex; width:100%; gap:12px;">
+              <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=f2d4c9b3b4e0f4c6e0b2a1a1c3d4e5f" alt="Day image" class="day-image" id="dayImg2">
+              <div class="dayContent">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <h4 contenteditable="true" style="color:#e65100; margin:0;">Day 2: Paris City Tour & Versailles</h4>
+                  <div>
+                    <label class="file-btn" for="dayImgUpload2">Change image</label>
+                    <button class="deleteDayBtn" style="background:#d32f2f; margin-left:8px;">Delete</button>
+                  </div>
+                </div>
+                <p contenteditable="true" style="margin-top:8px;">
+                  Guided city tour, visit Eiffel Tower (2nd Level), Palace of Versailles and Seine cruise. Overnight in Paris.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Inclusions & Exclusions -->
+      <section class="section">
+        <h3>Inclusions & Exclusions</h3>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="background:#e9f7fa; border-left:6px solid #00897b; padding:14px; border-radius:8px;">
+            <h4 style="color:#00695c; margin-top:0;">✅ What's Included</h4>
+            <ul contenteditable="true" style="margin:0; padding-left:20px;">
+              <li>Accommodation as per itinerary</li>
+              <li>Meals mentioned in itinerary</li>
+              <li>Transfers & sightseeing as per itinerary</li>
+              <li>Services of a professional tour manager</li>
+            </ul>
+          </div>
+
+          <div style="background:#fdeaea; border-left:6px solid #d32f2f; padding:14px; border-radius:8px;">
+            <h4 style="color:#b71c1c; margin-top:0;">❌ What's Not Included</h4>
+            <ul contenteditable="true" style="margin:0; padding-left:20px;">
+              <li>Airfare, visa, insurance</li>
+              <li>Personal expenses</li>
+              <li>Any services not mentioned</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+<!-- Terms & Conditions -->
+<section class="section">
+  <h3>Terms & Conditions</h3>
+  <div style="background:#f5f9ff; border-left:6px solid black; padding:14px; border-radius:8px;">
+    <ul contenteditable="true" style="margin:0; padding-left:20px; line-height:1.6;">
+      <li>Rates are valid for a minimum of 2 passengers traveling together.</li>
+      <li>Hotel rooms are subject to availability at the time of booking.</li>
+      <li>Any increase in airfare, taxes, or other charges will be borne by the client.</li>
+      <li>All sightseeing and transfers are as per itinerary unless stated otherwise.</li>
+      <li>Cancellation charges apply as per company policy.</li>
+      <li>Traverse Globe reserves the right to make changes in the itinerary due to unforeseen circumstances.</li>
+      <li>All payments must be cleared before the travel date.</li>
+    </ul>
+  </div>
+  <!-- Input to attach link -->
+  <div id="linkSection" style="text-align:center; margin-bottom:12px;">
+    <input type="text" id="linkInput" placeholder="Enter package URL here..." 
+           style="width:70%; max-width:400px; padding:8px 10px; border:2px solid black; border-radius:6px; outline:none;">
+    <button onclick="attachPackageLink()" 
+            style="background:black; color:#fff; border:none; padding:9px 16px; border-radius:6px; margin-left:6px; cursor:pointer; font-weight:600; transition:0.3s;">
+      Attach Link
+    </button>
+  </div>
+
+  <!-- Redirect Button -->
+  <div style="text-align:center; margin-top:10px;">
+    <a id="packageLink" href="#" target="_blank"
+       style="background:linear-gradient(135deg, black, #0d4b80); color:#fff; padding:10px 26px; border-radius:8px; text-decoration:none; font-weight:600; letter-spacing:0.5px; box-shadow:0 3px 8px rgba(27,108,168,0.3); transition:0.3s;">
+      View Full Package
+    </a>
+  </div>
+</section>
+
+<!-- Similar Packages Section -->
+<section style="padding: 0px 0; background: #f8fbfc;">
+  <div style="max-width: 1100px; margin: 0 auto; text-align: center;">
+    <h2 contenteditable="true" style="font-size: 26px; font-weight: 700; color: #075056; margin-bottom: 25px;">
+      Similar Packages You May Like
+    </h2>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;">
+
+      <!-- Package 1 -->
+        <div style="width: 23%;height: 270; background: white; border-radius: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden;">
+        <img src="C:/Users/akash.verma/Downloads/photo-1512453979798-5ea266f8880c.jpg" alt="Package Image" style="width: 100%; height: 100px; object-fit: cover;" contenteditable="true" />
+        <div style="padding-left: 10px;padding-right: 10px; text-align: left;">
+          <h3 contenteditable="true" style="font-weight: 600; color: #075056; margin-bottom: 8px;">
+            4N/5D – Dubai Delight Tour
+          </h3>
+          <div contenteditable="true" style="font-weight: 500; color: black; margin-bottom: 12px;">
+            ₹55,499 / person
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+           <!-- Input to attach link -->
+  <div id="linkSection1" style="text-align:center; margin-bottom:12px;">
+    <input type="text" id="linkInput1" placeholder="Enter package URL here..." 
+           style="width:70%; max-width:400px; padding:8px 10px; border:2px solid black; border-radius:6px; outline:none;">
+    <button onclick="attachPackageLink1()" 
+            style="background:black; color:#fff; border:none; padding:9px 16px; border-radius:6px; margin-left:6px; cursor:pointer; font-weight:600; transition:0.3s;">
+      Attach Link
+    </button>
+  </div>
+
+  <!-- Redirect Button -->
+  <div style="text-align:center; margin-top:10px;">
+    <a id="packageLink1" href="#" target="_blank"
+       style="background:linear-gradient(135deg, black, #0d4b80); color:#fff; padding:10px 26px; border-radius:8px; text-decoration:none; font-weight:600; letter-spacing:0.5px; box-shadow:0 3px 8px rgba(27,108,168,0.3); transition:0.3s;">
+      View Package
+    </a>
+  </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package 2 -->
+      <div style="width: 23%;height: 270px; background: white; border-radius: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden;">
+        <img src="C:/Users/akash.verma/Downloads/photo-1512453979798-5ea266f8880c.jpg" alt="Package Image" style="width: 100%; height: 100px; object-fit: cover;" contenteditable="true" />
+        <div style="padding-left: 10px;padding-right: 10px; text-align: left;">
+          <h3 contenteditable="true" style="font-weight: 600; color: #075056; margin-bottom: 8px;">
+            4N/5D – Dubai Delight Tour
+          </h3>
+          <div contenteditable="true" style="font-weight: 500; color: black; margin-bottom: 12px;">
+             ₹55,499 / person
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+           <!-- Input to attach link -->
+  <div id="linkSection2" style="text-align:center; margin-bottom:12px;">
+    <input type="text" id="linkInput2" placeholder="Enter package URL here..." 
+           style="width:70%; max-width:400px; padding:8px 10px; border:2px solid black; border-radius:6px; outline:none;">
+    <button onclick="attachPackageLink2()" 
+            style="background:black; color:#fff; border:none; padding:9px 16px; border-radius:6px; margin-left:6px; cursor:pointer; font-weight:600; transition:0.3s;">
+      Attach Link
+    </button>
+  </div>
+
+  <!-- Redirect Button -->
+  <div style="text-align:center; margin-top:10px;">
+    <a id="packageLink2" href="#" target="_blank"
+       style="background:linear-gradient(135deg, black, #0d4b80); color:#fff; padding:10px 26px; border-radius:8px; text-decoration:none; font-weight:600; letter-spacing:0.5px; box-shadow:0 3px 8px rgba(27,108,168,0.3); transition:0.3s;">
+      View Package
+    </a>
+  </div>
+          </div>
+        </div>
+      </div>
+       <!-- Package 3 -->
+      <div style="width: 23%;height: 270px; background: white; border-radius: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden;">
+        <img src="C:/Users/akash.verma/Downloads/photo-1512453979798-5ea266f8880c.jpg" alt="Package Image" style="width: 100%; height: 100px; object-fit: cover;" contenteditable="true" />
+        <div style="padding-left: 10px;padding-right: 10px; text-align: left;">
+          <h3 contenteditable="true" style="font-weight: 600; color: #075056; margin-bottom: 8px;">
+            4N/5D – Dubai Delight Tour
+          </h3>
+          <div contenteditable="true" style="font-weight: 500; color: black; margin-bottom: 12px;">
+           ₹55,499 / person
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+           <!-- Input to attach link -->
+  <div id="linkSection2" style="text-align:center; margin-bottom:12px;">
+    <input type="text" id="linkInput2" placeholder="Enter package URL here..." 
+           style="width:70%; max-width:400px; padding:8px 10px; border:2px solid black; border-radius:6px; outline:none;">
+    <button onclick="attachPackageLink2()" 
+            style="background:black; color:#fff; border:none; padding:9px 16px; border-radius:6px; margin-left:6px; cursor:pointer; font-weight:600; transition:0.3s;">
+      Attach Link
+    </button>
+  </div>
+
+  <!-- Redirect Button -->
+  <div style="text-align:center; margin-top:10px;">
+    <a id="packageLink2" href="#" target="_blank"
+       style="background:linear-gradient(135deg, black, #0d4b80); color:#fff; padding:10px 26px; border-radius:8px; text-decoration:none; font-weight:600; letter-spacing:0.5px; box-shadow:0 3px 8px rgba(27,108,168,0.3); transition:0.3s;">
+      View Package
+    </a>
+  </div>
+          </div>
+        </div>
+      </div>
+      <!-- Package 4 -->
+      <div style="width: 23%;height: 270px; background: white; border-radius: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden;">
+        <img src="C:/Users/akash.verma/Downloads/photo-1512453979798-5ea266f8880c.jpg" alt="Package Image" style="width: 100%; height: 100px; object-fit: cover;" contenteditable="true" />
+        <div style="padding-left: 10px;padding-right: 10px; text-align: left;">
+          <h3 contenteditable="true" style="font-weight: 600; color: #075056; margin-bottom: 8px;">
+            4N/5D – Dubai Delight Tour
+          </h3>
+          <div contenteditable="true" style="font-weight: 500; color: black; margin-bottom: 12px;">
+           ₹55,499 / person
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+           <!-- Input to attach link -->
+  <div id="linkSection2" style="text-align:center; margin-bottom:12px;">
+    <input type="text" id="linkInput2" placeholder="Enter package URL here..." 
+           style="width:70%; max-width:400px; padding:8px 10px; border:2px solid black; border-radius:6px; outline:none;">
+    <button onclick="attachPackageLink2()" 
+            style="background:black; color:#fff; border:none; padding:9px 16px; border-radius:6px; margin-left:6px; cursor:pointer; font-weight:600; transition:0.3s;">
+      Attach Link
+    </button>
+  </div>
+
+  <!-- Redirect Button -->
+  <div style="text-align:center; margin-top:10px;">
+    <a id="packageLink2" href="#" target="_blank"
+       style="background:linear-gradient(135deg, black, #0d4b80); color:#fff; padding:10px 26px; border-radius:8px; text-decoration:none; font-weight:600; letter-spacing:0.5px; box-shadow:0 3px 8px rgba(27,108,168,0.3); transition:0.3s;">
+      View Package
+    </a>
+  </div>
+          </div>
+        </div>
+      </div>
+     
+
+      <footer>
+        <div contenteditable="false">
+          Prepared by: Traverse Globe — Address: 129 First Floor, Antriksh Bhavan, Connaught Place, New Delhi, Delhi, Pin 110001
+        </div>
+        <div>Website:
+          <a href="https://traverseglobe.com" target="_blank" class="website">
+            <span contenteditable="true">traverseglobe.com</span>
+          </a>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Hidden file inputs for images -->
+  <input id="bannerUpload" type="file" accept="image/*" />
+  <input id="thumb1Upload" type="file" accept="image/*" />
+  <input id="thumb2Upload" type="file" accept="image/*" />
+  <input id="thumb3Upload" type="file" accept="image/*" />
+
+  <input id="dayImgUpload1" type="file" accept="image/*" />
+  <input id="dayImgUpload2" type="file" accept="image/*" />
+
+  
+
+
+  <script>
+    // Today's date
+    // document.getElementById('todayDate').innerText = new Date().toLocaleDateString();
+
+    // Page title input
+    const titleInput = document.getElementById('pageTitleInput');
+    titleInput.addEventListener('input', () => {
+      document.title = titleInput.value;
+    });
+
+    // IMAGE UPLOAD HANDLERS
+    function handleImageUpload(inputElem, imgElemId) {
+      inputElem.addEventListener('change', function(e) {
+        const file = this.files && this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = document.getElementById(imgElemId);
+          if (img) img.src = ev.target.result;
+          // update whatsapp message too (if needed)
+          updateWhatsAppLinks();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    handleImageUpload(document.getElementById('bannerUpload'), 'bannerImg');
+    handleImageUpload(document.getElementById('thumb1Upload'), 'thumb1');
+    handleImageUpload(document.getElementById('thumb2Upload'), 'thumb2');
+    handleImageUpload(document.getElementById('thumb3Upload'), 'thumb3');
+
+    handleImageUpload(document.getElementById('dayImgUpload1'), 'dayImg1');
+    handleImageUpload(document.getElementById('dayImgUpload2'), 'dayImg2');
+
+    // DOWNLOAD PDF (hide UI controls that would show)
+    document.getElementById('downloadPdf').addEventListener('click', () => {
+      const element = document.getElementById('printable');
+
+      // Hide buttons during export
+      const controls = document.querySelectorAll('#addDayBtn, .deleteDayBtn, label.file-btn, #downloadPdf');
+      controls.forEach(btn => btn.style.display = 'none');
+
+      // small delay for layout
+      setTimeout(() => {
+        const opt = {
+          margin: [8, 8, 8, 8],
+          filename: (document.getElementById('packageTitle').innerText.trim() || 'package') + '.pdf',
+          image: { type: 'jpeg', quality: 1 },
+          html2canvas: {
+            scale: 1.2,
+            useCORS: true,
+            allowTaint: false,
+            windowWidth: 900
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+          // Restore buttons after export
+          controls.forEach(btn => btn.style.display = '');
+        });
+      }, 300);
+    });
+
+    // Itinerary add / delete logic
+    const addDayBtn = document.getElementById("addDayBtn");
+    const dayContainer = document.getElementById("dayContainer");
+
+    function createDayBlock(dayNumber = "New Day") {
+      const wrapper = document.createElement("div");
+      wrapper.className = "dayCard";
+      wrapper.style.cssText = "background:#e4eef0; border-left:6px solid #f57c00; padding:14px; border-radius:8px; margin-bottom:10px;";
+      
+      // create a unique id for potential image
+      const uid = Math.floor(Math.random() * 1000000);
+      const imgId = `dayImg_${uid}`;
+      const fileInputId = `dayImgUpload_${uid}`;
+
+      wrapper.innerHTML = `
+        <div style="display:flex; width:100%; gap:12px;">
+          <img src="https://images.unsplash.com/photo-1505765051693-9de34a6fca1b?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=8e1f1307f0af4d7e6c10b6c6a6a3c9b3" alt="Day image" class="day-image" id="${imgId}">
+          <div class="dayContent">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h4 contenteditable="true" style="color:#e65100; margin:0;">${dayNumber}: Enter Title</h4>
+              <div>
+                <label class="file-btn" for="${fileInputId}">Change image</label>
+                <button class="deleteDayBtn" style="background:#d32f2f; margin-left:8px;">Delete</button>
+              </div>
+            </div>
+            <p contenteditable="true" style="margin-top:8px;">
+              Enter itinerary details for this day here...
+            </p>
+          </div>
+        </div>
+        <input id="${fileInputId}" type="file" accept="image/*" style="display:none;" />
+      `;
+
+      // append hidden file input event after inserting to DOM
+      // (we'll attach handler below when adding to container)
+
+      // delete functionality
+      // need to attach after insertion
+
+      return wrapper;
+    }
+
+    addDayBtn.addEventListener("click", () => {
+      const dayCount = dayContainer.children.length + 1;
+      const newDay = createDayBlock(`Day ${dayCount}`);
+      dayContainer.appendChild(newDay);
+
+      // attach delete handler to newly added delete button
+      const delBtn = newDay.querySelector(".deleteDayBtn");
+      delBtn.addEventListener("click", (e) => {
+        if (confirm("Delete this day?")) {
+          newDay.remove();
+        }
+      });
+
+      // attach file change handler for the newly added input
+      const fileInput = newDay.querySelector('input[type="file"]');
+      const imgElem = newDay.querySelector('img.day-image');
+      if (fileInput && imgElem) {
+        fileInput.addEventListener('change', function() {
+          const f = this.files && this.files[0];
+          if (!f) return;
+          const r = new FileReader();
+          r.onload = (ev) => { imgElem.src = ev.target.result; };
+          r.readAsDataURL(f);
+        });
+      }
+    });
+
+    // Enable Delete for initial Day blocks
+    document.querySelectorAll(".deleteDayBtn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        if (confirm("Delete this day?")) {
+          e.target.closest(".dayCard").remove();
+        }
+      });
+    });
+
+    // File inputs (banner/thumbs/day1/day2)
+    document.getElementById('bannerUpload').addEventListener('change', function(){
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = (e) => document.getElementById('bannerImg').src = e.target.result;
+      r.readAsDataURL(f);
+    });
+    document.getElementById('thumb1Upload').addEventListener('change', function(){
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = (e) => document.getElementById('thumb1').src = e.target.result;
+      r.readAsDataURL(f);
+    });
+    document.getElementById('thumb2Upload').addEventListener('change', function(){
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = (e) => document.getElementById('thumb2').src = e.target.result;
+      r.readAsDataURL(f);
+    });
+    document.getElementById('thumb3Upload').addEventListener('change', function(){
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = (e) => document.getElementById('thumb3').src = e.target.result;
+      r.readAsDataURL(f);
+    });
+
+    // Day image upload inputs (existing)
+    document.getElementById('dayImgUpload1').addEventListener('change', function(){
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = (e) => document.getElementById('dayImg1').src = e.target.result;
+      r.readAsDataURL(f);
+    });
+    document.getElementById('dayImgUpload2').addEventListener('change', function(){
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = (e) => document.getElementById('dayImg2').src = e.target.result;
+      r.readAsDataURL(f);
+    });
+
+    // Clicking the "Change" labels triggers the hidden inputs
+    document.querySelectorAll('label.file-btn').forEach(lbl => {
+      lbl.addEventListener('click', (e) => {
+        const forId = lbl.getAttribute('for');
+        const input = document.getElementById(forId);
+        if (input) input.click();
+      });
+    });
+
+    // WhatsApp auto message generator
+    function updateWhatsAppLinks() {
+      const packageTitle = document.getElementById("packageTitle").innerText.trim();
+      const message = encodeURIComponent(`Hi, I'm interested in your package: "${packageTitle}". Please share more details.`);
+      const numbers = ["919997085457", "919520232324"];
+      // two places for links
+      document.getElementById("whatsapp1_small").href = `https://wa.me/${numbers[0]}?text=${message}`;
+      document.getElementById("whatsapp2_small").href = `https://wa.me/${numbers[1]}?text=${message}`;
+      // also update main big links if present
+      if (document.getElementById("whatsapp1")) document.getElementById("whatsapp1").href = `https://wa.me/${numbers[0]}?text=${message}`;
+      if (document.getElementById("whatsapp2")) document.getElementById("whatsapp2").href = `https://wa.me/${numbers[1]}?text=${message}`;
+    }
+
+    // Run once and whenever title changes
+    updateWhatsAppLinks();
+    document.getElementById("packageTitle").addEventListener("input", updateWhatsAppLinks);
+
+    // Also update when thumbnails change (we already call update on image uploads above)
+  </script>
+  <script>
+  function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+      document.getElementById('packageImage').src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+</script>
+<script>
+  function attachPackageLink() {
+    const input = document.getElementById('linkInput').value.trim();
+    const linkBtn = document.getElementById('packageLink');
+    const inputBox = document.getElementById('linkSection');
+
+    if (input) {
+      linkBtn.href = input;
+      linkBtn.textContent = "View More Details"; // change button text
+      inputBox.style.display = "none"; // hide input and button
+      alert('✅ Link attached successfully!');
+    } else {
+      alert('⚠️ Please enter a valid link first.');
+    }
+  }
+</script>
+<script>
+  function attachPackageLink1() {
+    debugger;
+    const input1 = document.getElementById('linkInput1').value.trim();
+    const linkBtn1 = document.getElementById('packageLink1');
+    const inputBox1 = document.getElementById('linkSection1');
+
+    if (input1) {
+      linkBtn1.href = input1;
+      linkBtn1.textContent = "View"; // change button text
+      inputBox1.style.display = "none"; // hide input and button
+      alert('✅ Link attached successfully!');
+    } else {
+      alert('⚠️ Please enter a valid link first.');
+    }
+  }
+ function similarpreviewImage1(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+      document.getElementById('packageImage1').src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+</script>
+
+<script>
+    function attachPackageLink2() {
+        debugger;
+    const input = document.getElementById('linkInput2').value.trim();
+    const linkBtn = document.getElementById('packageLink2');
+    const inputBox = document.getElementById('linkSection2');
+
+    if (input) {
+      linkBtn.href = input;
+      linkBtn.textContent = "View"; // change button text
+      inputBox.style.display = "none"; // hide input and button
+      alert('✅ Link attached successfully!');
+    } else {
+      alert('⚠️ Please enter a valid link first.');
+    }
+  }
+</script>
+<script>
+  // ✅ Replace with your WhatsApp number (without + or spaces)
+  const whatsappNumber = "9520232324"; 
+
+  document.getElementById("bookNowBtn").addEventListener("click", function (e) {
+    e.preventDefault();
+
+    // ✅ Get the latest editable package name dynamically
+    const packageTitle = document.getElementById("packageTitle").innerText.trim();
+
+    // ✅ Create message with the live package name
+    const message = `Hello, I would like to confirm my interest in the package: ${packageTitle}`;
+
+    // ✅ WhatsApp redirect link
+    const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+    // ✅ Open WhatsApp chat in new tab/window
+    window.open(whatsappLink, "_blank");
+  });
+</script>
+
+</body>
+</html>
