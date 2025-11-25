@@ -27,8 +27,8 @@ export const QuotationPreview = React.forwardRef(
       </div>
     );
 
-    return (
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full">
+      return (
+        <div ref={ref} className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full" id="quotation-preview">
         {/* Header with Actions */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 flex justify-between items-center">
           <div>
@@ -64,11 +64,7 @@ export const QuotationPreview = React.forwardRef(
         </div>
 
         {/* Scrollable Content */}
-        <div
-          ref={ref}
-          className="flex-1 overflow-y-auto p-6 space-y-6"
-          id="quotation-preview"
-        >
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Guest Header */}
           <div className="border-b-2 pb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">

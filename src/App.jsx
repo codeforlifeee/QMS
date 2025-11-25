@@ -49,6 +49,7 @@ function App() {
       toast.error('Preview is not visible. Scroll to preview or resize window and try again.');
       return;
     }
+    console.debug('[App] Generating PDF for preview element size:', el.offsetWidth, 'x', el.offsetHeight, el.getBoundingClientRect());
 
     setPdfLoading(true);
     try {
