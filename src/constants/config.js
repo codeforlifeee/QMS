@@ -1,8 +1,8 @@
 // Google Sheets Configuration
 export const SHEETS_CONFIG = {
-  SHEET_ID: import.meta.env.VITE_SHEET_ID || '1gEu2lwx835VciZOGC6DZNTpbWkvp9EYM', // Set in .env.local
+  SHEET_ID: import.meta.env.VITE_SHEET_ID || '1gEu2lwx835VciZOGC6DZNTpbWkvp9EYM', // Your Google Sheets document ID
   API_KEY: import.meta.env.VITE_GOOGLE_SHEETS_API_KEY || '', // Set in .env.local
-  COST_SHEET_RANGE: 'Rayna_cost!A1:G1000', // Specify exact range instead of full columns
+  COST_SHEET_RANGE: 'Rayna_cost!A1:G1000', // Adjust sheet name and range as needed
 };
 
 // App Settings

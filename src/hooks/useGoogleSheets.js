@@ -24,8 +24,12 @@ export const useGoogleSheets = () => {
       const cached = localStorage.getItem('tourDataCache');
       if (cached) {
         const parsed = JSON.parse(cached);
+        // If cache contains a timestamp, use it to determine validity
+        if (parsed && parsed._lastFetch) {
+          setLastFetch(parsed._lastFetch);
+        }
         if (isCacheValid()) {
-          return parsed;
+          return parsed.data || parsed;
         }
       }
     } catch (err) {
@@ -37,11 +41,41 @@ export const useGoogleSheets = () => {
   // Save data to localStorage cache
   const cacheData = (dataToCache) => {
     try {
-      localStorage.setItem('tourDataCache', JSON.stringify(dataToCache));
-      setLastFetch(Date.now());
+      const cachedObj = { data: dataToCache, _lastFetch: Date.now() };
+      localStorage.setItem('tourDataCache', JSON.stringify(cachedObj));
+      setLastFetch(cachedObj._lastFetch);
     } catch (err) {
       console.warn('Error caching data:', err);
     }
+  };
+
+  // Sample data fallback when Google Sheets API fails
+  const getSampleData = () => {
+    return {
+      locations: ['Dubai', 'Abu Dhabi', 'Paris'],
+      categories: {
+        'Dubai': ['Activities', 'Tours', 'Attractions'],
+        'Abu Dhabi': ['Activities', 'Tours'],
+        'Paris': ['Activities', 'Tours', 'Attractions']
+      },
+      tours: {
+        'Dubai|Activities': ['Desert Safari', 'Dhow Cruise', 'City Tour'],
+        'Dubai|Tours': ['Full Day Tour', 'Half Day Tour'],
+        'Dubai|Attractions': ['Burj Khalifa', 'Dubai Mall', 'Dubai Fountain'],
+        'Abu Dhabi|Activities': ['Louvre Tour', 'Sheikh Zayed Mosque'],
+        'Abu Dhabi|Tours': ['City Tour', 'Desert Safari'],
+        'Paris|Activities': ['Eiffel Tower', 'Seine Cruise'],
+        'Paris|Tours': ['City Tour', 'Versailles'],
+        'Paris|Attractions': ['Louvre', 'Arc de Triomphe']
+      },
+      products: [
+        { location: 'Dubai', category: 'Activities', tour: 'Desert Safari', product: 'Standard', transfer: 'With Transfer', costAED: 250, costUSD: 68, markup: 255 },
+        { location: 'Dubai', category: 'Activities', tour: 'Dhow Cruise', product: 'Marina', transfer: 'With Transfer', costAED: 180, costUSD: 49, markup: 185 },
+        { location: 'Dubai', category: 'Attractions', tour: 'Burj Khalifa', product: '124th Floor', transfer: 'Without Transfer', costAED: 149, costUSD: 40, markup: 154 },
+        { location: 'Abu Dhabi', category: 'Activities', tour: 'Louvre Tour', product: 'Standard', transfer: 'With Transfer', costAED: 200, costUSD: 54, markup: 205 },
+        { location: 'Paris', category: 'Activities', tour: 'Eiffel Tower', product: 'Summit', transfer: 'Without Transfer', costAED: 300, costUSD: 81, markup: 305 }
+      ]
+    };
   };
 
   // Transform raw Google Sheets data to structured format
@@ -112,6 +146,8 @@ export const useGoogleSheets = () => {
   // Fetch data from Google Sheets
   const fetchFromGoogleSheets = async () => {
     try {
+      // Ensure loading indicator is correctly set when a manual fetch starts
+      setLoading(true);
       if (!SHEETS_CONFIG.API_KEY) {
         throw new Error(
           'Google Sheets API Key not configured. Please set VITE_GOOGLE_SHEETS_API_KEY in .env.local'
@@ -133,7 +169,19 @@ export const useGoogleSheets = () => {
         range: SHEETS_CONFIG.COST_SHEET_RANGE,
       });
 
-      let response = await fetch(url);
+      // Add a short timeout for the sheet fetch so the loader doesn't hang indefinitely
+      const controller = new AbortController();
+      const timeoutMs = 12000; // 12 seconds
+      const timeout = setTimeout(() => {
+        controller.abort();
+      }, timeoutMs);
+
+      let response;
+      try {
+        response = await fetch(url, { signal: controller.signal });
+      } finally {
+        clearTimeout(timeout);
+      }
       
       // If 400 error, the issue is likely API key restriction or sheet access
       if (response.status === 400) {
@@ -184,6 +232,12 @@ export const useGoogleSheets = () => {
       cacheData(structuredData);
       setError(null);
       
+      console.log('Google Sheets: Data fetched, setting structured state with', {
+        locations: structuredData.locations.length,
+        categories: Object.keys(structuredData.categories).length,
+        tours: Object.keys(structuredData.tours).length,
+        products: structuredData.products.length,
+      });
       return structuredData;
     } catch (err) {
       console.error('Google Sheets fetch error:', err);
@@ -199,7 +253,11 @@ export const useGoogleSheets = () => {
         setData(cachedData);
         setError(`Using cached data. Error: ${err.message}`);
       } else {
-        setError(`Cannot fetch data: ${err.message}. Using sample data.`);
+        // Provide helpful error message with fix instructions
+        const errorMsg = err.message.includes('restricted') || err.message.includes('Bad request')
+          ? `⚠️ API Key Restricted - Using sample data. TO FIX: Go to https://console.cloud.google.com/apis/credentials → Click your API key → Under "API restrictions" select "Don't restrict key" → Save → Refresh this page. See FIX_GOOGLE_SHEETS_API.md for detailed instructions.`
+          : `Cannot fetch data: ${err.message}. Using sample data.`;
+        setError(errorMsg);
         // Set sample data for development
         setSampleData();
       }
@@ -268,6 +326,7 @@ export const useGoogleSheets = () => {
       // Use cache if available
       setData(cachedData);
       setLoading(false);
+      console.debug('useGoogleSheets: using cached data, locations:', cachedData.locations?.length || (cachedData.data && cachedData.data.locations?.length));
       // Still try to refresh in background
       fetchFromGoogleSheets();
     } else {

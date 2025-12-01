@@ -1,8 +1,10 @@
 import React, { useRef } from 'react';
 import { formatCurrency, formatDate, formatDuration } from '../../utils/calculations';
 import { COMPANY_INFO, PAYMENT_POLICY } from '../../constants/config';
-import { Download, Share2, Copy } from 'lucide-react';
+import { Download, Share2, Copy, Eye, Edit } from 'lucide-react';
+import { previewPDF, downloadPDF } from '../../utils/pdfGenerator';
 import { Button } from '../ui/index.jsx';
+import { PDFEditorModal } from './PDFEditorModal';
 
 export const QuotationPreview = React.forwardRef(
   (
@@ -14,6 +16,9 @@ export const QuotationPreview = React.forwardRef(
     },
     ref
   ) => {
+      const [previewLoading, setPreviewLoading] = React.useState(false);
+      const [showPDFEditor, setShowPDFEditor] = React.useState(false);
+      const [pdfDownloading, setPdfDownloading] = React.useState(false);
     const totalPax = quotation.totalAdults + quotation.totalChildren;
 
     const renderPriceRow = (label, amount, isBold = false) => (
@@ -28,7 +33,7 @@ export const QuotationPreview = React.forwardRef(
     );
 
       return (
-        <div ref={ref} className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full" id="quotation-preview">
+        <div ref={ref} className="bg-white rounded-xl shadow-lg overflow-hidden" id="quotation-preview">
         {/* Header with Actions */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 flex justify-between items-center">
           <div>
@@ -39,6 +44,17 @@ export const QuotationPreview = React.forwardRef(
           </div>
           <div className="flex gap-2">
             <Button
+              onClick={() => setShowPDFEditor(true)}
+              icon={Edit}
+              size="sm"
+              variant="primary"
+              className="bg-white text-blue-600 hover:bg-blue-50"
+              disabled={!quotation.guestName || quotation.selectedActivities.length === 0}
+              title={!quotation.guestName ? 'Enter guest name to enable PDF' : quotation.selectedActivities.length === 0 ? 'Add at least one activity to enable PDF' : 'Edit & Download PDF'}
+            >
+              Edit PDF
+            </Button>
+            <Button
               onClick={onDownloadPDF}
               icon={Download}
               size="sm"
@@ -46,9 +62,30 @@ export const QuotationPreview = React.forwardRef(
               loading={loading}
               className="bg-white text-blue-600 hover:bg-blue-50"
               disabled={!quotation.guestName || quotation.selectedActivities.length === 0}
-              title={!quotation.guestName ? 'Enter guest name to enable PDF' : quotation.selectedActivities.length === 0 ? 'Add at least one activity to enable PDF' : 'Download PDF'}
+              title="Quick Download PDF (default settings)"
             >
-              PDF
+              Quick PDF
+            </Button>
+            <Button
+              onClick={async () => {
+                const el = ref && ref.current ? ref.current : null;
+                if (!el) return;
+                setPreviewLoading(true);
+                try {
+                  await previewPDF(el);
+                } catch (err) {
+                  console.error('Preview failed', err);
+                } finally {
+                  setPreviewLoading(false);
+                }
+              }}
+              icon={Eye}
+              size="sm"
+              variant="outline"
+              className="bg-white text-blue-600 hover:bg-blue-50"
+              disabled={!quotation.guestName || quotation.selectedActivities.length === 0 || previewLoading}
+            >
+              {previewLoading ? 'Preparing...' : 'Preview'}
             </Button>
             <Button
               onClick={onShareWhatsApp}
@@ -64,7 +101,7 @@ export const QuotationPreview = React.forwardRef(
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="p-6 space-y-6">
           {/* Guest Header */}
           <div className="border-b-2 pb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -289,6 +326,25 @@ export const QuotationPreview = React.forwardRef(
             </p>
           </div>
         </div>
+
+        {/* PDF Editor Modal */}
+        <PDFEditorModal
+          isOpen={showPDFEditor}
+          onClose={() => setShowPDFEditor(false)}
+          element={ref?.current}
+          filename={`${quotation.guestName?.replace(/\s+/g, '_') || 'quotation'}_${new Date().toISOString().split('T')[0]}.pdf`}
+          onDownload={async (element, filename, config) => {
+            setPdfDownloading(true);
+            try {
+              await downloadPDF(element, filename, config);
+            } catch (error) {
+              console.error('PDF download failed:', error);
+              alert('Failed to download PDF. Please try again.');
+            } finally {
+              setPdfDownloading(false);
+            }
+          }}
+        />
       </div>
     );
   }

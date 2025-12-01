@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Plus, Trash2, Edit2 } from 'lucide-react';
+import { Download, Plus, Trash2, Edit2, Edit } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { downloadPDF } from '../../utils/pdfGenerator';
+import { downloadPDFWithRetry, downloadPDF, previewPDF, PDF_BLOB_SMALL_THRESHOLD_BYTES } from '../../utils/pdfGenerator';
+import { PDFEditorModal } from './PDFEditorModal';
 
 const EditableQuotationTemplate = () => {
   const printRef = useRef(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [showPanel, setShowPanel] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [showPDFEditor, setShowPDFEditor] = useState(false);
+  const [pdfDownloading, setPdfDownloading] = useState(false);
 
   const [data, setData] = useState({
     pageTitle: 'Central European Splendours — Summer 2026',
@@ -96,8 +100,18 @@ const EditableQuotationTemplate = () => {
     setPdfLoading(true);
     try {
       const element = printRef.current;
-      await downloadPDF(element, `${data.pageTitle || data.packageTitle}.pdf`);
-      toast.success('PDF downloaded successfully!');
+      const blob = await downloadPDFWithRetry(element, `${data.pageTitle || data.packageTitle}.pdf`);
+      if (blob && blob.size && blob.size < PDF_BLOB_SMALL_THRESHOLD_BYTES) {
+        toast.warning('Generated PDF looks suspiciously small; opening preview for inspection.');
+        try {
+          await previewPDF(element);
+        } catch (previewErr) {
+          console.error('Auto-preview failed', previewErr);
+          toast.error('Preview failed; check console for details');
+        }
+      } else {
+        toast.success('PDF downloaded successfully!');
+      }
     } catch (error) {
       toast.error('Failed to download PDF');
     } finally {
@@ -204,10 +218,11 @@ const EditableQuotationTemplate = () => {
   };
 
   return (
-    <div className="flex gap-6 bg-gray-100 min-h-screen p-6">
+    <div className="bg-gray-100 min-h-screen">
+      <div className="flex gap-6 p-6">
       {/* Side Panel */}
       {showPanel && (
-        <div className="w-96 bg-white rounded-lg shadow-lg p-6 overflow-y-auto max-h-screen">
+        <div className="w-96 bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Edit Content</h2>
 
           {/* Basic Info */}
@@ -411,11 +426,35 @@ const EditableQuotationTemplate = () => {
         {/* Controls */}
         <div className="mb-6 flex gap-3">
           <button
+            onClick={() => setShowPDFEditor(true)}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 flex items-center gap-2 shadow-md"
+          >
+            <Edit size={20} /> Edit & Download PDF
+          </button>
+          <button
             onClick={handleDownloadPDF}
             disabled={pdfLoading}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
+            className="bg-white border-2 border-blue-600 text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-50 flex items-center gap-2 disabled:opacity-50"
           >
-            <Download size={20} /> {pdfLoading ? 'Downloading...' : 'Download PDF'}
+            <Download size={20} /> {pdfLoading ? 'Downloading...' : 'Quick Download'}
+          </button>
+          <button
+            onClick={async () => {
+              if (!printRef.current) return toast.error('Preview not ready');
+              setPreviewLoading(true);
+              try {
+                await previewPDF(printRef.current);
+              } catch (err) {
+                console.error('Preview failed', err);
+                toast.error('Failed to generate preview');
+              } finally {
+                setPreviewLoading(false);
+              }
+            }}
+            disabled={previewLoading}
+            className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50"
+          >
+            {previewLoading ? 'Preparing...' : 'Preview PDF'}
           </button>
           <button
             onClick={() => setShowPanel(!showPanel)}
@@ -704,6 +743,27 @@ const EditableQuotationTemplate = () => {
           </footer>
         </div>
       </div>
+      </div>
+
+      {/* PDF Editor Modal */}
+      <PDFEditorModal
+        isOpen={showPDFEditor}
+        onClose={() => setShowPDFEditor(false)}
+        element={printRef?.current}
+        filename={`${data.pageTitle?.replace(/\s+/g, '_') || data.packageTitle?.replace(/\s+/g, '_') || 'package'}_${new Date().toISOString().split('T')[0]}.pdf`}
+        onDownload={async (element, filename, config) => {
+          setPdfDownloading(true);
+          try {
+            await downloadPDF(element, filename, config);
+            toast.success('PDF downloaded successfully!');
+          } catch (error) {
+            console.error('PDF download failed:', error);
+            toast.error('Failed to download PDF. Please try again.');
+          } finally {
+            setPdfDownloading(false);
+          }
+        }}
+      />
     </div>
   );
 };

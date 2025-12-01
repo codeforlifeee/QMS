@@ -1,4 +1,8 @@
 import html2pdf from 'html2pdf.js';
+import { saveAs } from 'file-saver';
+
+// Threshold in bytes under which a generated PDF blob may be suspiciously small (blank)
+export const PDF_BLOB_SMALL_THRESHOLD_BYTES = 2048;
 
 /**
  * PDF Configuration for html2pdf
@@ -8,32 +12,39 @@ export const getPDFConfig = (filename = 'quotation.pdf', overrides = {}) => {
     return name.replace(/[:\\/*"?|<>]/g, '_');
   };
   const baseConfig = {
-    margin: [12, 12, 12, 12], // top, left, bottom, right (in mm)
+    margin: [8, 10, 8, 10], // Reduced margins: top, left, bottom, right (in mm)
     filename: sanitizeFilename(filename),
     image: {
       type: 'jpeg',
-      quality: 0.95,
+      quality: 0.98, // Increased quality
     },
     html2canvas: {
-      scale: 2,
+      scale: 2.5, // Increased scale for better quality
       useCORS: true,
       allowTaint: true,
       logging: false,
       letterRendering: true,
       backgroundColor: '#ffffff',
       removeContainer: false,
+      scrollY: 0,
+      scrollX: 0,
+      windowWidth: document.body.scrollWidth,
+      windowHeight: document.body.scrollHeight,
     },
     jsPDF: {
-      unit: 'mm',
+      unit: 'pt',
       format: 'a4',
       orientation: 'portrait',
       compress: true,
+      compressPdf: true, // Additional compression
+      hotfixes: ['px_scaling'],
+      enableLinks: true, // Enable clickable links in PDF
     },
     pagebreak: {
       mode: ['avoid-all', 'css', 'legacy'],
       before: '.page-break',
       after: '.section-break',
-      avoid: '.keep-together',
+      avoid: '.keep-together, .pdf-day-item',
     },
   };
   // Deep merge with overrides (shallow merge for nested objects as a simple approach)
@@ -87,11 +98,83 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
     } catch (e) {}
     const elementClone = element.cloneNode(true);
 
+    // Extract all links before processing to preserve them
+    const links = [];
+    const allLinks = elementClone.querySelectorAll('a[href]');
+    allLinks.forEach((link, index) => {
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && !href.startsWith('javascript:')) {
+        // Store link information
+        links.push({
+          href: href,
+          text: link.textContent || link.innerText,
+          element: link,
+          id: `pdf-link-${index}`
+        });
+        // Add a data attribute to identify this link later
+        link.setAttribute('data-pdf-link-id', `pdf-link-${index}`);
+        // Ensure link styling is visible
+        link.style.color = '#0066cc';
+        link.style.textDecoration = 'underline';
+      }
+    });
+    console.debug(`[pdfGenerator] Found ${links.length} links to preserve`);
+    
     // Remove elements that shouldn't appear in PDF
     const elementsToRemove = elementClone.querySelectorAll(
       '.no-print, .controls, .edit-button, .delete-button'
     );
     elementsToRemove.forEach((el) => el.remove());
+
+    // Apply compact spacing for PDF
+    const applyCompactSpacing = (clone) => {
+      try {
+        // Reduce section margins
+        const sections = clone.querySelectorAll('.pdf-section, section');
+        sections.forEach((section) => {
+          section.style.marginBottom = '8px';
+          section.style.marginTop = '0';
+        });
+
+        // Reduce padding in content boxes
+        const contentBoxes = clone.querySelectorAll('[style*="padding"]');
+        contentBoxes.forEach((box) => {
+          const currentPadding = box.style.padding;
+          if (currentPadding && currentPadding.includes('px')) {
+            const paddingValue = parseInt(currentPadding);
+            if (paddingValue > 10) {
+              box.style.padding = `${Math.max(8, paddingValue - 4)}px`;
+            }
+          }
+        });
+
+        // Reduce day item spacing
+        const dayItems = clone.querySelectorAll('.pdf-day-item');
+        dayItems.forEach((item) => {
+          item.style.marginBottom = '6px';
+          item.style.padding = '10px';
+        });
+
+        // Optimize line heights
+        const textElements = clone.querySelectorAll('p, li, div');
+        textElements.forEach((el) => {
+          if (!el.style.lineHeight || parseFloat(el.style.lineHeight) > 1.6) {
+            el.style.lineHeight = '1.5';
+          }
+        });
+      } catch (e) {
+        console.warn('[pdfGenerator] Compact spacing application failed:', e);
+      }
+    };
+
+    applyCompactSpacing(elementClone);
+
+    // Force fixed width BEFORE measuring to avoid viewport-dependent sizing
+    const FIXED_CONTENT_WIDTH = 800; // px - fits A4 nicely
+    elementClone.style.width = `${FIXED_CONTENT_WIDTH}px`;
+    elementClone.style.maxWidth = `${FIXED_CONTENT_WIDTH}px`;
+    elementClone.style.minWidth = `${FIXED_CONTENT_WIDTH}px`;
+    elementClone.style.boxSizing = 'border-box';
 
     // Ensure all images are fully loaded before PDF generation
     const images = elementClone.querySelectorAll('img');
@@ -139,6 +222,8 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
 
     // Create PDF
     // Make sure the cloned element is attached to the DOM and not visible
+    // `finalBlob` must be declared in this (outer) try scope so it's available after recovery/finally
+    let finalBlob = null;
     try {
       console.debug('[pdfGenerator] Preparing PDF for:', filename);
       console.debug('[pdfGenerator] Element width:', element.offsetWidth, 'height:', element.offsetHeight);
@@ -152,10 +237,7 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
         elementClone.style.background = '#ffffff';
         elementClone.style.boxSizing = 'border-box';
         elementClone.style.pointerEvents = 'none';
-      // preserve width so canvas sizing behaves as expected
-      const originalStyle = window.getComputedStyle(element);
-      const width = originalStyle.width || `${element.offsetWidth}px`;
-      elementClone.style.width = width;
+      // Width already set above to FIXED_CONTENT_WIDTH - don't override
       // Force minHeight & height so the clone layout isn't collapsed
       try {
         const height = element.offsetHeight || element.getBoundingClientRect().height || 0;
@@ -212,14 +294,30 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
       // Make sure any scrollable/overflow content expands in the clone so html2canvas captures it all
       try {
         elementClone.style.overflow = 'visible';
+        elementClone.style.height = 'auto';
+        elementClone.style.maxHeight = 'none';
+        elementClone.style.minHeight = 'auto';
         Array.from(elementClone.querySelectorAll('*')).forEach((el) => {
           const style = window.getComputedStyle(el);
           if (style.overflow && style.overflow !== 'visible') {
             el.style.overflow = 'visible';
           }
-          if ((style.maxHeight && style.maxHeight !== 'none') || (style.height && style.height.endsWith('px') && Number(style.height.replace('px', '')) > 0 && style.overflow === 'auto')) {
+          if (style.overflowY && style.overflowY !== 'visible') {
+            el.style.overflowY = 'visible';
+          }
+          if (style.overflowX && style.overflowX !== 'visible') {
+            el.style.overflowX = 'visible';
+          }
+          if ((style.maxHeight && style.maxHeight !== 'none')) {
             el.style.maxHeight = 'none';
+          }
+          if (style.height === 'auto' || style.height.endsWith('%')) {
             el.style.height = 'auto';
+          }
+          // Expand flex containers
+          if (style.display === 'flex' && (style.height || style.maxHeight)) {
+            el.style.height = 'auto';
+            el.style.maxHeight = 'none';
           }
         });
       } catch (e) {}
@@ -252,13 +350,22 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
       });
 
       const config = getPDFConfig(filename, overrides);
-      // Lock html2canvas window size to the element's width to prevent rendering mismatch
+      // Configure html2canvas to capture the fixed-width clone
       try {
-        const elWidth = Math.round(elementClone.getBoundingClientRect().width || elementClone.offsetWidth || element.offsetWidth);
+        const fullHeight = Math.max(elementClone.scrollHeight || 0, elementClone.offsetHeight || 0);
+        if (fullHeight > 0) {
+          elementClone.style.height = `${fullHeight}px`;
+          elementClone.style.minHeight = `${fullHeight}px`;
+        }
         config.html2canvas = config.html2canvas || {};
-        config.html2canvas.windowWidth = Math.max(window.innerWidth, elWidth);
-        config.html2canvas.width = elWidth;
-      } catch (e) {}
+        config.html2canvas.windowWidth = FIXED_CONTENT_WIDTH;
+        config.html2canvas.width = FIXED_CONTENT_WIDTH;
+        config.html2canvas.windowHeight = fullHeight;
+        config.html2canvas.height = fullHeight;
+        config.html2canvas.scale = overrides?.html2canvas?.scale || 2;
+      } catch (e) {
+        console.debug('[pdfGenerator] config setup skipped:', e);
+      }
       console.debug('[pdfGenerator] Using config:', config);
         // ensure custom fonts load - improves canvas rendering quality
         try {
@@ -274,20 +381,78 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
         console.debug('[pdfGenerator.debug] clone computed style after paint display/visibility/opacity:', computed.display, computed.visibility, computed.opacity);
       } catch (e) {}
       logElementDebug(elementClone, 'after-paint');
+      
+      // Use html2pdf with jsPDF's html method for better link preservation
+      let blob;
       try {
-        const blob = await html2pdf().set(config).from(elementClone).output('blob');
+        const worker = html2pdf().set(config).from(elementClone);
+        
+        // Get the jsPDF instance to add links manually after rendering
+        const pdf = await worker.toPdf().get('pdf');
+        
+        // Extract link positions and add them to PDF
+        if (links.length > 0 && pdf) {
+          try {
+            // Add clickable links to the PDF
+            links.forEach((linkInfo) => {
+              const linkElement = elementClone.querySelector(`[data-pdf-link-id="${linkInfo.id}"]`);
+              if (linkElement) {
+                const rect = linkElement.getBoundingClientRect();
+                const cloneRect = elementClone.getBoundingClientRect();
+                
+                // Calculate relative position within the PDF page
+                // Convert pixel coordinates to PDF points (pt)
+                const pdfPageWidth = pdf.internal.pageSize.getWidth();
+                const pdfPageHeight = pdf.internal.pageSize.getHeight();
+                const scale = pdfPageWidth / FIXED_CONTENT_WIDTH;
+                
+                const x = (rect.left - cloneRect.left) * scale;
+                const y = (rect.top - cloneRect.top) * scale;
+                const width = rect.width * scale;
+                const height = rect.height * scale;
+                
+                // Add link annotation to PDF
+                try {
+                  pdf.link(x, y, width, height, { url: linkInfo.href });
+                  console.debug(`[pdfGenerator] Added clickable link: ${linkInfo.href}`);
+                } catch (linkErr) {
+                  console.warn(`[pdfGenerator] Failed to add link ${linkInfo.href}:`, linkErr);
+                }
+              }
+            });
+          } catch (linkProcessErr) {
+            console.warn('[pdfGenerator] Link processing failed:', linkProcessErr);
+          }
+        }
+        
+        blob = await worker.output('blob');
+        if (!blob) {
+          throw new Error('html2pdf returned empty blob');
+        }
+        console.debug(`[pdfGenerator] generated blob size: ${blob.size} bytes with ${links.length} clickable links`);
+        if (blob.size < PDF_BLOB_SMALL_THRESHOLD_BYTES) {
+          console.warn('[pdfGenerator] generated PDF blob is small:', blob.size, 'bytes - may be blank');
+        }
+        finalBlob = blob;
         try {
-          console.debug('[pdfGenerator] generated blob size:', blob.size);
-          if (blob.size && blob.size < 2048) console.warn('[pdfGenerator] generated PDF blob looks too small; it may be blank');
-        } catch (e) {}
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename || 'download.pdf';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
+          saveAs(finalBlob, filename || 'download.pdf');
+        } catch (saveErr) {
+          console.warn('[pdfGenerator] saveAs fallback triggered:', saveErr);
+          const url = URL.createObjectURL(finalBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename || 'download.pdf';
+          document.body.appendChild(a);
+          a.click();
+          requestAnimationFrame(() => {
+            try {
+              a.remove();
+              URL.revokeObjectURL(url);
+            } catch (cleanupErr) {
+              console.debug('[pdfGenerator] anchor cleanup failed (ignored):', cleanupErr);
+            }
+          });
+        }
       } catch (err) {
         console.error('[pdfGenerator] html2pdf.save error:', err);
         // Attempt to provide additional diagnostic info
@@ -296,14 +461,31 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
         // Fallback: try to create a blob and download manually
         try {
           const fallbackBlob = await html2pdf().set(config).from(elementClone).output('blob');
-          const url = URL.createObjectURL(fallbackBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = filename || 'download.pdf';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          URL.revokeObjectURL(url);
+          if (!fallbackBlob) throw new Error('Fallback html2pdf returned empty blob');
+          console.debug('[pdfGenerator] fallback blob size:', fallbackBlob.size);
+          if (fallbackBlob.size < PDF_BLOB_SMALL_THRESHOLD_BYTES) {
+            console.warn('[pdfGenerator] fallback blob is small:', fallbackBlob.size, 'bytes - attempting download anyway');
+          }
+          try {
+            saveAs(fallbackBlob, filename || 'download.pdf');
+          } catch (fallbackSaveErr) {
+            console.warn('[pdfGenerator] fallback saveAs failed, using anchor download:', fallbackSaveErr);
+            const url = URL.createObjectURL(fallbackBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || 'download.pdf';
+            document.body.appendChild(a);
+            a.click();
+            requestAnimationFrame(() => {
+              try {
+                a.remove();
+                URL.revokeObjectURL(url);
+              } catch (cleanupErr) {
+                console.debug('[pdfGenerator] anchor cleanup failed (ignored):', cleanupErr);
+              }
+            });
+          }
+          finalBlob = fallbackBlob;
           console.debug('[pdfGenerator] fallback blob download success');
         } catch (fallbackErr) {
           console.error('[pdfGenerator] fallback blob download failed:', fallbackErr);
@@ -318,7 +500,10 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
           throw err; // throw original error since fallback didn't help
         }
       }
-      console.debug('[pdfGenerator] PDF saved successfully');
+      console.debug('[pdfGenerator] PDF saved successfully (size: ' + (finalBlob && finalBlob.size) + ')');
+      if (!finalBlob) {
+        throw new Error('PDF generation completed but produced no blob. This is likely a silent failure from html2pdf.');
+      }
     } finally {
       // remove the temporary clone to avoid affecting layout
       try {
@@ -330,10 +515,108 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
       }
     }
 
-    return true;
+    return finalBlob;
   } catch (error) {
     console.error('PDF Generation Error:', error);
     throw new Error(`PDF generation failed: ${error.message}`);
+  }
+};
+
+// ---------- Server-side PDF generation (Puppeteer) ----------
+const PDF_SERVER_URL = (typeof window !== 'undefined' && (window.PDF_SERVER_URL || import.meta.env.VITE_PDF_SERVER_URL)) || 'http://localhost:4000';
+
+const fetchAllCssText = async () => {
+  const styles = [];
+  // Inline <style> tags
+  Array.from(document.querySelectorAll('style')).forEach((s) => {
+    if (s.textContent && s.textContent.trim()) styles.push(s.textContent);
+  });
+  // External stylesheets
+  const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+  const externalCss = await Promise.all(
+    links.map(async (link) => {
+      try {
+        const href = link.href;
+        if (!href) return '';
+        const resp = await fetch(href);
+        if (!resp.ok) return '';
+        return await resp.text();
+      } catch (err) {
+        console.warn('[pdfGenerator.server] failed to fetch stylesheet', link.href, err);
+        return '';
+      }
+    })
+  );
+  styles.push(...externalCss.filter(Boolean));
+  return styles.join('\n');
+};
+
+const buildHtmlWrapper = async (element) => {
+  const clone = element.cloneNode(true);
+  // Remove interactive elements
+  const elementsToRemove = clone.querySelectorAll('.no-print, .controls, .edit-button, .delete-button');
+  elementsToRemove.forEach((el) => el.remove());
+
+  // Fix images that are local paths
+  Array.from(clone.querySelectorAll('img')).forEach((img) => {
+    try {
+      const src = img.getAttribute('src') || '';
+      const isExternal = src.startsWith('http') || src.startsWith('https') || src.startsWith('data:') || src.startsWith('//');
+      if (src && !isExternal) {
+        // Make absolute using current origin
+        const base = window.location.origin;
+        img.src = new URL(src, base).href;
+      }
+    } catch (e) {}
+  });
+
+  const cssText = await fetchAllCssText();
+  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>${cssText}</style></head><body>${clone.outerHTML}</body></html>`;
+  return html;
+};
+
+export const downloadPDFViaServer = async (element, filename = 'quotation.pdf', overrides = {}) => {
+  try {
+    if (!element) throw new Error('Element not provided');
+    const html = await buildHtmlWrapper(element);
+    const resp = await fetch(`${PDF_SERVER_URL}/api/render-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ html, filename, options: {} }),
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => null);
+      throw new Error(err?.error || `Server responded with ${resp.status}`);
+    }
+    const buffer = await resp.arrayBuffer();
+    const blob = new Blob([buffer], { type: 'application/pdf' });
+    // Validate size
+    if (blob.size && blob.size < PDF_BLOB_SMALL_THRESHOLD_BYTES) {
+      throw new Error(`Server returned a PDF but it is unexpectedly small (${blob.size})`);
+    }
+    try {
+      saveAs(blob, filename || 'download.pdf');
+    } catch (saveErr) {
+      console.warn('[pdfGenerator.server] saveAs failed, falling back to anchor download:', saveErr);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename || 'download.pdf';
+      document.body.appendChild(a);
+      a.click();
+      requestAnimationFrame(() => {
+        try {
+          a.remove();
+          URL.revokeObjectURL(url);
+        } catch (cleanupErr) {
+          console.debug('[pdfGenerator.server] anchor cleanup failed (ignored):', cleanupErr);
+        }
+      });
+    }
+    return blob;
+  } catch (error) {
+    console.error('[pdfGenerator.server] download error:', error);
+    throw error;
   }
 };
 
@@ -349,10 +632,37 @@ export const previewPDF = async (element) => {
     }
 
     const elementClone = element.cloneNode(true);
+    
+    // Extract all links before processing to preserve them
+    const links = [];
+    const allLinks = elementClone.querySelectorAll('a[href]');
+    allLinks.forEach((link, index) => {
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && !href.startsWith('javascript:')) {
+        links.push({
+          href: href,
+          text: link.textContent || link.innerText,
+          element: link,
+          id: `pdf-preview-link-${index}`
+        });
+        link.setAttribute('data-pdf-link-id', `pdf-preview-link-${index}`);
+        link.style.color = '#0066cc';
+        link.style.textDecoration = 'underline';
+      }
+    });
+    console.debug(`[pdfGenerator.preview] Found ${links.length} links to preserve`);
+    
     const elementsToRemove = elementClone.querySelectorAll(
       '.no-print, .controls, .edit-button, .delete-button'
     );
     elementsToRemove.forEach((el) => el.remove());
+
+    // Force fixed width to avoid viewport-dependent sizing
+    const FIXED_CONTENT_WIDTH = 800;
+    elementClone.style.width = `${FIXED_CONTENT_WIDTH}px`;
+    elementClone.style.maxWidth = `${FIXED_CONTENT_WIDTH}px`;
+    elementClone.style.minWidth = `${FIXED_CONTENT_WIDTH}px`;
+    elementClone.style.boxSizing = 'border-box';
 
     const images = elementClone.querySelectorAll('img');
     const imageLoadPromises = Array.from(images).map((img) => {
@@ -377,7 +687,7 @@ export const previewPDF = async (element) => {
       elementClone.style.top = '0';
       elementClone.style.opacity = '1'; // Keep visible for html2canvas capture
       elementClone.style.pointerEvents = 'none';
-      elementClone.style.width = window.getComputedStyle(element).width || `${element.offsetWidth}px`;
+      // Width already set to FIXED_CONTENT_WIDTH above
       document.body.appendChild(elementClone);
 
       // Diagnostic helper - reuse from above scope if present
@@ -418,12 +728,19 @@ export const previewPDF = async (element) => {
       });
 
       const config = getPDFConfig('preview.pdf');
-      // set html2canvas sizing to better match the element
+      // Configure for fixed-width capture
       try {
-        const elWidth = Math.round(elementClone.getBoundingClientRect().width || elementClone.offsetWidth || element.offsetWidth);
+        const fullHeight = Math.max(elementClone.scrollHeight || 0, elementClone.offsetHeight || 0);
+        if (fullHeight > 0) {
+          elementClone.style.height = `${fullHeight}px`;
+          elementClone.style.minHeight = `${fullHeight}px`;
+        }
         config.html2canvas = config.html2canvas || {};
-        config.html2canvas.windowWidth = Math.max(window.innerWidth, elWidth);
-        config.html2canvas.width = elWidth;
+        config.html2canvas.windowWidth = FIXED_CONTENT_WIDTH;
+        config.html2canvas.width = FIXED_CONTENT_WIDTH;
+        config.html2canvas.windowHeight = fullHeight;
+        config.html2canvas.height = fullHeight;
+        config.html2canvas.scale = 2;
       } catch (e) {}
         try {
           await (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve());
@@ -434,7 +751,35 @@ export const previewPDF = async (element) => {
       logElementDebug(elementClone, 'after-paint');
       let pdfAsString;
       try {
-        pdfAsString = await html2pdf().set(config).from(elementClone).outputPdf('dataurlstring');
+        const worker = html2pdf().set(config).from(elementClone);
+        const pdf = await worker.toPdf().get('pdf');
+        
+        // Add clickable links to preview PDF
+        if (links.length > 0 && pdf) {
+          const FIXED_CONTENT_WIDTH = 800;
+          const pdfPageWidth = pdf.internal.pageSize.getWidth();
+          const scale = pdfPageWidth / FIXED_CONTENT_WIDTH;
+          
+          links.forEach((linkInfo) => {
+            const linkElement = elementClone.querySelector(`[data-pdf-link-id="${linkInfo.id}"]`);
+            if (linkElement) {
+              const rect = linkElement.getBoundingClientRect();
+              const cloneRect = elementClone.getBoundingClientRect();
+              const x = (rect.left - cloneRect.left) * scale;
+              const y = (rect.top - cloneRect.top) * scale;
+              const width = rect.width * scale;
+              const height = rect.height * scale;
+              
+              try {
+                pdf.link(x, y, width, height, { url: linkInfo.href });
+              } catch (linkErr) {
+                console.warn(`[pdfGenerator.preview] Failed to add link: ${linkInfo.href}`, linkErr);
+              }
+            }
+          });
+        }
+        
+        pdfAsString = await worker.outputPdf('dataurlstring');
       } catch (err) {
         console.error('[pdfGenerator.preview] html2pdf outputPdf error:', err);
         logElementDebug(elementClone, 'on-error');
@@ -461,16 +806,44 @@ export const previewPDF = async (element) => {
  * @returns {Promise<Blob>}
  */
 export const getPDFBlob = async (element) => {
+
   try {
     if (!element) {
       throw new Error('Element not found');
     }
 
     const elementClone = element.cloneNode(true);
+    
+    // Extract all links before processing to preserve them
+    const links = [];
+    const allLinks = elementClone.querySelectorAll('a[href]');
+    allLinks.forEach((link, index) => {
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && !href.startsWith('javascript:')) {
+        links.push({
+          href: href,
+          text: link.textContent || link.innerText,
+          element: link,
+          id: `pdf-blob-link-${index}`
+        });
+        link.setAttribute('data-pdf-link-id', `pdf-blob-link-${index}`);
+        link.style.color = '#0066cc';
+        link.style.textDecoration = 'underline';
+      }
+    });
+    console.debug(`[pdfGenerator.getPDFBlob] Found ${links.length} links to preserve`);
+    
     const elementsToRemove = elementClone.querySelectorAll(
       '.no-print, .controls, .edit-button, .delete-button'
     );
     elementsToRemove.forEach((el) => el.remove());
+
+    // Force fixed width to avoid viewport-dependent sizing
+    const FIXED_CONTENT_WIDTH = 800;
+    elementClone.style.width = `${FIXED_CONTENT_WIDTH}px`;
+    elementClone.style.maxWidth = `${FIXED_CONTENT_WIDTH}px`;
+    elementClone.style.minWidth = `${FIXED_CONTENT_WIDTH}px`;
+    elementClone.style.boxSizing = 'border-box';
 
     const images = elementClone.querySelectorAll('img');
     const imageLoadPromises = Array.from(images).map((img) => {
@@ -495,7 +868,7 @@ export const getPDFBlob = async (element) => {
       elementClone.style.top = '0';
       elementClone.style.opacity = '1';
       elementClone.style.pointerEvents = 'none';
-      elementClone.style.width = window.getComputedStyle(element).width || `${element.offsetWidth}px`;
+      // Width already set to FIXED_CONTENT_WIDTH above
       document.body.appendChild(elementClone);
 
       // Diagnostic helper
@@ -521,12 +894,19 @@ export const getPDFBlob = async (element) => {
       });
 
       const config = getPDFConfig('quotation.pdf');
-      // set html2canvas sizing to better match the element
+      // Configure for fixed-width capture
       try {
-        const elWidth = Math.round(elementClone.getBoundingClientRect().width || elementClone.offsetWidth || element.offsetWidth);
+        const fullHeight = Math.max(elementClone.scrollHeight || 0, elementClone.offsetHeight || 0);
+        if (fullHeight > 0) {
+          elementClone.style.height = `${fullHeight}px`;
+          elementClone.style.minHeight = `${fullHeight}px`;
+        }
         config.html2canvas = config.html2canvas || {};
-        config.html2canvas.windowWidth = Math.max(window.innerWidth, elWidth);
-        config.html2canvas.width = elWidth;
+        config.html2canvas.windowWidth = FIXED_CONTENT_WIDTH;
+        config.html2canvas.width = FIXED_CONTENT_WIDTH;
+        config.html2canvas.windowHeight = fullHeight;
+        config.html2canvas.height = fullHeight;
+        config.html2canvas.scale = 2;
       } catch (e) {}
         try {
           await (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve());
@@ -535,19 +915,48 @@ export const getPDFBlob = async (element) => {
       // give the browser a short moment to paint the element before capturing
       await new Promise((resolve) => setTimeout(resolve, 150));
       logElementDebug(elementClone, 'after-paint');
-      let pdf;
+      let pdf = null;
       try {
-        pdf = await html2pdf().set(config).from(elementClone).output('blob');
-        try {
-          console.debug('[pdfGenerator.getPDFBlob] pdf blob size:', pdf.size);
-          if (pdf.size && pdf.size < 2048) {
-            console.warn('[pdfGenerator.getPDFBlob] pdf blob size is unexpectedly small and may be blank');
-          }
-        } catch (e) {}
+        const worker = html2pdf().set(config).from(elementClone);
+        const pdfInstance = await worker.toPdf().get('pdf');
+        
+        // Add clickable links to PDF blob
+        if (links.length > 0 && pdfInstance) {
+          const pdfPageWidth = pdfInstance.internal.pageSize.getWidth();
+          const scale = pdfPageWidth / FIXED_CONTENT_WIDTH;
+          
+          links.forEach((linkInfo) => {
+            const linkElement = elementClone.querySelector(`[data-pdf-link-id="${linkInfo.id}"]`);
+            if (linkElement) {
+              const rect = linkElement.getBoundingClientRect();
+              const cloneRect = elementClone.getBoundingClientRect();
+              const x = (rect.left - cloneRect.left) * scale;
+              const y = (rect.top - cloneRect.top) * scale;
+              const width = rect.width * scale;
+              const height = rect.height * scale;
+              
+              try {
+                pdfInstance.link(x, y, width, height, { url: linkInfo.href });
+              } catch (linkErr) {
+                console.warn(`[pdfGenerator.getPDFBlob] Failed to add link: ${linkInfo.href}`, linkErr);
+              }
+            }
+          });
+        }
+        
+        pdf = await worker.output('blob');
+        if (!pdf) throw new Error('html2pdf returned empty blob');
+        console.debug('[pdfGenerator.getPDFBlob] pdf blob size:', pdf.size);
+        if (pdf.size < PDF_BLOB_SMALL_THRESHOLD_BYTES) {
+          console.warn('[pdfGenerator.getPDFBlob] generated pdf is small:', pdf.size, 'bytes - may be blank');
+        }
       } catch (err) {
         console.error('[pdfGenerator.getPDFBlob] html2pdf.output error:', err);
         logElementDebug(elementClone, 'on-error');
         throw err;
+      }
+      if (!pdf) {
+        throw new Error('Failed to generate PDF blob (empty result from html2pdf)');
       }
       return pdf;
     } finally {
@@ -576,13 +985,42 @@ export const downloadPDFWithRetry = async (
   maxRetries = 3
 ) => {
   let lastError = null;
+  const WANT_SERVER = (() => {
+    if (typeof window !== 'undefined') {
+      if (typeof window.PDF_SERVER_PREFERRED !== 'undefined') return window.PDF_SERVER_PREFERRED === true || window.PDF_SERVER_PREFERRED === '1' || window.PDF_SERVER_PREFERRED === 'true';
+      return import.meta.env.VITE_PDF_SERVER_PREFERRED === 'true';
+    }
+    return false; // Default to client-side
+  })();
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      // Try a normal download first. If it fails, retries will attempt with different html2canvas scale.
-      const overrides = attempt === 1 ? {} : { html2canvas: { scale: attempt === 2 ? 1.2 : 1 } };
-      await downloadPDF(element, filename, overrides);
-      return; // Success
+      // Prefer server-based conversion on first attempt if configured.
+      if (attempt === 1 && WANT_SERVER) {
+        console.debug('[pdfGenerator.retry] Attempting server-side PDF at', (typeof window !== 'undefined' && window.PDF_SERVER_URL) || (import.meta.env.VITE_PDF_SERVER_URL || 'http://localhost:4000'));
+        try {
+          const blob = await downloadPDFViaServer(element, filename);
+          if (blob && blob.size > PDF_BLOB_SMALL_THRESHOLD_BYTES) {
+            return blob;
+          }
+        } catch (serverErr) {
+          console.warn('[pdfGenerator.retry] server PDF attempt failed:', serverErr);
+          // fallthrough to try client-side generation
+        }
+      }
+
+      // Client-side html2pdf attempts
+      const overrides = attempt === 1 ? {} : { html2canvas: { scale: attempt === 2 ? 1.5 : 1 } };
+      const blob = await downloadPDF(element, filename, overrides);
+      if (!blob) {
+        throw new Error('downloadPDF returned no blob. Treating as failure so retry will occur.');
+      }
+      // Only warn about small blobs, don't throw error on last attempt
+      if (blob.size && blob.size < PDF_BLOB_SMALL_THRESHOLD_BYTES && attempt < maxRetries) {
+        console.warn(`downloadPDF returned a small blob (${blob.size} bytes), retrying...`);
+        throw new Error(`downloadPDF returned a blob but it is unexpectedly small (${blob.size} bytes)`);
+      }
+      return blob; // Success
     } catch (error) {
       lastError = error;
       console.warn(`PDF download attempt ${attempt} failed:`, error);

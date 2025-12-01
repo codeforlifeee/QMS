@@ -1,18 +1,33 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { useGoogleSheets } from './hooks/useGoogleSheets';
 import { useQuotation } from './hooks/useQuotation';
-import { downloadPDFWithRetry } from './utils/pdfGenerator';
+import { downloadPDFWithRetry, previewPDF, PDF_BLOB_SMALL_THRESHOLD_BYTES } from './utils/pdfGenerator';
 import QuotationForm from './components/quotation/QuotationForm';
 import ActivitySelector from './components/quotation/ActivitySelector';
 import ItineraryBuilder from './components/quotation/ItineraryBuilder';
-import QuotationPreview from './components/quotation/QuotationPreview';
+import EditableQuotationTemplateNew from './components/quotation/EditableQuotationTemplateNew';
 import { Button, Spinner, Alert } from './components/ui/index.jsx';
 import { RefreshCw, X, Copy } from 'lucide-react';
 
 function App() {
   const previewRef = useRef(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfServerPreferred, setPdfServerPreferred] = useState(() => {
+    try {
+      const stored = localStorage.getItem('pdfServerPreferred');
+      if (stored !== null) return stored === 'true';
+    } catch (e) {}
+    return false; // Default to client-side rendering
+  });
+  const [pdfServerUrl, setPdfServerUrl] = useState(() => {
+    try {
+      return localStorage.getItem('pdfServerUrl') || import.meta.env.VITE_PDF_SERVER_URL || 'http://localhost:4000';
+    } catch (e) {
+      return import.meta.env.VITE_PDF_SERVER_URL || 'http://localhost:4000';
+    }
+  });
+  const [serverChecking, setServerChecking] = useState(false);
 
   // Google Sheets Data
   const { data: tourData, loading: sheetsLoading, error: sheetsError, refetch: refetchSheets } = useGoogleSheets();
@@ -36,7 +51,38 @@ function App() {
 
   const totalPax = quotation.totalAdults + quotation.totalChildren;
 
-  // Handle Download PDF
+  useEffect(() => {
+    try {
+      window.PDF_SERVER_PREFERRED = pdfServerPreferred;
+      localStorage.setItem('pdfServerPreferred', pdfServerPreferred);
+    } catch (e) {}
+  }, [pdfServerPreferred]);
+
+  useEffect(() => {
+    try {
+      window.PDF_SERVER_URL = pdfServerUrl;
+      localStorage.setItem('pdfServerUrl', pdfServerUrl);
+    } catch (e) {}
+  }, [pdfServerUrl]);
+
+  const testPdfServer = async () => {
+    setServerChecking(true);
+    try {
+      const url = `${pdfServerUrl.replace(/\/$/, '')}/health`;
+      const resp = await fetch(url, { method: 'GET' });
+      if (resp.ok) {
+        toast.success('PDF server is online');
+      } else {
+        toast.error(`PDF server responded with ${resp.status}`);
+      }
+    } catch (err) {
+      toast.error(`Failed to reach PDF server: ${err.message}`);
+    } finally {
+      setServerChecking(false);
+    }
+  };
+
+  // Handle Download PDF - Enhanced for exact preview match
   const handleDownloadPDF = async () => {
     if (!previewRef.current) {
       toast.error('Preview not ready. Please try again.');
@@ -49,16 +95,66 @@ function App() {
       toast.error('Preview is not visible. Scroll to preview or resize window and try again.');
       return;
     }
-    console.debug('[App] Generating PDF for preview element size:', el.offsetWidth, 'x', el.offsetHeight, el.getBoundingClientRect());
+    console.log('[App] Starting PDF generation for element:', {
+      width: el.offsetWidth,
+      height: el.offsetHeight,
+      scrollHeight: el.scrollHeight,
+      boundingRect: el.getBoundingClientRect()
+    });
 
     setPdfLoading(true);
     try {
-      const filename = `Quotation_${quotation.guestName || 'Quotation'}_${new Date().toISOString().split('T')[0]}.pdf`;
-      await downloadPDFWithRetry(previewRef.current, filename);
-      toast.success('PDF downloaded successfully!');
+      const guestName = quotation?.guestName || 'Guest';
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `${guestName.replace(/[^a-z0-9]/gi, '_')}_Quotation_${timestamp}.pdf`;
+      
+      // Set PDF server preference in window object for the utility to use
+      window.PDF_SERVER_PREFERRED = pdfServerPreferred;
+      window.PDF_SERVER_URL = pdfServerUrl;
+      
+      console.log('[App] Attempting PDF generation with:', { filename, serverPreferred: pdfServerPreferred, serverUrl: pdfServerUrl });
+      
+      const blob = await downloadPDFWithRetry(previewRef.current, filename);
+      
+      if (blob && blob.size && blob.size < PDF_BLOB_SMALL_THRESHOLD_BYTES) {
+        toast.warning('Generated PDF looks small. Opening preview for verification...');
+        try { 
+          await previewPDF(previewRef.current); 
+        } catch (err) { 
+          console.error('[App] Preview failed:', err); 
+        }
+      } else {
+        toast.success(`PDF downloaded successfully! (${(blob?.size / 1024).toFixed(2)} KB)`);
+        console.log('[App] PDF generated successfully:', {
+          filename,
+          size: blob?.size,
+          sizeKB: (blob?.size / 1024).toFixed(2)
+        });
+      }
     } catch (error) {
-      console.error('PDF download error:', error);
+      console.error('[App] PDF download error:', error);
       toast.error(`Failed to download PDF: ${error.message}`);
+      
+      // Offer to try preview instead
+      toast((t) => (
+        <div>
+          <p>Would you like to preview the PDF instead?</p>
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                await previewPDF(previewRef.current);
+                toast.success('PDF preview opened in new tab');
+              } catch (err) {
+                toast.error('Preview also failed: ' + err.message);
+              }
+            }}
+            style={{ marginTop: '8px', padding: '6px 12px', background: '#075056', color: 'white', borderRadius: '6px' }}
+          >
+            Try Preview
+          </button>
+        </div>
+      ), { duration: 8000 });
     } finally {
       setPdfLoading(false);
     }
@@ -102,22 +198,24 @@ Per Person: ₹${quotation.costs.perPersonCost.toLocaleString('en-IN')}
     }
   };
 
+  console.debug('[App] sheetsLoading:', sheetsLoading, 'tourData.locations:', tourData?.locations?.length);
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Toaster position="top-right" />
 
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
+      <header className="bg-gradient-to-r from-teal-600 to-teal-700 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold">Travel Quotation Maker</h1>
-              <p className="text-blue-100 mt-1">
-                Professional quotation generator for travel packages
+              <p className="text-teal-100 mt-1">
+                Automated quotation generator with Google Sheets integration
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Button
+            <Button
                 onClick={refetchSheets}
                 icon={RefreshCw}
                 variant="secondary"
@@ -134,13 +232,6 @@ Per Person: ₹${quotation.costs.perPersonCost.toLocaleString('en-IN')}
               >
                 Clear All
               </Button>
-              
-              {/* Quick link to exact UI HTML */}
-              <a href="/itt.html" target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="sm">
-                  Open Editor (Static)
-                </Button>
-              </a>
             </div>
           </div>
         </div>
@@ -185,10 +276,10 @@ Per Person: ₹${quotation.costs.perPersonCost.toLocaleString('en-IN')}
         )}
 
         {/* Two-Column Layout */}
-        {!sheetsLoading && tourData.locations.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column - Form Inputs */}
-            <div className="space-y-6 overflow-y-auto max-h-[90vh] pr-4">
+        {!sheetsLoading && Array.isArray(tourData.locations) && tourData.locations.length > 0 && (
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+            {/* Left Column - Form Inputs (2/5 width) */}
+            <div className="xl:col-span-2 space-y-6 pr-2">
               {/* Basic Details */}
               <QuotationForm
                 quotation={quotation}
@@ -225,33 +316,21 @@ Per Person: ₹${quotation.costs.perPersonCost.toLocaleString('en-IN')}
               </div>
             </div>
 
-            {/* Right Column - Preview */}
-            <div className="sticky top-8 h-fit">
-              <QuotationPreview
+            {/* Right Column - Live Preview (3/5 width) */}
+            <div className="xl:col-span-3">
+              <EditableQuotationTemplateNew
                 ref={previewRef}
-                quotation={quotation}
+                quotationData={quotation}
+                tourData={tourData}
                 onDownloadPDF={handleDownloadPDF}
-                onShareWhatsApp={handleShareWhatsApp}
                 loading={pdfLoading}
               />
-
-              {/* Additional Actions */}
-              <div className="mt-4 space-y-2">
-                <Button
-                  onClick={handleCopyQuotation}
-                  icon={Copy}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Copy Quotation
-                </Button>
-              </div>
             </div>
           </div>
         )}
 
         {/* Empty State */}
-        {!sheetsLoading && tourData.locations.length === 0 && !sheetsError && (
+        {!sheetsLoading && Array.isArray(tourData.locations) && tourData.locations.length === 0 && !sheetsError && (
           <div className="text-center py-12 bg-white rounded-lg">
             <p className="text-gray-600 mb-4">
               No tour data found. Please check your Google Sheets API configuration.
