@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect, forwardRef } from 'react';
-import html2pdf from 'html2pdf.js';
 import { formatCurrency } from '../../utils/formatters';
 import { Download, Edit } from 'lucide-react';
 import { PDFEditorModal } from './PDFEditorModal';
-import { downloadPDF as downloadPDFUtil } from '../../utils/pdfGenerator';
+import { downloadPDFWithRetry } from '../../utils/pdfGenerator';
+import PDFDownloadSelector from './PDFDownloadSelector';
+import { toast } from 'react-hot-toast';
 
 // Print-specific styles and PDF rendering styles
 const printStyles = `
@@ -51,6 +52,7 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
   const [accommodationImage, setAccommodationImage] = useState('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200');
   const [showPDFEditor, setShowPDFEditor] = useState(false);
   const [pdfDownloading, setPdfDownloading] = useState(false);
+  const [showPDFSelector, setShowPDFSelector] = useState(false);
   
   // Create internal ref if none provided
   const internalRef = useRef(null);
@@ -189,6 +191,17 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
     { id: 4, title: '6N/7D – Dubai Luxury', price: '₹85,999', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=400', link: '' }
   ]);
 
+  // NEW: Feedback section state
+  const [feedbackText, setFeedbackText] = useState('We value your feedback! Please share your thoughts about this package or your travel experience here...');
+
+  // NEW: Recommended Activities state
+  const [recommendedActivities, setRecommendedActivities] = useState([
+    { id: 1, title: 'Dhow Cruise Dinner', description: 'Romantic dinner cruise along Dubai Creek with stunning city views', icon: '🚢' },
+    { id: 2, title: 'Desert Safari', description: 'Thrilling dune bashing, camel rides, and traditional BBQ dinner', icon: '🏜️' },
+    { id: 3, title: 'Burj Khalifa Visit', description: 'Experience breathtaking views from the world\'s tallest building', icon: '🏙️' },
+    { id: 4, title: 'Dubai Mall Shopping', description: 'World-class shopping and entertainment destination', icon: '🛍️' }
+  ]);
+
   const [packageLink, setPackageLink] = useState('');
   const [packageLinkInput, setPackageLinkInput] = useState('');
   const [showPackageLinkInput, setShowPackageLinkInput] = useState(true);
@@ -279,7 +292,7 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
     window.open(whatsappLink, '_blank');
   };
 
-  // Enhanced PDF download with quality presets
+  // NEW ADVANCED PDF GENERATION - Using jsPDF + html2canvas
   const [pdfGenerating, setPdfGenerating] = useState(false);
   const [pdfProgress, setPdfProgress] = useState('');
   
@@ -299,138 +312,17 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
     try {
       setPdfGenerating(true);
       setPdfProgress('Preparing document...');
-      console.log('[Template] Starting PDF generation with quality:', quality);
+      console.log('[Template] Starting NEW PDF generation with quality:', quality);
       
-      // Clone the element to avoid modifying the original
-      const elementClone = element.cloneNode(true);
-      
-      // Remove no-print elements from clone
-      const noPrintElements = elementClone.querySelectorAll('.no-print');
-      noPrintElements.forEach(el => el.remove());
-      
-      // Apply compact spacing for PDF
-      setPdfProgress('Optimizing layout...');
-      const sections = elementClone.querySelectorAll('.pdf-section, section');
-      sections.forEach((section) => {
-        section.style.marginBottom = '8px';
-        section.style.marginTop = '0';
-      });
-      
-      // Reduce padding in day items
-      const dayItems = elementClone.querySelectorAll('.pdf-day-item');
-      dayItems.forEach((item) => {
-        item.style.marginBottom = '6px';
-        item.style.padding = '10px';
-      });
-
-      // Optimize line heights to reduce spacing
-      const textElements = elementClone.querySelectorAll('p, li, div');
-      textElements.forEach((el) => {
-        if (!el.style.lineHeight || parseFloat(el.style.lineHeight) > 1.6) {
-          el.style.lineHeight = '1.5';
-        }
-      });
-      
-      setPdfProgress('Loading images...');
-      // Ensure all images are loaded and handle CORS
-      const images = elementClone.querySelectorAll('img');
-      await Promise.all(
-        Array.from(images).map(img => {
-          // Set crossOrigin for CORS support
-          if (!img.getAttribute('crossorigin')) {
-            img.setAttribute('crossorigin', 'anonymous');
-          }
-          
-          if (img.complete) return Promise.resolve();
-          return new Promise(resolve => {
-            img.onload = resolve;
-            img.onerror = resolve;
-            setTimeout(resolve, 3000); // Timeout after 3s
-          });
-        })
-      );
-
       // Generate filename
       const guestName = quotationData?.guestName || 'Guest';
       const timestamp = new Date().toISOString().split('T')[0];
       const filename = `${guestName.replace(/[^a-z0-9]/gi, '_')}_Quotation_${timestamp}.pdf`;
 
-      // Prepare clone for rendering
-      elementClone.style.position = 'absolute';
-      elementClone.style.left = '-9999px';
-      elementClone.style.top = '0';
-      elementClone.style.width = '1100px'; // Match preview width
-      elementClone.style.maxWidth = '1100px';
-      elementClone.style.background = '#ffffff';
-      elementClone.style.padding = '0';
-      elementClone.style.margin = '0';
-      elementClone.style.visibility = 'visible';
-      elementClone.style.display = 'block';
+      setPdfProgress('Capturing content...');
       
-      // Append to body temporarily
-      document.body.appendChild(elementClone);
-      
-      setPdfProgress('Loading fonts...');
-      // Wait for fonts and layout
-      await document.fonts.ready;
-      await new Promise(resolve => setTimeout(resolve, 300));
-
-      // Quality presets
-      const qualityPresets = {
-        'ultra': { scale: 3, imgQuality: 0.99, margin: [6, 8, 6, 8] },
-        'high': { scale: 2.5, imgQuality: 0.98, margin: [8, 10, 8, 10] },
-        'medium': { scale: 2, imgQuality: 0.95, margin: [10, 12, 10, 12] },
-        'compact': { scale: 2, imgQuality: 0.95, margin: [6, 8, 6, 8] }
-      };
-
-      const preset = qualityPresets[quality] || qualityPresets['high'];
-
-      // PDF generation options - OPTIMIZED FOR REDUCED SPACING
-      const opt = {
-        margin: preset.margin, // Compact margins
-        filename: filename,
-        image: { 
-          type: 'jpeg', 
-          quality: preset.imgQuality
-        },
-        html2canvas: {
-          scale: preset.scale,
-          useCORS: true,
-          allowTaint: true,
-          letterRendering: true,
-          logging: false,
-          width: 1100, // Match preview width
-          windowWidth: 1100,
-          windowHeight: elementClone.scrollHeight,
-          scrollY: 0,
-          scrollX: 0,
-          backgroundColor: '#ffffff',
-          removeContainer: false,
-          imageTimeout: 0
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait',
-          compress: true,
-          compressPdf: true
-        },
-        pagebreak: { 
-          mode: ['avoid-all', 'css', 'legacy'],
-          before: '.page-break-before',
-          after: '.page-break-after',
-          avoid: ['.no-break', 'img', '.keep-together', '.pdf-day-item']
-        }
-      };
-
-      setPdfProgress('Generating PDF...');
-      console.log('[Template] Generating PDF with config:', opt);
-      
-      // Generate and download PDF
-      await html2pdf().set(opt).from(elementClone).save();
-
-      // Clean up clone
-      document.body.removeChild(elementClone);
+      // Use the new PDF generator with retry logic
+      await downloadPDFWithRetry(element, filename, 2);
 
       console.log('[Template] PDF generated successfully:', filename);
       setPdfProgress('Complete!');
@@ -438,11 +330,14 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
         setPdfGenerating(false);
         setPdfProgress('');
       }, 1500);
+      
     } catch (error) {
       console.error('[Template] PDF generation error:', error);
       setPdfGenerating(false);
       setPdfProgress('');
-      alert('Failed to generate PDF. Please try again or contact support.');
+      const needsServer = /Ensure the PDF server is running/i.test(error?.message || '');
+      const help = needsServer ? '\n\nTip: Start the PDF server with "npm run pdf:server" in a separate terminal.' : '';
+      alert('Failed to generate PDF. Please try again or contact support.\n\nError: ' + (error?.message || 'Unknown error') + help);
     }
   };
 
@@ -456,7 +351,7 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
       <div className="no-print" style={{ maxWidth: '1100px', margin: '0 auto', marginBottom: '14px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', background: 'white', padding: '12px 16px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         
         <button 
-          onClick={() => downloadPDF('high')}
+          onClick={() => setShowPDFSelector(true)}
           disabled={loading || pdfGenerating}
           style={{ 
             background: (loading || pdfGenerating) ? '#666' : 'linear-gradient(135deg, #075056 0%, #0a6b72 100%)', 
@@ -476,7 +371,7 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
           onMouseOver={(e) => !(loading || pdfGenerating) && (e.target.style.transform = 'translateY(-2px)')}
           onMouseOut={(e) => !(loading || pdfGenerating) && (e.target.style.transform = 'translateY(0)')}>
           <Download size={20} />
-          {pdfGenerating ? pdfProgress || 'Generating...' : loading ? 'Loading...' : 'Download PDF'}
+          {pdfGenerating ? pdfProgress || 'Generating...' : loading ? 'Loading...' : 'Download PDF (Choose Method)'}
         </button>
         
         <button 
@@ -613,7 +508,7 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
       )}
 
       {/* Main Page */}
-      <div ref={printableRef} style={{ maxWidth: '1100px', margin: '0 auto', background: '#ffffff', padding: '20px', boxShadow: '0 6px 20px rgba(0,0,0,0.08)', color: '#222', position: 'relative' }}>
+      <div ref={printableRef} style={{ maxWidth: '1100px', margin: '0 auto', background: '#ffffff', backgroundColor: '#ffffff', padding: '20px', boxShadow: '0 6px 20px rgba(0,0,0,0.08)', color: '#222', position: 'relative' }} className="pdf-content">
         
         {/* Header */}
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: '18px', gap: '16px', paddingTop: '20px' }}>
@@ -992,6 +887,76 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
           </div>
         </section>
 
+        {/* NEW: Recommended Activities Section */}
+        <section style={{ marginBottom: '10px' }} className="pdf-section no-break">
+          <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', color: 'black', borderLeft: '4px solid #ff5b04', paddingLeft: '10px', fontWeight: '600' }}>Recommended Activities</h3>
+          <div style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fff9f0 100%)', borderLeft: '6px solid #ff5b04', padding: '14px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(255,91,4,0.08)' }}>
+            <p style={{ color: '#075056', marginBottom: '12px', fontSize: '14px' }}>
+              Enhance your experience with these carefully selected activities designed to make your trip unforgettable:
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '12px' }}>
+              {recommendedActivities.map((activity) => (
+                <div key={activity.id} style={{ background: '#ffffff', borderRadius: '10px', padding: '12px', boxShadow: '0 2px 6px rgba(0,0,0,0.08)', border: '1px solid rgba(255,91,4,0.2)', transition: 'all 0.3s' }} onMouseOver={(e) => { e.currentTarget.style.boxShadow = '0 4px 12px rgba(255,91,4,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseOut={(e) => { e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                  <div style={{ display: 'flex', alignItems: 'start', gap: '10px' }}>
+                    <div style={{ fontSize: '28px', flexShrink: 0 }}>{activity.icon}</div>
+                    <div style={{ flex: 1 }}>
+                      <h4 contentEditable suppressContentEditableWarning style={{ color: '#075056', margin: '0 0 4px 0', fontWeight: '600', fontSize: '14px' }}>
+                        {activity.title}
+                      </h4>
+                      <p contentEditable suppressContentEditableWarning style={{ color: '#666', margin: 0, fontSize: '13px', lineHeight: '1.4' }}>
+                        {activity.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: '12px', padding: '10px', background: 'linear-gradient(135deg, #c9f1ff 0%, #d9f5ff 100%)', borderRadius: '8px', textAlign: 'center' }}>
+              <p style={{ margin: 0, color: '#01579b', fontSize: '13px', fontWeight: '600' }}>
+                💡 Tip: These activities can be added to your package. Contact us for customization!
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* NEW: Customer Feedback Section */}
+        <section style={{ marginBottom: '10px' }} className="pdf-section no-break">
+          <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', color: 'black', borderLeft: '4px solid #075056', paddingLeft: '10px', fontWeight: '600' }}>Customer Feedback</h3>
+          <div style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #f7fef9 100%)', borderLeft: '6px solid #00897b', padding: '14px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,137,123,0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'start', gap: '12px', marginBottom: '12px' }}>
+              <div style={{ fontSize: '32px' }}>✍️</div>
+              <div style={{ flex: 1 }}>
+                <h4 style={{ color: '#00695c', margin: '0 0 6px 0', fontWeight: '600', fontSize: '15px' }}>We Value Your Feedback!</h4>
+                <p style={{ color: '#075056', margin: '0 0 10px 0', fontSize: '13px' }}>
+                  Your experience matters to us. Please share your thoughts, suggestions, or any special requests:
+                </p>
+              </div>
+            </div>
+            <div style={{ background: '#ffffff', border: '2px solid #00897b', borderRadius: '8px', padding: '14px', minHeight: '100px', position: 'relative' }}>
+              <div 
+                contentEditable 
+                suppressContentEditableWarning
+                onInput={(e) => setFeedbackText(e.currentTarget.innerText)}
+                style={{ 
+                  color: '#666', 
+                  fontSize: '14px', 
+                  lineHeight: '1.6', 
+                  minHeight: '80px',
+                  outline: 'none'
+                }}>
+                {feedbackText}
+              </div>
+              <div style={{ position: 'absolute', bottom: '8px', right: '8px', fontSize: '11px', color: '#999' }}>
+                Click to edit and add your feedback...
+              </div>
+            </div>
+            <div style={{ marginTop: '10px', display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <span style={{ background: '#e0f2f1', color: '#00695c', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' }}>⭐ Rate us: ⭐⭐⭐⭐⭐</span>
+              <span style={{ background: '#e0f2f1', color: '#00695c', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' }}>📧 Email: feedback@traverseglobe.com</span>
+            </div>
+          </div>
+        </section>
+
         {/* Similar Packages */}
         <section style={{ padding: '20px 0', background: 'linear-gradient(180deg, #f8fbfc 0%, #ffffff 100%)', marginLeft: '-20px', marginRight: '-20px', paddingLeft: '20px', paddingRight: '20px' }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
@@ -1012,15 +977,110 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
           </div>
         </section>
 
-        {/* Footer */}
-        <footer style={{ marginTop: '22px', borderTop: '1px solid #eee', paddingTop: '10px', paddingBottom: '20px', fontSize: '13px', color: '#666' }}>
-          <div>
-            Prepared by: <span contentEditable suppressContentEditableWarning>Traverse Globe</span> — Address: <span contentEditable suppressContentEditableWarning>129 First Floor, Antriksh Bhavan, Connaught Place, New Delhi, Delhi, Pin 110001</span>
-          </div>
-          <div>
-            Website: <a href="https://traverseglobe.com" target="_blank" rel="noopener noreferrer" style={{ color: 'black', fontWeight: '600', textDecoration: 'underline' }}>
-              <span contentEditable suppressContentEditableWarning>traverseglobe.com</span>
-            </a>
+        {/* Enhanced Footer with Social Media & Contact Details */}
+        <footer style={{ marginTop: '16px', background: 'linear-gradient(135deg, #075056 0%, #0a6b72 100%)', marginLeft: '-20px', marginRight: '-20px', padding: '24px 20px 16px 20px', color: '#ffffff' }}>
+          <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+            {/* Top Section - Company Info */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+              {/* Company Column */}
+              <div>
+                <h4 contentEditable suppressContentEditableWarning style={{ color: '#ffffff', margin: '0 0 10px 0', fontSize: '16px', fontWeight: '700', borderBottom: '2px solid #ff5b04', paddingBottom: '6px', display: 'inline-block' }}>
+                  Traverse Globe
+                </h4>
+                <p contentEditable suppressContentEditableWarning style={{ margin: '8px 0', fontSize: '13px', lineHeight: '1.5', color: '#e0f2f1' }}>
+                  Your trusted travel partner for unforgettable journeys around the world. Creating memories, one destination at a time.
+                </p>
+              </div>
+
+              {/* Contact Column */}
+              <div>
+                <h4 style={{ color: '#ffffff', margin: '0 0 10px 0', fontSize: '16px', fontWeight: '700', borderBottom: '2px solid #ff5b04', paddingBottom: '6px', display: 'inline-block' }}>
+                  Contact Us
+                </h4>
+                <div style={{ fontSize: '13px', lineHeight: '1.8', color: '#e0f2f1' }}>
+                  <div style={{ marginBottom: '4px' }}>
+                    📍 <span contentEditable suppressContentEditableWarning>129 First Floor, Antriksh Bhavan, Connaught Place, New Delhi, Delhi, Pin 110001</span>
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    📧 <a href="mailto:info@traverseglobe.com" style={{ color: '#ffffff', textDecoration: 'none', fontWeight: '600' }}>
+                      <span contentEditable suppressContentEditableWarning>info@traverseglobe.com</span>
+                    </a>
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    📞 <span contentEditable suppressContentEditableWarning>+91 99970 85457</span> | <span contentEditable suppressContentEditableWarning>+91 95202 32324</span>
+                  </div>
+                  <div>
+                    🌐 <a href="https://traverseglobe.com" target="_blank" rel="noopener noreferrer" style={{ color: '#ffffff', textDecoration: 'underline', fontWeight: '600' }}>
+                      <span contentEditable suppressContentEditableWarning>www.traverseglobe.com</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Media Column */}
+              <div>
+                <h4 style={{ color: '#ffffff', margin: '0 0 10px 0', fontSize: '16px', fontWeight: '700', borderBottom: '2px solid #ff5b04', paddingBottom: '6px', display: 'inline-block' }}>
+                  Follow Us
+                </h4>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '12px' }}>
+                  <a href="https://www.facebook.com/traverseglobe" target="_blank" rel="noopener noreferrer" style={{ background: '#ffffff', color: '#075056', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: '700', fontSize: '18px', transition: 'all 0.3s', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }} onMouseOver={(e) => { e.target.style.background = '#ff5b04'; e.target.style.color = '#ffffff'; e.target.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.target.style.background = '#ffffff'; e.target.style.color = '#075056'; e.target.style.transform = 'translateY(0)'; }}>
+                    f
+                  </a>
+                  <a href="https://www.instagram.com/traverseglobe" target="_blank" rel="noopener noreferrer" style={{ background: '#ffffff', color: '#075056', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: '700', fontSize: '18px', transition: 'all 0.3s', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }} onMouseOver={(e) => { e.target.style.background = '#ff5b04'; e.target.style.color = '#ffffff'; e.target.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.target.style.background = '#ffffff'; e.target.style.color = '#075056'; e.target.style.transform = 'translateY(0)'; }}>
+                    📷
+                  </a>
+                  <a href="https://twitter.com/traverseglobe" target="_blank" rel="noopener noreferrer" style={{ background: '#ffffff', color: '#075056', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: '700', fontSize: '18px', transition: 'all 0.3s', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }} onMouseOver={(e) => { e.target.style.background = '#ff5b04'; e.target.style.color = '#ffffff'; e.target.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.target.style.background = '#ffffff'; e.target.style.color = '#075056'; e.target.style.transform = 'translateY(0)'; }}>
+                    🐦
+                  </a>
+                  <a href="https://www.linkedin.com/company/traverseglobe" target="_blank" rel="noopener noreferrer" style={{ background: '#ffffff', color: '#075056', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: '700', fontSize: '18px', transition: 'all 0.3s', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }} onMouseOver={(e) => { e.target.style.background = '#ff5b04'; e.target.style.color = '#ffffff'; e.target.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.target.style.background = '#ffffff'; e.target.style.color = '#075056'; e.target.style.transform = 'translateY(0)'; }}>
+                    in
+                  </a>
+                  <a href="https://wa.me/919997085457" target="_blank" rel="noopener noreferrer" style={{ background: '#25D366', color: '#ffffff', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: '700', fontSize: '18px', transition: 'all 0.3s', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }} onMouseOver={(e) => { e.target.style.background = '#128C7E'; e.target.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.target.style.background = '#25D366'; e.target.style.transform = 'translateY(0)'; }}>
+                    💬
+                  </a>
+                  <a href="https://www.youtube.com/@traverseglobe" target="_blank" rel="noopener noreferrer" style={{ background: '#ffffff', color: '#075056', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: '700', fontSize: '18px', transition: 'all 0.3s', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }} onMouseOver={(e) => { e.target.style.background = '#ff5b04'; e.target.style.color = '#ffffff'; e.target.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.target.style.background = '#ffffff'; e.target.style.color = '#075056'; e.target.style.transform = 'translateY(0)'; }}>
+                    ▶️
+                  </a>
+                </div>
+                <div style={{ marginTop: '12px', fontSize: '12px', color: '#e0f2f1' }}>
+                  <p style={{ margin: '4px 0' }}>Stay connected for exclusive deals!</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Section - Legal & Copyright */}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', fontSize: '12px', color: '#b2dfdb' }}>
+              <div>
+                <span contentEditable suppressContentEditableWarning>© 2024 Traverse Globe. All rights reserved.</span>
+              </div>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <a href="#" style={{ color: '#b2dfdb', textDecoration: 'none', transition: 'color 0.3s' }} onMouseOver={(e) => e.target.style.color = '#ffffff'} onMouseOut={(e) => e.target.style.color = '#b2dfdb'}>
+                  Privacy Policy
+                </a>
+                <a href="#" style={{ color: '#b2dfdb', textDecoration: 'none', transition: 'color 0.3s' }} onMouseOver={(e) => e.target.style.color = '#ffffff'} onMouseOut={(e) => e.target.style.color = '#b2dfdb'}>
+                  Terms & Conditions
+                </a>
+                <a href="#" style={{ color: '#b2dfdb', textDecoration: 'none', transition: 'color 0.3s' }} onMouseOver={(e) => e.target.style.color = '#ffffff'} onMouseOut={(e) => e.target.style.color = '#b2dfdb'}>
+                  Cancellation Policy
+                </a>
+              </div>
+            </div>
+
+            {/* Trust Badges */}
+            <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', fontSize: '11px', color: '#b2dfdb' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: '20px' }}>
+                <span>✅</span> <span>IATA Certified</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: '20px' }}>
+                <span>🛡️</span> <span>100% Secure Booking</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: '20px' }}>
+                <span>⭐</span> <span>4.8/5 Rating</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: '20px' }}>
+                <span>🏆</span> <span>Award Winning Service</span>
+              </div>
+            </div>
           </div>
         </footer>
       </div>
@@ -1043,6 +1103,89 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
         }
       }}
     />
+
+    {/* PDF Download Method Selector Modal */}
+    {showPDFSelector && (
+      <div 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          padding: '20px'
+        }}
+        onClick={() => setShowPDFSelector(false)}
+      >
+        <div 
+          style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '0',
+            maxWidth: '900px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => setShowPDFSelector(false)}
+            style={{
+              position: 'absolute',
+              top: '15px',
+              right: '15px',
+              background: 'none',
+              border: 'none',
+              fontSize: '28px',
+              color: '#666',
+              cursor: 'pointer',
+              lineHeight: 1,
+              padding: 0,
+              width: '32px',
+              height: '32px',
+              zIndex: 10
+            }}
+          >
+            ×
+          </button>
+          
+          <PDFDownloadSelector
+            element={printableRef?.current}
+            quotationData={{
+              guestName: quotationData?.guestName || pageTitle || 'Guest',
+              destination: quotationData?.destination,
+              packageTitle: packageTitle,
+              totalCost: totalCost,
+              numberOfPax: quotationData?.numberOfPax || paxInfo
+            }}
+            filename={(() => {
+              const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+              const guest = (quotationData?.guestName || 'Guest').replace(/[^a-z0-9]/gi, '_').substring(0, 30);
+              const dest = (quotationData?.destination || packageTitle || 'Travel').replace(/[^a-z0-9]/gi, '_').substring(0, 30);
+              return `${guest}_${dest}_${timestamp}.pdf`;
+            })()}
+            onSuccess={(result) => {
+              const sizeKB = result.blob ? (result.blob.size / 1024).toFixed(2) : 'N/A';
+              toast.success(`PDF generated via ${result.method}! (${sizeKB} KB)`);
+              console.log('PDF generated successfully:', result);
+              setShowPDFSelector(false);
+            }}
+            onError={(error) => {
+              toast.error(`PDF generation failed: ${error.message}`);
+              console.error('PDF generation failed:', error);
+            }}
+          />
+        </div>
+      </div>
+    )}
     </>
   );
 });

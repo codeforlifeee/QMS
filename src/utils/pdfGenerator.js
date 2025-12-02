@@ -12,7 +12,7 @@ export const getPDFConfig = (filename = 'quotation.pdf', overrides = {}) => {
     return name.replace(/[:\\/*"?|<>]/g, '_');
   };
   const baseConfig = {
-    margin: [8, 10, 8, 10], // Reduced margins: top, left, bottom, right (in mm)
+    margin: [6, 8, 6, 8], // Minimal margins: top, left, bottom, right (in mm) - FIXED
     filename: sanitizeFilename(filename),
     image: {
       type: 'jpeg',
@@ -22,7 +22,7 @@ export const getPDFConfig = (filename = 'quotation.pdf', overrides = {}) => {
       scale: 2.5, // Increased scale for better quality
       useCORS: true,
       allowTaint: true,
-      logging: false,
+      logging: true, // Enable logging to debug black PDF issue
       letterRendering: true,
       backgroundColor: '#ffffff',
       removeContainer: false,
@@ -30,6 +30,26 @@ export const getPDFConfig = (filename = 'quotation.pdf', overrides = {}) => {
       scrollX: 0,
       windowWidth: document.body.scrollWidth,
       windowHeight: document.body.scrollHeight,
+      onclone: function(clonedDoc) {
+        // Additional cleanup in cloned document
+        const clonedBody = clonedDoc.body;
+        if (clonedBody) {
+          clonedBody.style.backgroundColor = '#ffffff';
+          // Remove any problematic gradients
+          const allEls = clonedBody.querySelectorAll('*');
+          allEls.forEach(el => {
+            try {
+              if (el.style.backgroundImage && el.style.backgroundImage.includes('gradient')) {
+                el.style.backgroundImage = 'none';
+              }
+              // Ensure visibility
+              if (el.style.opacity === '0') {
+                el.style.opacity = '1';
+              }
+            } catch (e) {}
+          });
+        }
+      },
     },
     jsPDF: {
       unit: 'pt',
@@ -42,9 +62,9 @@ export const getPDFConfig = (filename = 'quotation.pdf', overrides = {}) => {
     },
     pagebreak: {
       mode: ['avoid-all', 'css', 'legacy'],
-      before: '.page-break',
-      after: '.section-break',
-      avoid: '.keep-together, .pdf-day-item',
+      before: '.page-break-before',
+      after: '.page-break-after',
+      avoid: '.keep-together, .pdf-day-item, .pdf-section, .no-break',
     },
   };
   // Deep merge with overrides (shallow merge for nested objects as a simple approach)
@@ -126,14 +146,16 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
     );
     elementsToRemove.forEach((el) => el.remove());
 
-    // Apply compact spacing for PDF
+    // Apply compact spacing for PDF - ENHANCED TO FIX WHITE SPACE
     const applyCompactSpacing = (clone) => {
       try {
-        // Reduce section margins
+        // Reduce section margins aggressively
         const sections = clone.querySelectorAll('.pdf-section, section');
         sections.forEach((section) => {
-          section.style.marginBottom = '8px';
+          section.style.marginBottom = '4px';
           section.style.marginTop = '0';
+          section.style.paddingBottom = '4px';
+          section.style.paddingTop = '4px';
         });
 
         // Reduce padding in content boxes
@@ -143,7 +165,7 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
           if (currentPadding && currentPadding.includes('px')) {
             const paddingValue = parseInt(currentPadding);
             if (paddingValue > 10) {
-              box.style.padding = `${Math.max(8, paddingValue - 4)}px`;
+              box.style.padding = `${Math.max(6, paddingValue - 6)}px`;
             }
           }
         });
@@ -151,23 +173,133 @@ export const downloadPDF = async (element, filename = 'quotation.pdf', overrides
         // Reduce day item spacing
         const dayItems = clone.querySelectorAll('.pdf-day-item');
         dayItems.forEach((item) => {
-          item.style.marginBottom = '6px';
-          item.style.padding = '10px';
+          item.style.marginBottom = '4px';
+          item.style.padding = '8px';
         });
 
-        // Optimize line heights
-        const textElements = clone.querySelectorAll('p, li, div');
+        // Optimize line heights and remove excess spacing
+        const textElements = clone.querySelectorAll('p, li, div, h1, h2, h3, h4');
         textElements.forEach((el) => {
-          if (!el.style.lineHeight || parseFloat(el.style.lineHeight) > 1.6) {
-            el.style.lineHeight = '1.5';
+          if (!el.style.lineHeight || parseFloat(el.style.lineHeight) > 1.5) {
+            el.style.lineHeight = '1.4';
           }
+          // Remove excess margins
+          const marginBottom = parseInt(window.getComputedStyle(el).marginBottom);
+          if (marginBottom > 8) {
+            el.style.marginBottom = '6px';
+          }
+        });
+        
+        // Remove large gaps between sections
+        const allElements = clone.querySelectorAll('*');
+        allElements.forEach((el) => {
+          const marginTop = parseInt(window.getComputedStyle(el).marginTop);
+          const marginBottom = parseInt(window.getComputedStyle(el).marginBottom);
+          if (marginTop > 12) el.style.marginTop = '8px';
+          if (marginBottom > 12) el.style.marginBottom = '8px';
         });
       } catch (e) {
         console.warn('[pdfGenerator] Compact spacing application failed:', e);
       }
     };
 
+    // FIX BLACK PDF ISSUE: Convert gradients to solid colors and ensure proper rendering
+    const fixBackgroundsForPDF = (clone) => {
+      try {
+        console.debug('[pdfGenerator] Fixing backgrounds for PDF rendering...');
+        
+        // Get all elements
+        const allElements = clone.querySelectorAll('*');
+        
+        allElements.forEach((el) => {
+          try {
+            const computedStyle = window.getComputedStyle(el);
+            const bgImage = computedStyle.backgroundImage;
+            const bgColor = computedStyle.backgroundColor;
+            
+            // Convert gradient backgrounds to solid colors
+            if (bgImage && bgImage !== 'none' && bgImage.includes('gradient')) {
+              // Replace gradients with solid colors
+              if (bgImage.includes('#075056') || bgImage.includes('teal')) {
+                el.style.backgroundImage = 'none';
+                el.style.backgroundColor = '#e9f7fa'; // Light teal
+              } else if (bgImage.includes('#ff5b04') || bgImage.includes('orange')) {
+                el.style.backgroundImage = 'none';
+                el.style.backgroundColor = '#fff7ed'; // Light orange
+              } else if (bgImage.includes('#00897b') || bgImage.includes('green')) {
+                el.style.backgroundImage = 'none';
+                el.style.backgroundColor = '#f0fdf4'; // Light green
+              } else if (bgImage.includes('blue')) {
+                el.style.backgroundImage = 'none';
+                el.style.backgroundColor = '#e0f2f1'; // Light blue
+              } else {
+                // Default: remove gradient, use white
+                el.style.backgroundImage = 'none';
+                if (!bgColor || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
+                  el.style.backgroundColor = '#ffffff';
+                }
+              }
+            }
+            
+            // Ensure footer has proper background
+            if (el.tagName === 'FOOTER' || el.classList?.contains('footer')) {
+              el.style.backgroundImage = 'none';
+              el.style.backgroundColor = '#075056'; // Solid teal
+              el.style.color = '#ffffff';
+            }
+            
+            // Force all text to have proper color
+            const color = computedStyle.color;
+            if (!color || color === 'rgba(0, 0, 0, 0)') {
+              // If no color or transparent, set to black
+              if (el.style.color === 'white' || el.style.color === '#ffffff' || el.style.color === 'rgb(255, 255, 255)') {
+                el.style.color = '#ffffff';
+              } else {
+                el.style.color = '#222222';
+              }
+            }
+            
+            // Ensure proper rendering of colored sections
+            if (el.style.background && el.style.background.includes('gradient')) {
+              const bg = el.style.background;
+              el.style.backgroundImage = 'none';
+              
+              // Extract color from gradient
+              if (bg.includes('#075056')) {
+                el.style.backgroundColor = '#e9f7fa';
+              } else if (bg.includes('#ff5b04')) {
+                el.style.backgroundColor = '#fff7ed';
+              } else if (bg.includes('#00897b')) {
+                el.style.backgroundColor = '#f0fdf4';
+              } else {
+                el.style.backgroundColor = '#ffffff';
+              }
+            }
+            
+            // Force opacity to 1 for all elements
+            if (computedStyle.opacity && parseFloat(computedStyle.opacity) < 1) {
+              el.style.opacity = '1';
+            }
+            
+          } catch (err) {
+            console.warn('[pdfGenerator] Failed to fix background for element:', err);
+          }
+        });
+        
+        // Ensure root clone has white background
+        clone.style.background = '#ffffff';
+        clone.style.backgroundColor = '#ffffff';
+        
+        console.debug('[pdfGenerator] Background fixes applied successfully');
+      } catch (e) {
+        console.error('[pdfGenerator] Background fix failed:', e);
+      }
+    };
+
     applyCompactSpacing(elementClone);
+    
+    // FIX BLACK PDF: Apply background fixes AFTER spacing but BEFORE measuring
+    fixBackgroundsForPDF(elementClone);
 
     // Force fixed width BEFORE measuring to avoid viewport-dependent sizing
     const FIXED_CONTENT_WIDTH = 800; // px - fits A4 nicely
@@ -557,6 +689,14 @@ const buildHtmlWrapper = async (element) => {
   const elementsToRemove = clone.querySelectorAll('.no-print, .controls, .edit-button, .delete-button');
   elementsToRemove.forEach((el) => el.remove());
 
+  // Force consistent width/background for server rendering
+  clone.style.maxWidth = '1100px';
+  clone.style.width = '100%';
+  clone.style.margin = '0 auto';
+  clone.style.background = '#ffffff';
+  clone.style.boxSizing = 'border-box';
+  clone.style.padding = '16px 24px';
+
   // Fix images that are local paths
   Array.from(clone.querySelectorAll('img')).forEach((img) => {
     try {
@@ -571,7 +711,39 @@ const buildHtmlWrapper = async (element) => {
   });
 
   const cssText = await fetchAllCssText();
-  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>${cssText}</style></head><body>${clone.outerHTML}</body></html>`;
+  const wrapperStyles = `
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: #0b1f2a;
+    }
+    .pdf-root {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 24px 32px;
+      box-sizing: border-box;
+    }
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      footer, .footer, [class*="footer"] {
+        display: block !important;
+        visibility: visible !important;
+        page-break-inside: avoid !important;
+      }
+    }
+  `;
+  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${wrapperStyles}${cssText}</style></head><body><div class="pdf-root">${clone.outerHTML}</div></body></html>`;
   return html;
 };
 
@@ -616,7 +788,8 @@ export const downloadPDFViaServer = async (element, filename = 'quotation.pdf', 
     return blob;
   } catch (error) {
     console.error('[pdfGenerator.server] download error:', error);
-    throw error;
+    const baseMessage = error?.message || 'Unknown server error';
+    throw new Error(`${baseMessage}. Ensure the PDF server is running at ${PDF_SERVER_URL}`);
   }
 };
 
@@ -985,54 +1158,46 @@ export const downloadPDFWithRetry = async (
   maxRetries = 3
 ) => {
   let lastError = null;
-  const WANT_SERVER = (() => {
-    if (typeof window !== 'undefined') {
-      if (typeof window.PDF_SERVER_PREFERRED !== 'undefined') return window.PDF_SERVER_PREFERRED === true || window.PDF_SERVER_PREFERRED === '1' || window.PDF_SERVER_PREFERRED === 'true';
-      return import.meta.env.VITE_PDF_SERVER_PREFERRED === 'true';
-    }
-    return false; // Default to client-side
-  })();
+  const serverAttempts = Math.max(1, Math.min(2, maxRetries));
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      // Prefer server-based conversion on first attempt if configured.
-      if (attempt === 1 && WANT_SERVER) {
-        console.debug('[pdfGenerator.retry] Attempting server-side PDF at', (typeof window !== 'undefined' && window.PDF_SERVER_URL) || (import.meta.env.VITE_PDF_SERVER_URL || 'http://localhost:4000'));
-        try {
-          const blob = await downloadPDFViaServer(element, filename);
-          if (blob && blob.size > PDF_BLOB_SMALL_THRESHOLD_BYTES) {
-            return blob;
-          }
-        } catch (serverErr) {
-          console.warn('[pdfGenerator.retry] server PDF attempt failed:', serverErr);
-          // fallthrough to try client-side generation
-        }
-      }
+    const isServerAttempt = attempt <= serverAttempts;
 
-      // Client-side html2pdf attempts
+    if (isServerAttempt) {
+      try {
+        console.debug('[pdfGenerator.retry] Attempting server-side PDF (attempt', attempt, ')');
+        const blob = await downloadPDFViaServer(element, filename);
+        if (blob && blob.size > PDF_BLOB_SMALL_THRESHOLD_BYTES) {
+          return blob;
+        }
+        console.warn('[pdfGenerator.retry] Server PDF returned small blob, falling back to client');
+      } catch (serverErr) {
+        lastError = serverErr;
+        console.warn('[pdfGenerator.retry] Server PDF attempt failed:', serverErr);
+      }
+    }
+
+    try {
+      // Client-side html2pdf fallback
       const overrides = attempt === 1 ? {} : { html2canvas: { scale: attempt === 2 ? 1.5 : 1 } };
       const blob = await downloadPDF(element, filename, overrides);
       if (!blob) {
         throw new Error('downloadPDF returned no blob. Treating as failure so retry will occur.');
       }
-      // Only warn about small blobs, don't throw error on last attempt
       if (blob.size && blob.size < PDF_BLOB_SMALL_THRESHOLD_BYTES && attempt < maxRetries) {
         console.warn(`downloadPDF returned a small blob (${blob.size} bytes), retrying...`);
         throw new Error(`downloadPDF returned a blob but it is unexpectedly small (${blob.size} bytes)`);
       }
-      return blob; // Success
-    } catch (error) {
-      lastError = error;
-      console.warn(`PDF download attempt ${attempt} failed:`, error);
-
+      return blob;
+    } catch (clientErr) {
+      lastError = clientErr;
+      console.warn(`PDF download attempt ${attempt} failed:`, clientErr);
       if (attempt < maxRetries) {
-        // Wait before retry
         await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
       }
     }
   }
 
-  // All retries failed
   throw new Error(
     `PDF download failed after ${maxRetries} attempts: ${lastError?.message}`
   );

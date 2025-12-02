@@ -32,7 +32,7 @@
   }
 
   body {
-    background: white;
+    background: white !important;
   }
 
   .page-break {
@@ -46,6 +46,18 @@
   .keep-together {
     page-break-inside: avoid;
   }
+  
+  /* FIX BLACK PDF: Force all backgrounds to render properly */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  /* Remove gradients in print, use solid colors */
+  [style*="linear-gradient"] {
+    background-image: none !important;
+  }
 }
 
 /* PDF Preview Modal Styles */
@@ -56,6 +68,20 @@
 
 .pdf-preview-content * {
   box-sizing: border-box;
+}
+
+/* PDF Content Rendering - FIX BLACK PDF */
+.pdf-content {
+  background: #ffffff !important;
+  color: #222222 !important;
+}
+
+.pdf-content * {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+  -webkit-filter: none !important;
+  filter: none !important;
 }
 
 /* Custom range input styling */

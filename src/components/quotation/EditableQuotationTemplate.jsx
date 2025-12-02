@@ -77,6 +77,13 @@ const EditableQuotationTemplate = () => {
       { title: '4N/5D – Dubai Delight Tour', price: '55,499' },
       { title: '4N/5D – Dubai Delight Tour', price: '55,499' },
     ],
+    recommendedActivities: [
+      { id: 1, title: 'Dhow Cruise Dinner', description: 'Romantic dinner cruise along Dubai Creek with stunning city views', icon: '🚢' },
+      { id: 2, title: 'Desert Safari', description: 'Thrilling dune bashing, camel rides, and traditional BBQ dinner', icon: '🏜️' },
+      { id: 3, title: 'Burj Khalifa Visit', description: 'Experience breathtaking views from the world\'s tallest building', icon: '🏙️' },
+      { id: 4, title: 'Dubai Mall Shopping', description: 'World-class shopping and entertainment destination', icon: '🛍️' }
+    ],
+    feedbackText: 'We value your feedback! Please share your thoughts about this package or your travel experience here...',
     website: 'traverseglobe.com',
     address: '129 First Floor, Antriksh Bhavan, Connaught Place, New Delhi, Delhi, Pin 110001',
     packageLink: '#',
@@ -691,6 +698,80 @@ const EditableQuotationTemplate = () => {
             </div>
           </section>
 
+          {/* NEW: Recommended Activities Section */}
+          <section className="mb-8">
+            <h3 className="text-xl font-bold text-black border-l-4 border-orange-500 pl-3 mb-4">Recommended Activities</h3>
+            <div className="bg-orange-50 border-l-6 border-orange-500 p-4 rounded">
+              <p className="text-teal-900 mb-4 text-sm">
+                Enhance your experience with these carefully selected activities designed to make your trip unforgettable:
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {data.recommendedActivities.map((activity) => (
+                  <div key={activity.id} className="bg-white rounded-lg p-3 shadow-md border border-orange-200">
+                    <div className="flex items-start gap-3">
+                      <div className="text-3xl flex-shrink-0">{activity.icon}</div>
+                      <div className="flex-1">
+                        <h4 contentEditable={!isExporting} suppressContentEditableWarning onInput={(e) => {
+                          const updated = data.recommendedActivities.map(a => 
+                            a.id === activity.id ? {...a, title: e.currentTarget.innerText} : a
+                          );
+                          updateField('recommendedActivities', updated);
+                        }} className="text-teal-900 font-semibold text-sm mb-1">
+                          {activity.title}
+                        </h4>
+                        <p contentEditable={!isExporting} suppressContentEditableWarning onInput={(e) => {
+                          const updated = data.recommendedActivities.map(a => 
+                            a.id === activity.id ? {...a, description: e.currentTarget.innerText} : a
+                          );
+                          updateField('recommendedActivities', updated);
+                        }} className="text-gray-600 text-xs leading-tight">
+                          {activity.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 bg-blue-100 p-3 rounded text-center">
+                <p className="text-blue-900 text-sm font-semibold">
+                  💡 Tip: These activities can be added to your package. Contact us for customization!
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* NEW: Customer Feedback Section */}
+          <section className="mb-8">
+            <h3 className="text-xl font-bold text-black border-l-4 border-teal-700 pl-3 mb-4">Customer Feedback</h3>
+            <div className="bg-green-50 border-l-6 border-teal-700 p-4 rounded">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="text-4xl">✍️</div>
+                <div className="flex-1">
+                  <h4 className="text-teal-900 font-bold text-base mb-2">We Value Your Feedback!</h4>
+                  <p className="text-teal-900 text-sm mb-3">
+                    Your experience matters to us. Please share your thoughts, suggestions, or any special requests:
+                  </p>
+                </div>
+              </div>
+              <div className="bg-white border-2 border-teal-700 rounded-lg p-4 min-h-24 relative">
+                <div 
+                  contentEditable={!isExporting}
+                  suppressContentEditableWarning
+                  onInput={(e) => updateField('feedbackText', e.currentTarget.innerText)}
+                  className="text-gray-600 text-sm leading-relaxed min-h-20 outline-none">
+                  {data.feedbackText}
+                </div>
+                <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+                  Click to edit and add your feedback...
+                </div>
+              </div>
+              <div className="mt-3 flex gap-2 flex-wrap justify-center">
+                <span className="bg-teal-100 text-teal-900 px-3 py-1 rounded-full text-xs font-semibold">⭐ Rate us: ⭐⭐⭐⭐⭐</span>
+                <span className="bg-teal-100 text-teal-900 px-3 py-1 rounded-full text-xs font-semibold">📧 Email: feedback@traverseglobe.com</span>
+              </div>
+            </div>
+          </section>
+
           {/* Similar Packages */}
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-teal-900 text-center mb-6">Similar Packages You May Like</h2>
@@ -731,15 +812,91 @@ const EditableQuotationTemplate = () => {
             </div>
           </section>
 
-          {/* Footer */}
-          <footer className="border-t pt-4 text-center text-sm text-gray-600">
-            <p className="mb-2">Prepared by: Traverse Globe — Address: {data.address}</p>
-            <p>
-              Website:{' '}
-              <a href={`https://${data.website}`} className="text-black font-semibold underline">
-                {data.website}
-              </a>
-            </p>
+          {/* Enhanced Footer with Social Media & Contact Details */}
+          <footer className="mt-6 bg-gradient-to-r from-teal-800 to-teal-900 -mx-8 px-8 py-6 text-white">
+            <div className="max-w-6xl mx-auto">
+              {/* Top Section - Company Info */}
+              <div className="grid grid-cols-3 gap-6 mb-6">
+                {/* Company Column */}
+                <div>
+                  <h4 contentEditable={!isExporting} suppressContentEditableWarning className="text-white font-bold text-base mb-3 border-b-2 border-orange-500 pb-2 inline-block">
+                    Traverse Globe
+                  </h4>
+                  <p contentEditable={!isExporting} suppressContentEditableWarning className="text-teal-100 text-xs leading-relaxed">
+                    Your trusted travel partner for unforgettable journeys around the world. Creating memories, one destination at a time.
+                  </p>
+                </div>
+
+                {/* Contact Column */}
+                <div>
+                  <h4 className="text-white font-bold text-base mb-3 border-b-2 border-orange-500 pb-2 inline-block">
+                    Contact Us
+                  </h4>
+                  <div className="text-xs leading-relaxed text-teal-100 space-y-1">
+                    <div>📍 <span contentEditable={!isExporting} suppressContentEditableWarning>{data.address}</span></div>
+                    <div>📧 <a href="mailto:info@traverseglobe.com" className="text-white font-semibold hover:underline">info@traverseglobe.com</a></div>
+                    <div>📞 <span contentEditable={!isExporting} suppressContentEditableWarning>+91 99970 85457 | +91 95202 32324</span></div>
+                    <div>🌐 <a href={`https://${data.website}`} target="_blank" rel="noopener noreferrer" className="text-white font-semibold hover:underline">{data.website}</a></div>
+                  </div>
+                </div>
+
+                {/* Social Media Column */}
+                <div>
+                  <h4 className="text-white font-bold text-base mb-3 border-b-2 border-orange-500 pb-2 inline-block">
+                    Follow Us
+                  </h4>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <a href="https://www.facebook.com/traverseglobe" target="_blank" rel="noopener noreferrer" className="bg-white text-teal-900 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg hover:bg-orange-500 hover:text-white transition-all shadow-md">
+                      f
+                    </a>
+                    <a href="https://www.instagram.com/traverseglobe" target="_blank" rel="noopener noreferrer" className="bg-white text-teal-900 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg hover:bg-orange-500 hover:text-white transition-all shadow-md">
+                      📷
+                    </a>
+                    <a href="https://twitter.com/traverseglobe" target="_blank" rel="noopener noreferrer" className="bg-white text-teal-900 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg hover:bg-orange-500 hover:text-white transition-all shadow-md">
+                      🐦
+                    </a>
+                    <a href="https://www.linkedin.com/company/traverseglobe" target="_blank" rel="noopener noreferrer" className="bg-white text-teal-900 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg hover:bg-orange-500 hover:text-white transition-all shadow-md">
+                      in
+                    </a>
+                    <a href="https://wa.me/919997085457" target="_blank" rel="noopener noreferrer" className="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg hover:bg-green-600 transition-all shadow-md">
+                      💬
+                    </a>
+                    <a href="https://www.youtube.com/@traverseglobe" target="_blank" rel="noopener noreferrer" className="bg-white text-teal-900 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg hover:bg-orange-500 hover:text-white transition-all shadow-md">
+                      ▶️
+                    </a>
+                  </div>
+                  <p className="mt-3 text-xs text-teal-100">Stay connected for exclusive deals!</p>
+                </div>
+              </div>
+
+              {/* Bottom Section - Legal & Copyright */}
+              <div className="border-t border-teal-700 pt-4 flex justify-between items-center flex-wrap gap-3 text-xs text-teal-200">
+                <div>
+                  <span contentEditable={!isExporting} suppressContentEditableWarning>© 2024 Traverse Globe. All rights reserved.</span>
+                </div>
+                <div className="flex gap-4 flex-wrap">
+                  <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                  <a href="#" className="hover:text-white transition-colors">Terms & Conditions</a>
+                  <a href="#" className="hover:text-white transition-colors">Cancellation Policy</a>
+                </div>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="mt-4 flex justify-center gap-4 flex-wrap text-xs text-teal-200">
+                <div className="flex items-center gap-2 bg-teal-700 bg-opacity-50 px-3 py-1.5 rounded-full">
+                  <span>✅</span> <span>IATA Certified</span>
+                </div>
+                <div className="flex items-center gap-2 bg-teal-700 bg-opacity-50 px-3 py-1.5 rounded-full">
+                  <span>🛡️</span> <span>100% Secure Booking</span>
+                </div>
+                <div className="flex items-center gap-2 bg-teal-700 bg-opacity-50 px-3 py-1.5 rounded-full">
+                  <span>⭐</span> <span>4.8/5 Rating</span>
+                </div>
+                <div className="flex items-center gap-2 bg-teal-700 bg-opacity-50 px-3 py-1.5 rounded-full">
+                  <span>🏆</span> <span>Award Winning Service</span>
+                </div>
+              </div>
+            </div>
           </footer>
         </div>
       </div>
