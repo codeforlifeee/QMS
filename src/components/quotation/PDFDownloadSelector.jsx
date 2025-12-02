@@ -28,8 +28,8 @@ const PDFDownloadSelector = ({ element, filename = 'quotation.pdf', quotationDat
   const methods = [
     {
       id: PDF_METHODS.JSPDF,
-      name: 'jsPDF (Best)',
-      description: 'High quality - Works offline',
+      name: 'PDF Generator (Best)',
+      description: 'Selectable text & clickable links',
       icon: FileText,
       quality: 'Excellent',
       color: 'green',
@@ -509,18 +509,18 @@ const PDFDownloadSelector = ({ element, filename = 'quotation.pdf', quotationDat
         </button>
         
         {/* Cloud Save Button - shows after PDF is generated */}
-        {generatedBlob && !showCloudSave && (
+        {generatedBlob && (
           <button
             className="btn btn-cloud"
-            onClick={() => setShowCloudSave(true)}
+            onClick={() => setShowCloudSave(!showCloudSave)}
             style={{
-              background: 'linear-gradient(135deg, #075056 0%, #0a6b72 100%)',
+              background: showCloudSave ? '#6b7280' : 'linear-gradient(135deg, #075056 0%, #0a6b72 100%)',
               color: '#ffffff',
               border: 'none'
             }}
           >
             <Cloud size={18} />
-            Save to Cloud
+            {showCloudSave ? 'Hide Cloud Options' : 'Save to Cloud Storage'}
           </button>
         )}
       </div>

@@ -67,11 +67,19 @@ const CloudSaveSelector = ({
       }
 
       // Check if it's a configuration error
-      if (error.message.includes('Firebase') || error.message.includes('configure')) {
+      if (error.message.includes('Firebase') || error.message.includes('configure') || error.message.includes('YOUR_API_KEY')) {
         toast.error(
           <div>
-            <div className="font-bold">Configuration Needed</div>
-            <div className="text-sm">Please set up Firebase in cloudStorage.js</div>
+            <div className="font-bold">⚙️ Firebase Not Configured</div>
+            <div className="text-sm">Update firebaseConfig in src/utils/cloudStorage.js with your Firebase project credentials</div>
+          </div>,
+          { duration: 6000 }
+        );
+      } else if (error.message.includes('not initialized')) {
+        toast.error(
+          <div>
+            <div className="font-bold">🔧 Setup Required</div>
+            <div className="text-sm">Cloud storage initialization failed. Check console for details.</div>
           </div>,
           { duration: 5000 }
         );

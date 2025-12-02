@@ -186,133 +186,81 @@ export const generatePDFViaHtml2Pdf = async (element, filename = 'quotation.pdf'
 };
 
 /**
- * METHOD 3: jsPDF + html2canvas - BEST CLIENT-SIDE METHOD
- * IMPROVED: Better quality, faster, footer at end only
+ * METHOD 3: html2pdf.js - BEST CLIENT-SIDE METHOD
+ * Preserves text selection and clickable links
+ * IMPROVED: Better quality, selectable text, working links
  */
 export const generatePDFViaJsPDF = async (element, filename = 'quotation.pdf') => {
   try {
-    console.log('[PDF jsPDF] Starting IMPROVED jsPDF generation...');
+    console.log('[PDF html2pdf] Starting generation with selectable text and links...');
     
     if (!element) {
       throw new Error('Element not provided');
     }
     
-    // Apply quality fixes (now much less aggressive)
+    // Apply quality fixes (preserve colors and gradients)
     const fixedElement = applyAllQualityFixes(element);
     
     // Prepare element
     const prepared = await prepareElementForPDF(fixedElement);
     
-    // Keep footer as part of content (don't separate it)
-    // Footer will appear at the end as a section, not repeated on pages
+    // Make all links explicitly visible and clickable
+    const links = prepared.querySelectorAll('a[href]');
+    links.forEach(link => {
+      link.style.color = '#0066cc';
+      link.style.textDecoration = 'underline';
+      link.setAttribute('target', '_blank');
+    });
     
-    // Attach main content
-    prepared.style.position = 'fixed';
-    prepared.style.left = '-9999px';
-    prepared.style.top = '0';
-    prepared.style.width = '900px'; // Increased for better quality
-    
-    document.body.appendChild(prepared);
-    
-    try {
-      await document.fonts.ready;
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Capture content with IMPROVED settings - PRESERVE EXACT UI APPEARANCE
-      console.log('[PDF jsPDF] Capturing content with high quality settings...');
-      const contentCanvas = await html2canvas(prepared, {
-        scale: 4, // High quality
+    // Configure html2pdf options for best quality with selectable text
+    const opt = {
+      margin: [10, 10, 15, 10],
+      filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff',
-        windowWidth: 900,
-        windowHeight: prepared.scrollHeight,
         letterRendering: true,
-        allowTaint: false,
-        removeContainer: false,
-        // CRITICAL: Preserve exact colors as user sees them
-        foreignObjectRendering: false,
-        imageTimeout: 0,
-        onclone: (clonedDoc) => {
-          // Ensure all computed styles are preserved
-          const clonedElement = clonedDoc.body.firstChild;
-          if (clonedElement) {
-            clonedElement.style.webkitPrintColorAdjust = 'exact';
-            clonedElement.style.printColorAdjust = 'exact';
-            clonedElement.style.colorAdjust = 'exact';
-          }
-        }
-      });
-      
-      console.log('[PDF jsPDF] Canvas captured. Size:', contentCanvas.width, 'x', contentCanvas.height);
-      
-      // Create PDF with optimized settings
-      const pdf = new jsPDF({
-        orientation: 'portrait',
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: {
         unit: 'mm',
         format: 'a4',
-        compress: true,
-        precision: 2
-      });
-      
-      const pageWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const margin = 8; // Reduced margins
-      const contentWidth = pageWidth - (margin * 2);
-      const contentHeight = pageHeight - (margin * 2);
-      
-      // Calculate dimensions
-      const imgWidth = contentWidth;
-      const imgHeight = (contentCanvas.height * imgWidth) / contentCanvas.width;
-      
-      // Split into pages
-      const totalPages = Math.ceil(imgHeight / contentHeight);
-      
-      console.log('[PDF jsPDF] Splitting into', totalPages, 'pages...');
-      
-      for (let page = 0; page < totalPages; page++) {
-        if (page > 0) {
-          pdf.addPage();
-        }
-        
-        const yOffset = -(page * contentHeight);
-        
-        const imgData = contentCanvas.toDataURL('image/jpeg', 0.98); // Higher quality
-        pdf.addImage(
-          imgData,
-          'JPEG',
-          margin,
-          margin + yOffset,
-          imgWidth,
-          imgHeight,
-          undefined,
-          'FAST' // Use FAST compression
-        );
-        
-        console.log('[PDF jsPDF] Page', page + 1, 'of', totalPages, 'added');
+        orientation: 'portrait',
+        compress: true
+      },
+      pagebreak: {
+        mode: ['avoid-all', 'css', 'legacy'],
+        before: '.page-break-before',
+        after: '.page-break-after',
+        avoid: ['img', 'table', 'tr', '.no-break']
       }
-      
-      // Get blob
-      const blob = pdf.output('blob');
-      
-      if (!blob || blob.size < MIN_PDF_SIZE) {
-        throw new Error(`Generated PDF is too small (${blob?.size || 0} bytes)`);
-      }
-      
-      console.log('[PDF jsPDF] Success! Size:', (blob.size / 1024).toFixed(2), 'KB');
-      
-      // Download
-      saveAs(blob, filename);
-      
-      return blob;
-      
-    } finally {
-      document.body.removeChild(prepared);
+    };
+    
+    console.log('[PDF html2pdf] Generating with text preservation...');
+    
+    // Generate PDF with html2pdf
+    const pdfBlob = await html2pdf()
+      .from(prepared)
+      .set(opt)
+      .outputPdf('blob');
+    
+    if (!pdfBlob || pdfBlob.size < MIN_PDF_SIZE) {
+      throw new Error(`Generated PDF is too small (${pdfBlob?.size || 0} bytes)`);
     }
     
+    console.log('[PDF html2pdf] Success! Size:', (pdfBlob.size / 1024).toFixed(2), 'KB');
+    console.log('[PDF html2pdf] Text is selectable and links are clickable');
+    
+    // Download
+    saveAs(pdfBlob, filename);
+    
+    return pdfBlob;
+    
   } catch (error) {
-    console.error('[PDF jsPDF] Failed:', error);
-    throw new Error(`jsPDF failed: ${error.message}`);
+    console.error('[PDF html2pdf] Failed:', error);
+    throw new Error(`html2pdf failed: ${error.message}`);
   }
 };
 

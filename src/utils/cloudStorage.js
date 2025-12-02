@@ -65,6 +65,12 @@ export const initializeCloudStorage = async () => {
   if (firebaseInitialized) return true;
 
   try {
+    // Check if Firebase is configured
+    if (firebaseConfig.apiKey === 'YOUR_API_KEY' || !firebaseConfig.apiKey) {
+      console.warn('[Cloud Storage] Firebase not configured. Update firebaseConfig in cloudStorage.js');
+      throw new Error('Please configure Firebase first. See src/utils/cloudStorage.js');
+    }
+
     // Dynamic imports: these will only attempt to load if the package exists / is installed
     const firebaseApp = await import('firebase/app');
     const firebaseStorage = await import('firebase/storage');
@@ -85,11 +91,21 @@ export const initializeCloudStorage = async () => {
 
     firebaseInitialized = true;
     firebaseInitError = null;
-    console.log('[Cloud Storage] Firebase initialized successfully');
+    console.log('[Cloud Storage] ✅ Firebase initialized successfully');
+    console.log('[Cloud Storage] Storage and Firestore ready for use');
     return true;
   } catch (error) {
     firebaseInitError = error;
-    console.warn('[Cloud Storage] Firebase not available or initialization failed:', error.message || error);
+    console.error('[Cloud Storage] ❌ Initialization failed:', error.message || error);
+    
+    if (error.message.includes('configure')) {
+      console.log('[Cloud Storage] 📋 Setup Steps:');
+      console.log('   1. Create Firebase project at https://console.firebase.google.com');
+      console.log('   2. Enable Storage and Firestore');
+      console.log('   3. Get your config from Project Settings');
+      console.log('   4. Update firebaseConfig in src/utils/cloudStorage.js');
+    }
+    
     // Do not throw - keep it friendly; callers should guard using isCloudAvailable()
     return false;
   }

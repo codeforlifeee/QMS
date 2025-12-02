@@ -1168,8 +1168,19 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
             }}
             filename={(() => {
               const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
-              const guest = (quotationData?.guestName || 'Guest').replace(/[^a-z0-9]/gi, '_').substring(0, 30);
-              const dest = (quotationData?.destination || packageTitle || 'Travel').replace(/[^a-z0-9]/gi, '_').substring(0, 30);
+              
+              // Get clean guest name (avoid duplicates)
+              let guestName = quotationData?.guestName || 'Guest';
+              guestName = guestName.split('_')[0].trim(); // Take first part if already has underscores
+              const guest = guestName.replace(/[^a-z0-9]/gi, '_').substring(0, 20);
+              
+              // Get destination or package - avoid duplicates
+              let destination = quotationData?.destination || packageTitle || 'Package';
+              // Remove any date patterns and clean up
+              destination = destination.replace(/\d{1,2}N[_\s]*\d{1,2}D/gi, '').trim();
+              destination = destination.replace(/_+/g, '_').replace(/^_|_$/g, '');
+              const dest = destination.replace(/[^a-z0-9]/gi, '_').substring(0, 25);
+              
               return `${guest}_${dest}_${timestamp}.pdf`;
             })()}
             onSuccess={(result) => {
