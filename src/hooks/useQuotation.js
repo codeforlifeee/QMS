@@ -138,16 +138,6 @@ export const useQuotation = () => {
     });
   }, []);
 
-  // Update selected activity
-  const updateActivity = useCallback((index, activity) => {
-    setQuotation((prev) => {
-      const updated = { ...prev };
-      updated.selectedActivities[index] = activity;
-      updateCosts(updated);
-      return updated;
-    });
-  }, []);
-
   // Calculate and update costs
   const updateCosts = useCallback((quotationData) => {
     let subtotal = 0;
@@ -237,42 +227,6 @@ export const useQuotation = () => {
     });
   }, []);
 
-  // Toggle flights inclusion
-  const toggleFlights = useCallback((included) => {
-    setQuotation((prev) => {
-      const updated = {
-        ...prev,
-        flights: { ...prev.flights, included },
-      };
-      updateCosts(updated);
-      return updated;
-    });
-  }, []);
-
-  // Toggle visa inclusion
-  const toggleVisa = useCallback((included) => {
-    setQuotation((prev) => {
-      const updated = {
-        ...prev,
-        visa: { ...prev.visa, included },
-      };
-      updateCosts(updated);
-      return updated;
-    });
-  }, []);
-
-  // Toggle GST
-  const toggleGST = useCallback((includeGST) => {
-    setQuotation((prev) => {
-      const updated = {
-        ...prev,
-        includeGST,
-      };
-      updateCosts(updated);
-      return updated;
-    });
-  }, []);
-
   // Clear all data
   const clearAll = useCallback(() => {
     setQuotation({
@@ -295,23 +249,6 @@ export const useQuotation = () => {
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
-  // Export quotation data
-  const exportData = useCallback(() => {
-    return JSON.stringify(quotation, null, 2);
-  }, [quotation]);
-
-  // Import quotation data
-  const importData = useCallback((jsonString) => {
-    try {
-      const imported = JSON.parse(jsonString);
-      setQuotation(imported);
-      return true;
-    } catch (err) {
-      console.error('Import failed:', err);
-      return false;
-    }
-  }, []);
-
   return {
     quotation,
     isSaved,
@@ -319,15 +256,9 @@ export const useQuotation = () => {
     updateBasicDetails,
     addActivity,
     removeActivity,
-    updateActivity,
     addDay,
     removeDay,
     updateDay,
-    toggleFlights,
-    toggleVisa,
-    toggleGST,
     clearAll,
-    exportData,
-    importData,
   };
 };

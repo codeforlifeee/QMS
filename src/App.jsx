@@ -8,7 +8,7 @@ import ActivitySelector from './components/quotation/ActivitySelector';
 import ItineraryBuilder from './components/quotation/ItineraryBuilder';
 import EditableQuotationTemplateNew from './components/quotation/EditableQuotationTemplateNew';
 import { Button, Spinner, Alert } from './components/ui/index.jsx';
-import { RefreshCw, X, Copy } from 'lucide-react';
+import { RefreshCw, X } from 'lucide-react';
 
 function App() {
   const previewRef = useRef(null);
@@ -27,7 +27,6 @@ function App() {
       return import.meta.env.VITE_PDF_SERVER_URL || 'http://localhost:4000';
     }
   });
-  const [serverChecking, setServerChecking] = useState(false);
 
   // Google Sheets Data
   const { data: tourData, loading: sheetsLoading, error: sheetsError, refetch: refetchSheets } = useGoogleSheets();
@@ -43,9 +42,6 @@ function App() {
     addDay,
     removeDay,
     updateDay,
-    toggleFlights,
-    toggleVisa,
-    toggleGST,
     clearAll,
   } = useQuotation();
 
@@ -64,23 +60,6 @@ function App() {
       localStorage.setItem('pdfServerUrl', pdfServerUrl);
     } catch (e) {}
   }, [pdfServerUrl]);
-
-  const testPdfServer = async () => {
-    setServerChecking(true);
-    try {
-      const url = `${pdfServerUrl.replace(/\/$/, '')}/health`;
-      const resp = await fetch(url, { method: 'GET' });
-      if (resp.ok) {
-        toast.success('PDF server is online');
-      } else {
-        toast.error(`PDF server responded with ${resp.status}`);
-      }
-    } catch (err) {
-      toast.error(`Failed to reach PDF server: ${err.message}`);
-    } finally {
-      setServerChecking(false);
-    }
-  };
 
   // Handle Download PDF - Enhanced for exact preview match
   const handleDownloadPDF = async () => {
@@ -158,36 +137,6 @@ function App() {
     } finally {
       setPdfLoading(false);
     }
-  };
-
-  // Handle WhatsApp Share
-  const handleShareWhatsApp = () => {
-    const message = `Hi,\n\nI'm sharing a travel quotation for you:\n\n*${quotation.guestName}*\n${quotation.tripDuration.days > 0 ? `Duration: ${quotation.tripDuration.nights}N/${quotation.tripDuration.days}D\n` : ''}Total Cost: ${quotation.costs.finalTotal ? `₹${quotation.costs.finalTotal.toLocaleString('en-IN')}` : 'TBD'}\n\nPlease find the detailed PDF attached or visit our website for more details.`;
-
-    const encodedMessage = encodeURIComponent(message);
-    window.open(
-      `https://wa.me/?text=${encodedMessage}`,
-      '_blank'
-    );
-  };
-
-  // Handle Copy Quotation
-  const handleCopyQuotation = () => {
-    const summary = `
-TRAVEL QUOTATION
-================
-
-Guest: ${quotation.guestName}
-Pax: ${quotation.totalAdults} Adults${quotation.totalChildren > 0 ? `, ${quotation.totalChildren} Children` : ''}
-Dates: ${quotation.travelDates.from || 'TBD'} to ${quotation.travelDates.to || 'TBD'}
-Duration: ${quotation.tripDuration.days > 0 ? `${quotation.tripDuration.nights}N/${quotation.tripDuration.days}D` : 'N/A'}
-
-TOTAL COST: ₹${quotation.costs.finalTotal.toLocaleString('en-IN')}
-Per Person: ₹${quotation.costs.perPersonCost.toLocaleString('en-IN')}
-    `.trim();
-
-    navigator.clipboard.writeText(summary);
-    toast.success('Quotation summary copied to clipboard!');
   };
 
   // Handle Clear All
