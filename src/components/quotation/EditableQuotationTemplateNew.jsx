@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, forwardRef } from 'react';
 import { formatCurrency } from '../../utils/formatters';
-import { Download, Edit } from 'lucide-react';
-import { PDFEditorModal } from './PDFEditorModal';
+import { Download } from 'lucide-react';
 import { downloadPDFWithRetry } from '../../utils/pdfGenerator';
 import PDFDownloadSelector from './PDFDownloadSelector';
 import { toast } from 'react-hot-toast';
@@ -50,7 +49,6 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
   const [logoSrc, setLogoSrc] = useState('');
   const [bannerSrc, setBannerSrc] = useState('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1200');
   const [accommodationImage, setAccommodationImage] = useState('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200');
-  const [showPDFEditor, setShowPDFEditor] = useState(false);
   const [pdfDownloading, setPdfDownloading] = useState(false);
   const [showPDFSelector, setShowPDFSelector] = useState(false);
   
@@ -371,74 +369,8 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
           onMouseOver={(e) => !(loading || pdfGenerating) && (e.target.style.transform = 'translateY(-2px)')}
           onMouseOut={(e) => !(loading || pdfGenerating) && (e.target.style.transform = 'translateY(0)')}>
           <Download size={20} />
-          {pdfGenerating ? pdfProgress || 'Generating...' : loading ? 'Loading...' : 'Download PDF (Choose Method)'}
+          {pdfGenerating ? pdfProgress || 'Generating...' : loading ? 'Loading...' : 'Download PDF'}
         </button>
-        
-        <button 
-          onClick={() => setShowPDFEditor(true)}
-          disabled={loading || pdfGenerating}
-          style={{ 
-            background: (loading || pdfGenerating) ? '#666' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)', 
-            color: 'white', 
-            border: 'none', 
-            padding: '12px 24px', 
-            borderRadius: '8px', 
-            cursor: (loading || pdfGenerating) ? 'not-allowed' : 'pointer', 
-            fontWeight: '600',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.3s',
-            boxShadow: (loading || pdfGenerating) ? 'none' : '0 3px 8px rgba(37,99,235,0.3)',
-            fontSize: '15px'
-          }}
-          onMouseOver={(e) => !(loading || pdfGenerating) && (e.target.style.transform = 'translateY(-2px)')}
-          onMouseOut={(e) => !(loading || pdfGenerating) && (e.target.style.transform = 'translateY(0)')}>
-          <Edit size={20} />
-          Edit PDF Layout
-        </button>
-        
-        {/* Quick Quality Selector */}
-        {!pdfGenerating && !loading && (
-          <div style={{ display: 'flex', gap: '6px' }}>
-            <button 
-              onClick={() => downloadPDF('compact')}
-              title="Compact: Smallest file, tight spacing, fewer pages"
-              style={{ 
-                background: 'linear-gradient(135deg, #ff5b04 0%, #ff7b34 100%)', 
-                color: 'white', 
-                border: 'none', 
-                padding: '8px 14px', 
-                borderRadius: '6px', 
-                cursor: 'pointer', 
-                fontWeight: '600',
-                fontSize: '13px',
-                transition: 'all 0.3s'
-              }}
-              onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-              onMouseOut={(e) => e.target.style.transform = 'scale(1)'}>
-              📄 Compact
-            </button>
-            <button 
-              onClick={() => downloadPDF('ultra')}
-              title="Ultra HD: Best quality, sharpest text & images"
-              style={{ 
-                background: 'linear-gradient(135deg, #01579b 0%, #0277bd 100%)', 
-                color: 'white', 
-                border: 'none', 
-                padding: '8px 14px', 
-                borderRadius: '6px', 
-                cursor: 'pointer', 
-                fontWeight: '600',
-                fontSize: '13px',
-                transition: 'all 0.3s'
-              }}
-              onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-              onMouseOut={(e) => e.target.style.transform = 'scale(1)'}>
-              ⭐ Ultra HD
-            </button>
-          </div>
-        )}
         
         {/* PDF Generation Progress Indicator */}
         {pdfGenerating && (
@@ -456,26 +388,7 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
             <span style={{ color: '#856404', fontWeight: '600', fontSize: '14px' }}>{pdfProgress}</span>
           </div>
         )}
-        
-        {quotationData && (
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', fontSize: '13px', color: '#666', marginLeft: 'auto', flexWrap: 'wrap' }}>
-            {quotationData.guestName && (
-              <span style={{ background: '#e9f7fa', padding: '6px 12px', borderRadius: '6px', color: '#075056', fontWeight: '500' }}>
-                👤 {quotationData.guestName}
-              </span>
-            )}
-            {paxInfo && (
-              <span style={{ background: '#e9f7fa', padding: '6px 12px', borderRadius: '6px', color: '#075056', fontWeight: '500' }}>
-                👥 {paxInfo}
-              </span>
-            )}
-            {totalCost && totalCost !== '0' && (
-              <span style={{ background: '#c9f1ff', padding: '6px 12px', borderRadius: '6px', color: '#01579b', fontWeight: '600' }}>
-                💰 AED {totalCost}
-              </span>
-            )}
-          </div>
-        )}
+
         
         <label style={{ fontSize: '13px', color: '#444', display: 'none' }}>
           Page title:
@@ -887,6 +800,84 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
           </div>
         </section>
 
+        {/* Customer Reviews Section */}
+        <section style={{ marginBottom: '10px' }} className="pdf-section no-break">
+          <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', color: 'black', borderLeft: '4px solid #00897b', paddingLeft: '10px', fontWeight: '600' }}>What Our Customers Say</h3>
+          <div style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #f7fef9 100%)', borderLeft: '6px solid #00897b', padding: '14px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,137,123,0.08)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
+              
+              {/* Review 1 */}
+              <div style={{ background: '#ffffff', borderRadius: '10px', padding: '14px', boxShadow: '0 2px 6px rgba(0,0,0,0.08)', border: '1px solid rgba(0,137,123,0.2)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'linear-gradient(135deg, #00897b, #00695c)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '18px', fontWeight: '700' }}>
+                    RS
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 contentEditable suppressContentEditableWarning style={{ margin: 0, color: '#075056', fontSize: '14px', fontWeight: '600' }}>
+                      Rajesh Sharma
+                    </h4>
+                    <div style={{ color: '#ffc107', fontSize: '14px' }}>⭐⭐⭐⭐⭐</div>
+                  </div>
+                </div>
+                <p contentEditable suppressContentEditableWarning style={{ margin: 0, color: '#666', fontSize: '13px', lineHeight: '1.5', fontStyle: 'italic' }}>
+                  "Amazing experience! The itinerary was well planned and everything was smooth. Highly recommend Traverse Globe for Dubai packages."
+                </p>
+                <div style={{ marginTop: '8px', fontSize: '11px', color: '#999' }}>
+                  <span contentEditable suppressContentEditableWarning>Mumbai, India • December 2024</span>
+                </div>
+              </div>
+
+              {/* Review 2 */}
+              <div style={{ background: '#ffffff', borderRadius: '10px', padding: '14px', boxShadow: '0 2px 6px rgba(0,0,0,0.08)', border: '1px solid rgba(0,137,123,0.2)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'linear-gradient(135deg, #00897b, #00695c)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '18px', fontWeight: '700' }}>
+                    PK
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 contentEditable suppressContentEditableWarning style={{ margin: 0, color: '#075056', fontSize: '14px', fontWeight: '600' }}>
+                      Priya Kapoor
+                    </h4>
+                    <div style={{ color: '#ffc107', fontSize: '14px' }}>⭐⭐⭐⭐⭐</div>
+                  </div>
+                </div>
+                <p contentEditable suppressContentEditableWarning style={{ margin: 0, color: '#666', fontSize: '13px', lineHeight: '1.5', fontStyle: 'italic' }}>
+                  "Excellent service from start to finish. The team was very responsive and made our family trip memorable. Will definitely book again!"
+                </p>
+                <div style={{ marginTop: '8px', fontSize: '11px', color: '#999' }}>
+                  <span contentEditable suppressContentEditableWarning>Delhi, India • November 2024</span>
+                </div>
+              </div>
+
+              {/* Review 3 */}
+              <div style={{ background: '#ffffff', borderRadius: '10px', padding: '14px', boxShadow: '0 2px 6px rgba(0,0,0,0.08)', border: '1px solid rgba(0,137,123,0.2)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'linear-gradient(135deg, #00897b, #00695c)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '18px', fontWeight: '700' }}>
+                    AM
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 contentEditable suppressContentEditableWarning style={{ margin: 0, color: '#075056', fontSize: '14px', fontWeight: '600' }}>
+                      Amit Mehta
+                    </h4>
+                    <div style={{ color: '#ffc107', fontSize: '14px' }}>⭐⭐⭐⭐⭐</div>
+                  </div>
+                </div>
+                <p contentEditable suppressContentEditableWarning style={{ margin: 0, color: '#666', fontSize: '13px', lineHeight: '1.5', fontStyle: 'italic' }}>
+                  "Best travel agency for Dubai! Great prices, amazing hotels, and hassle-free experience. Thank you Traverse Globe team!"
+                </p>
+                <div style={{ marginTop: '8px', fontSize: '11px', color: '#999' }}>
+                  <span contentEditable suppressContentEditableWarning>Bangalore, India • October 2024</span>
+                </div>
+              </div>
+
+            </div>
+            <div style={{ marginTop: '12px', padding: '10px', background: 'linear-gradient(135deg, #e0f2f1 0%, #f1f8f7 100%)', borderRadius: '8px', textAlign: 'center' }}>
+              <p style={{ margin: 0, color: '#00695c', fontSize: '13px', fontWeight: '600' }}>
+                ⭐ Rated 4.9/5 based on 500+ customer reviews | 📞 Call us for more testimonials!
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* NEW: Recommended Activities Section */}
         <section style={{ marginBottom: '10px' }} className="pdf-section no-break">
           <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', color: 'black', borderLeft: '4px solid #ff5b04', paddingLeft: '10px', fontWeight: '600' }}>Recommended Activities</h3>
@@ -1086,24 +1077,6 @@ const EditableQuotationTemplateNew = forwardRef(({ quotationData = {}, tourData 
       </div>
     </div>
     
-    {/* PDF Editor Modal */}
-    <PDFEditorModal
-      isOpen={showPDFEditor}
-      onClose={() => setShowPDFEditor(false)}
-      element={printableRef?.current}
-      filename={`${pageTitle?.replace(/\s+/g, '_') || packageTitle?.replace(/\s+/g, '_') || 'quotation'}_${new Date().toISOString().split('T')[0]}.pdf`}
-      onDownload={async (element, filename, config) => {
-        setPdfDownloading(true);
-        try {
-          await downloadPDFUtil(element, filename, config);
-        } catch (error) {
-          console.error('PDF download failed:', error);
-        } finally {
-          setPdfDownloading(false);
-        }
-      }}
-    />
-
     {/* PDF Download Method Selector Modal */}
     {showPDFSelector && (
       <div 

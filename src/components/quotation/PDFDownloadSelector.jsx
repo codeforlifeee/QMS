@@ -17,7 +17,7 @@ import CloudSaveSelector from './CloudSaveSelector';
  * Now includes cloud storage option
  */
 const PDFDownloadSelector = ({ element, filename = 'quotation.pdf', quotationData = {}, onSuccess, onError }) => {
-  const [selectedMethod, setSelectedMethod] = useState('smart');
+  const [selectedMethod, setSelectedMethod] = useState('jspdf');
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastResult, setLastResult] = useState(null);
   const [showValidation, setShowValidation] = useState(false);
@@ -28,37 +28,12 @@ const PDFDownloadSelector = ({ element, filename = 'quotation.pdf', quotationDat
   const methods = [
     {
       id: PDF_METHODS.JSPDF,
-      name: 'PDF Generator (Best)',
-      description: 'Selectable text & clickable links',
+      name: 'Download PDF',
+      description: 'High quality PDF with selectable text',
       icon: FileText,
       quality: 'Excellent',
       color: 'green',
       recommended: true
-    },
-    {
-      id: 'smart',
-      name: 'Smart (Auto)',
-      description: 'Tries methods automatically',
-      icon: CheckCircle,
-      quality: 'Auto',
-      color: 'blue'
-    },
-    {
-      id: PDF_METHODS.HTML2PDF,
-      name: 'html2pdf',
-      description: 'Alternative method',
-      icon: FileText,
-      quality: 'Good',
-      color: 'teal'
-    },
-    {
-      id: PDF_METHODS.PUPPETEER,
-      name: 'Puppeteer',
-      description: 'Server required',
-      icon: Server,
-      quality: 'High',
-      color: 'purple',
-      requiresServer: true
     },
     {
       id: PDF_METHODS.PRINT,
@@ -93,25 +68,15 @@ const PDFDownloadSelector = ({ element, filename = 'quotation.pdf', quotationDat
       let result;
       const startTime = Date.now();
 
-      if (selectedMethod === 'smart') {
-        result = await generatePDFSmart(element, filename);
-      } else {
-        switch (selectedMethod) {
-          case PDF_METHODS.PUPPETEER:
-            result = { blob: await generatePDFViaPuppeteer(element, filename), method: 'Puppeteer' };
-            break;
-          case PDF_METHODS.HTML2PDF:
-            result = { blob: await generatePDFViaHtml2Pdf(element, filename), method: 'html2pdf' };
-            break;
-          case PDF_METHODS.JSPDF:
-            result = { blob: await generatePDFViaJsPDF(element, filename), method: 'jsPDF' };
-            break;
-          case PDF_METHODS.PRINT:
-            result = { blob: await generatePDFViaPrint(element, filename), method: 'Print' };
-            break;
-          default:
-            throw new Error('Unknown method');
-        }
+      switch (selectedMethod) {
+        case PDF_METHODS.JSPDF:
+          result = { blob: await generatePDFViaJsPDF(element, filename), method: 'jsPDF' };
+          break;
+        case PDF_METHODS.PRINT:
+          result = { blob: await generatePDFViaPrint(element, filename), method: 'Print' };
+          break;
+        default:
+          result = { blob: await generatePDFViaJsPDF(element, filename), method: 'jsPDF' };
       }
 
       const elapsed = Date.now() - startTime;
@@ -400,7 +365,7 @@ const PDFDownloadSelector = ({ element, filename = 'quotation.pdf', quotationDat
 
       <div className="selector-header">
         <h3 className="selector-title">Download PDF</h3>
-        <p className="selector-subtitle">Choose your preferred PDF generation method</p>
+        <p className="selector-subtitle">Select download method</p>
       </div>
 
       <div className="methods-grid">
