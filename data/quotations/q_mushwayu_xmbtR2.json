@@ -1,0 +1,120 @@
+{
+  "id": "q_mushwayu_xmbtR2",
+  "token": "WGvoj4JXnco6Mw5yhsoqfM",
+  "status": "draft",
+  "reference": "TG-2026-0002",
+  "title": "New quotation",
+  "destination": "",
+  "client": {
+    "name": ""
+  },
+  "travelStart": "2026-11-02",
+  "travelEnd": "2026-11-17",
+  "pax": {
+    "adults": 2,
+    "children": 0,
+    "infants": 0
+  },
+  "quoteCurrency": "INR",
+  "fx": {
+    "AED": "22.85"
+  },
+  "pricingMode": "PER_SERVICE",
+  "defaultMarkupByType": {
+    "HOTEL": 15,
+    "ACTIVITY": 20,
+    "TRANSFER": 20,
+    "VISA": 10,
+    "MEAL": 20,
+    "MISC": 15
+  },
+  "taxRatesByClass": {
+    "standard": 5
+  },
+  "defaultTaxClass": "standard",
+  "taxLabel": "GST @ 5%",
+  "roundingUnit": 100,
+  "days": [
+    {
+      "id": "d1",
+      "index": 1,
+      "title": "Burj Kahlifa",
+      "prose": ""
+    },
+    {
+      "id": "d2",
+      "index": 2,
+      "title": "Day 2",
+      "prose": ""
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_mutqb3xv_iol4y",
+      "dayId": null,
+      "type": "HOTEL",
+      "label": "",
+      "costCurrency": "AED",
+      "adultRate": "0.00",
+      "basis": "PER_ROOM_NIGHT",
+      "nights": 1,
+      "rooms": [
+        {
+          "occupancy": "TWIN",
+          "roomCount": 1,
+          "roomRate": "0.00"
+        }
+      ]
+    },
+    {
+      "id": "l_mutqbkjy_a3m1p",
+      "dayId": null,
+      "type": "ACTIVITY",
+      "label": "New activity",
+      "costCurrency": "AED",
+      "adultRate": "0.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      }
+    },
+    {
+      "id": "l_mutqbr90_rwkqa",
+      "dayId": null,
+      "type": "TRANSFER",
+      "label": "New transfer",
+      "costCurrency": "AED",
+      "adultRate": "0.00",
+      "basis": "PER_UNIT",
+      "qty": 1
+    },
+    {
+      "id": "l_mutqbwmu_hvacj",
+      "dayId": null,
+      "type": "VISA",
+      "label": "New visa",
+      "costCurrency": "AED",
+      "adultRate": "0.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "SAME_AS_ADULT"
+      }
+    }
+  ],
+  "paymentPolicy": [
+    "50% at the time of confirmation",
+    "Rest 30%, 20 days before travel date",
+    "Remaining 20%, 7 days before travel date"
+  ],
+  "terms": [
+    "Rates are subject to availability at the time of confirmation.",
+    "Hotel check-in is typically 1500 hrs and check-out 1200 hrs.",
+    "Any increase in government taxes or fuel surcharge will be charged extra.",
+    "Cancellation charges apply as per the policy shared at the time of booking."
+  ],
+  "createdAt": "2026-10-03T14:36:33.803Z",
+  "updatedAt": "2026-10-04T11:20:25.441Z",
+  "validUntil": "2026-11-02",
+  "viewCount": 0
+}

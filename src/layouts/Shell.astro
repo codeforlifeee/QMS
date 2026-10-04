@@ -1,0 +1,30 @@
+---
+import '../styles/app.css';
+import { COMPANY } from '../config/company.js';
+
+interface Props {
+  title?: string;
+}
+const { title = 'Quotations' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} — QMS</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-brand">
+        <a href="/">QMS</a><small>{COMPANY.name}</small>
+      </div>
+      <div class="topbar-actions">
+        <slot name="actions" />
+      </div>
+    </header>
+    <slot />
+  </body>
+</html>

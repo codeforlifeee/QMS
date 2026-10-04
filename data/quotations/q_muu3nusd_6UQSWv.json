@@ -1,0 +1,134 @@
+{
+  "id": "q_muu3nusd_6UQSWv",
+  "token": "uXbaFxF9hdf9t5yzHF288W",
+  "status": "draft",
+  "reference": "AI-2026-5292",
+  "title": "Dubai — 4N",
+  "destination": "Dubai",
+  "client": {
+    "name": "Sarah Jenkins"
+  },
+  "travelStart": "2026-10-04",
+  "travelEnd": "2026-10-08",
+  "pax": {
+    "adults": 2,
+    "children": 1,
+    "infants": 0
+  },
+  "quoteCurrency": "USD",
+  "fx": {
+    "AED": "3.65",
+    "USD": "1.00"
+  },
+  "pricingMode": "PER_SERVICE",
+  "defaultMarkupByType": {
+    "ACTIVITY": 15,
+    "HOTEL": 15,
+    "TRANSFER": 15,
+    "MEAL": 15,
+    "VISA": 15,
+    "FLIGHT": 0,
+    "MISC": 15
+  },
+  "taxRatesByClass": {
+    "standard": 5
+  },
+  "defaultTaxClass": "standard",
+  "taxLabel": "VAT",
+  "days": [
+    {
+      "id": "d_muu3ntzp_5wvi1",
+      "index": 1,
+      "title": "Welcome to Vibrant Dubai",
+      "prose": "Welcome to the dazzling city of Dubai, where modern marvels meet rich Arabian culture. Step out and immerse yourself in the vibrant atmosphere as your unforgettable journey begins."
+    },
+    {
+      "id": "d_muu3ntzp_djxfd",
+      "index": 2,
+      "title": "Burj Khalifa and Sky Views",
+      "prose": "Ascend to the clouds with visits to the iconic Burj Khalifa and the thrilling Sky Views observatory. Witness breathtaking panoramic vistas that showcase the unbelievable scale of this metropolis."
+    },
+    {
+      "id": "d_muu3ntzp_zuqbf",
+      "index": 3,
+      "title": "Thrilling Desert Safari Adventure",
+      "prose": "Embark on an adrenaline-pumping desert safari across golden dunes and experience traditional Arabian hospitality under the stars. It is an exhilarating adventure that brings you face-to-face with the magic of the Arabian desert."
+    },
+    {
+      "id": "d_muu3ntzp_i7gfb",
+      "index": 4,
+      "title": "Discovering Old Dubai",
+      "prose": "Step back in time as you explore the charming historic alleyways and bustling souks of Old Dubai. Discover the city's rich heritage along the sparkling waters of the Dubai Creek."
+    },
+    {
+      "id": "d_muu3ntzp_nn8u9",
+      "index": 5,
+      "title": "Farewell Dubai Marina",
+      "prose": "Conclude your Dubai getaway with a relaxing stroll along the picturesque Dubai Marina. Soak in the stunning waterfront views and toast to an unforgettable Arabian adventure."
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_muu3ntzp_vpqo4",
+      "dayId": "d_muu3ntzp_djxfd",
+      "type": "ACTIVITY",
+      "label": "Burj Khalifa At the Top & Sky Views Tickets",
+      "costCurrency": "AED",
+      "adultRate": "151.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "description": "The Burj Khalifa Tickets",
+      "catalogRef": "p_6eb114b23073",
+      "supplier": "Rayna Tours"
+    },
+    {
+      "id": "l_muu3ntzq_ss7x3",
+      "dayId": "d_muu3ntzp_zuqbf",
+      "type": "ACTIVITY",
+      "label": "Desert Safari",
+      "costCurrency": "AED",
+      "adultRate": "110.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "description": "Desert Safari Price & Offers",
+      "catalogRef": "p_24af4aebca18",
+      "supplier": "Rayna Tours"
+    },
+    {
+      "id": "l_muu3ntzq_znfcg",
+      "dayId": null,
+      "type": "HOTEL",
+      "costCurrency": "AED",
+      "adultRate": "0.00",
+      "basis": "PER_ROOM_NIGHT",
+      "nights": 4,
+      "rooms": [
+        {
+          "occupancy": "TWIN",
+          "roomCount": 1,
+          "roomRate": "0.00"
+        }
+      ]
+    }
+  ],
+  "paymentPolicy": [
+    "50% at the time of confirmation",
+    "Rest 30%, 20 days before travel date",
+    "Remaining 20%, 7 days before travel date"
+  ],
+  "terms": [
+    "Rates are subject to availability at the time of confirmation.",
+    "Hotel check-in is typically 1500 hrs and check-out 1200 hrs.",
+    "Any increase in government taxes or fuel surcharge will be charged extra.",
+    "Cancellation charges apply as per the policy shared at the time of booking."
+  ],
+  "createdAt": "2026-10-04T17:33:37.309Z",
+  "updatedAt": "2026-10-04T17:34:23.761Z",
+  "inclusions": []
+}

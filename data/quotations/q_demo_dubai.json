@@ -1,0 +1,243 @@
+{
+  "id": "q_demo_dubai",
+  "token": "kRn7tPmXq2vLdW4hGb9sZc",
+  "status": "draft",
+  "reference": "TG-2026-0041",
+  "title": "Dubai Family Escape",
+  "destination": "Dubai & Abu Dhabi, UAE",
+  "heroImageUrl": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1100&q=55",
+  "client": {
+    "name": "Mr. Rajesh Mehta",
+    "phone": "+91 98100 45612",
+    "email": "rajesh.mehta@example.com"
+  },
+  "agentName": "Priya Sharma",
+  "travelStart": "2026-11-12",
+  "travelEnd": "2026-11-17",
+  "pax": {
+    "adults": 2,
+    "children": 1,
+    "infants": 0
+  },
+  "quoteCurrency": "INR",
+  "fx": {
+    "AED": "22.85"
+  },
+  "pricingMode": "PER_SERVICE",
+  "defaultMarkupByType": {
+    "HOTEL": 15,
+    "ACTIVITY": 40,
+    "TRANSFER": 20,
+    "VISA": 10,
+    "MEAL": 20,
+    "MISC": 15
+  },
+  "taxRatesByClass": {
+    "standard": 5
+  },
+  "defaultTaxClass": "standard",
+  "taxLabel": "GST @ 5%",
+  "roundingUnit": 100,
+  "discounts": [
+    {
+      "kind": "PERCENT",
+      "pct": 3,
+      "label": "Early-bird booking"
+    }
+  ],
+  "overview": "Six days built around what actually works for a family travelling with an eight-year-old — a central Marina base you return to each evening, mornings that start late enough to be civil, and one genuinely unforgettable desert night. Abu Dhabi is a full day out, so we have placed it mid-trip while everyone still has energy.",
+  "days": [
+    {
+      "id": "d1",
+      "index": 1,
+      "title": "Arrival",
+      "prose": "You are met at the airport and driven straight to the hotel in Dubai Marina. The rest of the day is yours — the Marina walk is five minutes from the lobby and is at its best after sunset, when the towers light up and the promenade fills with families."
+    },
+    {
+      "id": "d2",
+      "index": 2,
+      "title": "Desert safari & BBQ dinner",
+      "prose": "A slow morning, then afternoon pickup for the red dunes of Lahbab. Dune bashing first, then camel rides and sandboarding at the camp, and dinner under string lights with live tanoura. We have requested a family-friendly vehicle with a gentler drive."
+    },
+    {
+      "id": "d3",
+      "index": 3,
+      "title": "BUrj",
+      "prose": "Up to the 124th floor in the late afternoon so you catch the city in daylight and then watch it switch to night. Afterwards, the Dubai Fountain show runs every thirty minutes, and the Mall's aquarium tunnel is free to walk past."
+    },
+    {
+      "id": "d4",
+      "index": 4,
+      "title": "Burj kah",
+      "prose": "A full day out: Sheikh Zayed Grand Mosque in the morning light, then the Louvre Abu Dhabi and a drive along the Corniche. Modest dress is required at the mosque and abayas are available free at the entrance."
+    },
+    {
+      "id": "d5",
+      "index": 5,
+      "title": "Leisure & shopping",
+      "prose": "Nothing scheduled. Most families use this day for the beach at JBR in the morning and the souks of Old Dubai in the evening — we are happy to arrange either on the day."
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_flight",
+      "dayId": null,
+      "type": "FLIGHT",
+      "label": "Return airfare DEL–DXB–DEL (Economy)",
+      "description": "Emirates / IndiGo, 30kg checked baggage",
+      "basis": "PER_PERSON",
+      "costCurrency": "INR",
+      "adultRate": "34500.00",
+      "child": {
+        "mode": "SAME_AS_ADULT"
+      },
+      "markupLocked": true,
+      "supplier": "Direct airline booking",
+      "isOptional": false
+    },
+    {
+      "id": "l_visa",
+      "dayId": null,
+      "type": "VISA",
+      "label": "UAE tourist visa (14 days)",
+      "basis": "PER_PERSON",
+      "costCurrency": "AED",
+      "adultRate": "350.00",
+      "child": {
+        "mode": "SAME_AS_ADULT"
+      },
+      "supplier": "Rayna Tours",
+      "isOptional": false
+    },
+    {
+      "id": "l_hotel",
+      "dayId": null,
+      "type": "HOTEL",
+      "label": "Rove Dubai Marina — 5 nights",
+      "description": "Deluxe room, breakfast included. One double room with an extra bed.",
+      "basis": "PER_ROOM_NIGHT",
+      "costCurrency": "AED",
+      "adultRate": "0.00",
+      "nights": 5,
+      "rooms": [
+        {
+          "occupancy": "DOUBLE",
+          "roomCount": 1,
+          "roomRate": "420.00",
+          "extraBedCount": 1,
+          "extraBedRate": "120.00",
+          "capacity": 3,
+          "paxInRoom": 3
+        }
+      ],
+      "supplier": "Rayna Tours",
+      "isOptional": false
+    },
+    {
+      "id": "l_transfer",
+      "dayId": null,
+      "type": "TRANSFER",
+      "label": "Private airport transfers (arrival & departure)",
+      "basis": "PER_UNIT",
+      "costCurrency": "AED",
+      "adultRate": "180.00",
+      "qty": 2,
+      "supplier": "Rayna Tours",
+      "isOptional": false
+    },
+    {
+      "id": "l_safari",
+      "dayId": "d2",
+      "type": "ACTIVITY",
+      "label": "Desert safari with BBQ dinner",
+      "description": "Shared 4x4, camel ride, sandboarding, live entertainment",
+      "basis": "PER_PERSON",
+      "costCurrency": "AED",
+      "adultRate": "250.00",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "supplier": "Rayna Tours",
+      "isOptional": false
+    },
+    {
+      "id": "l_burj",
+      "dayId": "d3",
+      "type": "ACTIVITY",
+      "label": "Burj Khalifa — Level 124 & 125",
+      "description": "Non-prime time slot, skip-the-line entry",
+      "basis": "PER_PERSON",
+      "costCurrency": "AED",
+      "adultRate": "169.00",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "supplier": "Rayna Tours",
+      "isOptional": false
+    },
+    {
+      "id": "l_abudhabi",
+      "dayId": "d4",
+      "type": "ACTIVITY",
+      "label": "Abu Dhabi city tour with Louvre",
+      "description": "Full day, air-conditioned coach, English-speaking guide",
+      "basis": "PER_PERSON",
+      "costCurrency": "AED",
+      "adultRate": "320.00",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.6
+      },
+      "supplier": "Rayna Tours",
+      "isOptional": false
+    },
+    {
+      "id": "l_cruise",
+      "dayId": "d5",
+      "type": "ACTIVITY",
+      "label": "Dhow cruise dinner, Dubai Marina",
+      "basis": "PER_PERSON",
+      "costCurrency": "AED",
+      "adultRate": "180.00",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "isOptional": true,
+      "supplier": "Rayna Tours"
+    }
+  ],
+  "inclusions": [
+    "Return economy airfare with 30kg checked baggage",
+    "UAE tourist visa for all travellers",
+    "5 nights at Rove Dubai Marina with daily breakfast",
+    "Private airport transfers on arrival and departure",
+    "Desert safari with BBQ dinner and live entertainment",
+    "Burj Khalifa Level 124 & 125 entry",
+    "Full-day Abu Dhabi tour including Louvre entry",
+    "All applicable taxes as listed"
+  ],
+  "exclusions": [
+    "Travel insurance",
+    "Lunches and dinners except where mentioned",
+    "Personal expenses, tips and gratuities",
+    "Anything not listed under inclusions"
+  ],
+  "paymentPolicy": [
+    "50% at the time of confirmation",
+    "Rest 30%, 20 days before travel date",
+    "Remaining 20%, 7 days before travel date"
+  ],
+  "terms": [
+    "Rates are subject to availability at the time of confirmation.",
+    "Hotel check-in is typically 1500 hrs and check-out 1200 hrs.",
+    "Any increase in government taxes or fuel surcharge will be charged extra.",
+    "Cancellation charges apply as per the policy shared at the time of booking."
+  ],
+  "validUntil": "2026-10-20",
+  "createdAt": "2026-10-03T06:00:00.000Z",
+  "updatedAt": "2026-10-04T11:19:33.717Z",
+  "viewCount": 0
+}

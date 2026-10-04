@@ -1,0 +1,58 @@
+{
+  "l_muu3ntzp_vpqo4": [
+    {
+      "lineId": "l_muu3ntzp_vpqo4",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "p_6eb114b23073",
+        "productName": "Burj Khalifa At the Top & Sky Views Tickets",
+        "sheetName": "Catalog",
+        "originalValueAed": 15100,
+        "matchScore": 1,
+        "matchedQuery": "Burj Khalifa"
+      },
+      "alternatives": [
+        {
+          "catalogId": "p_7849312f501c",
+          "productName": "Burj Khalifa At the Top & Sky Views Tickets",
+          "costAed": 15100,
+          "score": 1
+        },
+        {
+          "catalogId": "p_be4a5cc5c36b",
+          "productName": "Burj Khalifa At the Top & Sky Views Tickets",
+          "costAed": 15100,
+          "score": 1
+        }
+      ]
+    }
+  ],
+  "l_muu3ntzq_ss7x3": [
+    {
+      "lineId": "l_muu3ntzq_ss7x3",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "p_24af4aebca18",
+        "productName": "Desert Safari",
+        "sheetName": "Catalog",
+        "originalValueAed": 11000,
+        "matchScore": 1,
+        "matchedQuery": "Desert Safari"
+      },
+      "alternatives": [
+        {
+          "catalogId": "p_31b31cf64f3d",
+          "productName": "Desert Safari",
+          "costAed": 11000,
+          "score": 1
+        },
+        {
+          "catalogId": "p_fd1934560b75",
+          "productName": "Desert Safari & Overnight Camp",
+          "costAed": 40000,
+          "score": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+---
+import '../../document/document.css';
+import '../../styles/app.css';
+import QuotationDocument from '../../document/QuotationDocument.tsx';
+import { loadByToken } from '../../lib/load.js';
+import { COMPANY } from '../../config/company.js';
+import { formatMoney } from '../../pricing/money.js';
+
+export const prerender = false;
+
+const loaded = await loadByToken(Astro.params.token);
+if (!loaded) return new Response('Quotation not found', { status: 404 });
+const { q, result } = loaded;
+
+const whatsappNumber = COMPANY.whatsapp[0];
+const headline = formatMoney(result.grandTotal, { showDecimals: false });
+const shareText = encodeURIComponent(
+  `Hi ${q.client.name}, your quotation "${q.title}" (${q.reference}) is ready — ${headline}. View here: ${Astro.url.href}`,
+);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{q.title} — {q.reference}</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta property="og:title" content={q.title} />
+    <meta property="og:description" content={`${q.destination} · ${headline}`} />
+    {q.heroImageUrl && <meta property="og:image" content={q.heroImageUrl} />}
+  </head>
+  <body style="background:#eef3f5;margin:0;">
+    <div class="share-wrap">
+      <div class="share-actions">
+        <!--
+          Downloads via /api/pdf — Chrome renders it server-side with
+          preferCSSPageSize + displayHeaderFooter:false, so the file matches this page
+          exactly, with no browser-dialog time/URL/page-number overlays.
+        -->
+        <a href={`/api/pdf/${q.token}`} class="btn btn-primary">
+          Download PDF
+        </a>
+        <a
+          href={`https://wa.me/${whatsappNumber}?text=${shareText}`}
+          target="_blank"
+          rel="noopener"
+          class="btn"
+        >
+          Share on WhatsApp
+        </a>
+      </div>
+
+      <!--
+        The document component renders the same markup used by /print, so the share
+        preview is exactly what the client sees in the PDF.
+      -->
+      <QuotationDocument q={q} result={result} />
+    </div>
+  </body>
+</html>

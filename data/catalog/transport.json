@@ -1,0 +1,1194 @@
+[
+  {
+    "id": "t_75c50a4756d0",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 10000,
+    "parkingAed": 4000
+  },
+  {
+    "id": "t_30e74dc81a0e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 12500,
+    "parkingAed": 4000
+  },
+  {
+    "id": "t_cf40e63aeec0",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 30000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_8c49e5483d6f",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 40000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_46d6c677150c",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 40000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_cd65190ffc0f",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to Beach Hotel(Al Barsha , Palm Jumirah, Marina) (Airport Transfers)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 11000,
+    "parkingAed": 4000
+  },
+  {
+    "id": "t_12e0554e4a13",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to Beach Hotel(Al Barsha , Palm Jumirah, Marina) (Airport Transfers)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 15000,
+    "parkingAed": 4000
+  },
+  {
+    "id": "t_3b6b041ed6ca",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to Beach Hotel(Al Barsha , Palm Jumirah, Marina) (Airport Transfers)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 35000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_be847fe9b4e7",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to Beach Hotel(Al Barsha , Palm Jumirah, Marina) (Airport Transfers)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 45000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_dfea4616a351",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Airport to Beach Hotel(Al Barsha , Palm Jumirah, Marina) (Airport Transfers)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 45000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_1f0ef96b0078",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Sharjah Airport to Dubai City (Airport Transfers)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 15000,
+    "parkingAed": 2000
+  },
+  {
+    "id": "t_6ff27782a247",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Sharjah Airport to Dubai City (Airport Transfers)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 17500,
+    "parkingAed": 2000
+  },
+  {
+    "id": "t_6a6a882f258c",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Sharjah Airport to Dubai City (Airport Transfers)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 45000,
+    "parkingAed": 5000
+  },
+  {
+    "id": "t_587ce9e317d5",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Sharjah Airport to Dubai City (Airport Transfers)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 55000,
+    "parkingAed": 5000
+  },
+  {
+    "id": "t_7577541c932a",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Sharjah Airport to Dubai City (Airport Transfers)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 55000,
+    "parkingAed": 5000
+  },
+  {
+    "id": "t_6f5e1c6aa589",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival Dxb to Fujairah City (Airport Transfers)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 30000,
+    "parkingAed": 4000
+  },
+  {
+    "id": "t_4e9e452b87f1",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival Dxb to Fujairah City (Airport Transfers)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 37500,
+    "parkingAed": 4000
+  },
+  {
+    "id": "t_1bc07abd5ad8",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival Dxb to Fujairah City (Airport Transfers)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 50000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_d31a3b976528",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival Dxb to Fujairah City (Airport Transfers)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 80000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_009aaea8d440",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival Dxb to Fujairah City (Airport Transfers)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 80000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_92fd0698717d",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival dxb airpot to Abu Dhabi City (Airport Transfers)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 30000,
+    "parkingAed": 4000
+  },
+  {
+    "id": "t_706423f0be9c",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival dxb airpot to Abu Dhabi City (Airport Transfers)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 37500,
+    "parkingAed": 4000
+  },
+  {
+    "id": "t_75911e7213b4",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival dxb airpot to Abu Dhabi City (Airport Transfers)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 55000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_e67b3e68719c",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival dxb airpot to Abu Dhabi City (Airport Transfers)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 80000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_9c86b62e029a",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Arrival dxb airpot to Abu Dhabi City (Airport Transfers)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 80000,
+    "parkingAed": 23500
+  },
+  {
+    "id": "t_4dc7c9b2017c",
+    "supplier": "Parmar Tours and Transport",
+    "route": "AUH Airport Arrival (Airport Transfers)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 30000,
+    "parkingAed": 3500
+  },
+  {
+    "id": "t_98c80d5bf6bf",
+    "supplier": "Parmar Tours and Transport",
+    "route": "AUH Airport Arrival (Airport Transfers)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 37500,
+    "parkingAed": 20000
+  },
+  {
+    "id": "t_e8e82299adb6",
+    "supplier": "Parmar Tours and Transport",
+    "route": "AUH Airport Arrival (Airport Transfers)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 55000,
+    "parkingAed": 25000
+  },
+  {
+    "id": "t_62beccb2ec8b",
+    "supplier": "Parmar Tours and Transport",
+    "route": "AUH Airport Arrival (Airport Transfers)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 80000,
+    "parkingAed": 25000
+  },
+  {
+    "id": "t_ddfb5d7bab91",
+    "supplier": "Parmar Tours and Transport",
+    "route": "AUH Airport Arrival (Airport Transfers)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 80000,
+    "parkingAed": 25000
+  },
+  {
+    "id": "t_47640e365f28",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DWC Airport (Airport Transfers)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 17500
+  },
+  {
+    "id": "t_704bfe058afb",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DWC Airport (Airport Transfers)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_53ac40509b57",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DWC Airport (Airport Transfers)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 45000
+  },
+  {
+    "id": "t_41174a360c98",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DWC Airport (Airport Transfers)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 55000
+  },
+  {
+    "id": "t_f6ce1f8ba192",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DWC Airport (Airport Transfers)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 55000
+  },
+  {
+    "id": "t_08e7a9ca0ace",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Lunch Transfer (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_16c06f0f2b3d",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Lunch Transfer (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_b449f23bdf2c",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Lunch Transfer (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_8288cf809987",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Lunch Transfer (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_ad55f8d90561",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Lunch Transfer (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_854b5263c648",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Lunch Transfer (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_57bda43ba45c",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dhow Deira Creek (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_235018820dfc",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dhow Deira Creek (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_00ea16ca281a",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dhow Deira Creek (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_dd03e0feeef8",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dhow Deira Creek (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_11de2e984bd0",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dhow Deira Creek (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_bf13eecfa248",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dhow Deira Creek (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_bb5450f4c822",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Marina Dhow Cruise (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_40b515c411f5",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Marina Dhow Cruise (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_499635b0421e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Marina Dhow Cruise (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_64ea30734e0e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Marina Dhow Cruise (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_3b2fc57a8b57",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Marina Dhow Cruise (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_98386210f9c7",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Marina Dhow Cruise (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_fe03927cb9a4",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Burj Khalifa (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 15000
+  },
+  {
+    "id": "t_04c361447a55",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Burj Khalifa (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_1da40063b115",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Burj Khalifa (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_993a2a6145b2",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Burj Khalifa (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_9f3e7f0161c1",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Burj Khalifa (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_b9320e69ef82",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Burj Khalifa (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_f48d8e857e60",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Emirates Mall Snow Park (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_32d615c7c1a1",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Emirates Mall Snow Park (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_6b0178ed4bf9",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Emirates Mall Snow Park (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_3feb73651cd6",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Emirates Mall Snow Park (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_7333d0086eb2",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Emirates Mall Snow Park (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_5ecb78c53f0f",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Emirates Mall Snow Park (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_4a8db46b1631",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Miracle Garden (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_4db052662f21",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Miracle Garden (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_0c03800f3d00",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Miracle Garden (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_5c6a352bbd1d",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Miracle Garden (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 40000
+  },
+  {
+    "id": "t_428be1a27101",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Miracle Garden (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_c427fe88ad03",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Miracle Garden (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_1b21e5067c56",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Park + IMG Park (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_44f6e9a4c43d",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Park + IMG Park (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_dbcd811d62c1",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Park + IMG Park (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_4a343253ac44",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Park + IMG Park (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_6f4b514e57ba",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Park + IMG Park (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 65000
+  },
+  {
+    "id": "t_e0848252bef6",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dubai Park + IMG Park (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 65000
+  },
+  {
+    "id": "t_dde6a3897175",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Atlantis (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_148a81987cc6",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Atlantis (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_2bb53c74d8d6",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Atlantis (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_5d5aedae3ae0",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Atlantis (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 45000
+  },
+  {
+    "id": "t_d5dfefbdf9d3",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Atlantis (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_5214652a8cad",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Atlantis (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_6dfa87d8beae",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dolphin Show (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_7be732b72487",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dolphin Show (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_4b75fbc1b2d6",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dolphin Show (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_58f56587d9ce",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dolphin Show (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_cdd318438e52",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dolphin Show (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_aedae4efa866",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Dolphin Show (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_ea44ee9ac299",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Global Village (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_6d95d426d1c8",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Global Village (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_1df3ec5d8c38",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Global Village (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_eee00ccfc71f",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Global Village (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 45000
+  },
+  {
+    "id": "t_5892820e958b",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Global Village (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_71a10bb832d5",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Global Village (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_f483cab78f97",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Future Museum (Two Way Transfer)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 20000
+  },
+  {
+    "id": "t_76154a65c636",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Future Museum (Two Way Transfer)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 25000
+  },
+  {
+    "id": "t_6af5e1b2a792",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Future Museum (Two Way Transfer)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_0d62aa930e14",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Future Museum (Two Way Transfer)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_b1cf7e15117e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Future Museum (Two Way Transfer)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_72fd23d95894",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Future Museum (Two Way Transfer)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 50000
+  },
+  {
+    "id": "t_1036f37a1c2e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour only (Half Day)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_d8490585f457",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour only (Half Day)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_0e5134d23006",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour only (Half Day)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 40000
+  },
+  {
+    "id": "t_a6487b997269",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour only (Half Day)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_5bc8020f756e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour only (Half Day)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_17cd696fa117",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB Sharjah city tour (Half Day)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 30000
+  },
+  {
+    "id": "t_12105c770a9e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB Sharjah city tour (Half Day)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 35000
+  },
+  {
+    "id": "t_fcb22e585a56",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB Sharjah city tour (Half Day)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 40000
+  },
+  {
+    "id": "t_8f9268ab7a2b",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB Sharjah city tour (Half Day)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_f192864c27eb",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB Sharjah city tour (Half Day)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_22d66e45b429",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Half Day)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 6000
+  },
+  {
+    "id": "t_fde87e31e8f3",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Half Day)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 6500
+  },
+  {
+    "id": "t_ca4f6787cd02",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Half Day)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 8500
+  },
+  {
+    "id": "t_60e62886c272",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Half Day)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 10000
+  },
+  {
+    "id": "t_0870034c898e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Half Day)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 10000
+  },
+  {
+    "id": "t_0dbbbf81df09",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 55000
+  },
+  {
+    "id": "t_68837d085218",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 70000
+  },
+  {
+    "id": "t_0e6369728052",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 55000
+  },
+  {
+    "id": "t_5c1a47fc08ed",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 75000
+  },
+  {
+    "id": "t_8e8a03b3bcab",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 95000
+  },
+  {
+    "id": "t_26d348a1d4c6",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB city tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 95000
+  },
+  {
+    "id": "t_c12adc511219",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB and Sharjah tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 55000
+  },
+  {
+    "id": "t_5ad1818d3854",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB and Sharjah tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 70000
+  },
+  {
+    "id": "t_37e08f08aca3",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB and Sharjah tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 55000
+  },
+  {
+    "id": "t_d3bd96bcc51b",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB and Sharjah tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 75000
+  },
+  {
+    "id": "t_0967dfbd244e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB and Sharjah tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 100000
+  },
+  {
+    "id": "t_327599b51a1c",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB and Sharjah tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 100000
+  },
+  {
+    "id": "t_552d20b49c4e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Al Ain Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 55000
+  },
+  {
+    "id": "t_8fe9ce45da9f",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Al Ain Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 70000
+  },
+  {
+    "id": "t_060bfdde8db9",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Al Ain Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_99ba85810639",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Al Ain Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 85000
+  },
+  {
+    "id": "t_bef5a22a1754",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Al Ain Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 110000
+  },
+  {
+    "id": "t_84f16cef884e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Al Ain Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 110000
+  },
+  {
+    "id": "t_213a01640658",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Fujaiarh Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 55000
+  },
+  {
+    "id": "t_5cf9015a61f0",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Fujaiarh Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 80000
+  },
+  {
+    "id": "t_e99801b79c4d",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Fujaiarh Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_5c80075d8bd0",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Fujaiarh Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 85000
+  },
+  {
+    "id": "t_5e345b326648",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Fujaiarh Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 110000
+  },
+  {
+    "id": "t_0f3c05fec9da",
+    "supplier": "Parmar Tours and Transport",
+    "route": "Fujaiarh Tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 110000
+  },
+  {
+    "id": "t_2706d09d0122",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB to Auh tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 55000
+  },
+  {
+    "id": "t_ed0f9038530a",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB to Auh tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "18 Coaster",
+    "rateAed": 75000
+  },
+  {
+    "id": "t_23b8f97c4926",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB to Auh tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_f4a269c0064f",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB to Auh tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 85000
+  },
+  {
+    "id": "t_be142242b0c5",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB to Auh tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 100000
+  },
+  {
+    "id": "t_2941d9c3fb1e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "DXB to Auh tour (Full Day Pick Up From Dubai)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 100000
+  },
+  {
+    "id": "t_923cc1876ae8",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Full Day Pick Up From Dubai)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 6000
+  },
+  {
+    "id": "t_c069f9330e93",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Full Day Pick Up From Dubai)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 6500
+  },
+  {
+    "id": "t_46e0e7a9b99d",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Full Day Pick Up From Dubai)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 8500
+  },
+  {
+    "id": "t_39f1dbc1fae9",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Full Day Pick Up From Dubai)",
+    "vehicleSize": "51 Seater",
+    "rateAed": 10000
+  },
+  {
+    "id": "t_e7b7de89e10a",
+    "supplier": "Parmar Tours and Transport",
+    "route": "EXTRA HOURS (Full Day Pick Up From Dubai)",
+    "vehicleSize": "53 Seater",
+    "rateAed": 10000
+  },
+  {
+    "id": "t_9893a491bf6b",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK transfer one way (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 40000
+  },
+  {
+    "id": "t_51f2c82db3f8",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK transfer one way (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 45000
+  },
+  {
+    "id": "t_63c128ad5871",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK transfer one way (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 65000
+  },
+  {
+    "id": "t_3f6087525df0",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK transfer one way (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "51 seater",
+    "rateAed": 85000
+  },
+  {
+    "id": "t_bb821e8b9c6e",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK transfer one way (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "53 seater",
+    "rateAed": 85000
+  },
+  {
+    "id": "t_2283c79399d4",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK two way transfer (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 60000
+  },
+  {
+    "id": "t_f74db8cd02a1",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK two way transfer (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 65000
+  },
+  {
+    "id": "t_34a2896d5e1a",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK two way transfer (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 85000
+  },
+  {
+    "id": "t_13b2ee09612b",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK two way transfer (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "51 seater",
+    "rateAed": 115000
+  },
+  {
+    "id": "t_2cd8534f3841",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK two way transfer (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "53 seater",
+    "rateAed": 115000
+  },
+  {
+    "id": "t_3dcd3ccc1768",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK to Dubai FULL DAY (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "7 Seater",
+    "rateAed": 65000
+  },
+  {
+    "id": "t_bd8ae37156ee",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK to Dubai FULL DAY (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "15 Seater",
+    "rateAed": 75000
+  },
+  {
+    "id": "t_858d2fc7f69c",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK to Dubai FULL DAY (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "33/37 Seater",
+    "rateAed": 90000
+  },
+  {
+    "id": "t_8bc80d68577d",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK to Dubai FULL DAY (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "51 seater",
+    "rateAed": 120000
+  },
+  {
+    "id": "t_37f2736dcb45",
+    "supplier": "Parmar Tours and Transport",
+    "route": "RAK to Dubai FULL DAY (Guide Is Complusary As Per Rta/Dtcm - Dubai City Tour + Sharjah City Tour)",
+    "vehicleSize": "53 seater",
+    "rateAed": 120000
+  }
+]

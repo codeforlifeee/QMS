@@ -1,0 +1,61 @@
+---
+import '../../document/document.css';
+import QuotationDocument from '../../document/QuotationDocument.tsx';
+import { loadByToken } from '../../lib/load.js';
+
+export const prerender = false;
+
+const loaded = await loadByToken(Astro.params.token);
+if (!loaded) return new Response('Quotation not found', { status: 404 });
+
+const { q, result } = loaded;
+
+// ?print=1 makes the page print itself once fonts and images have settled. The script
+// only calls window.print() — it never touches the DOM — so the rendered layout is
+// identical with or without it.
+const autoPrint = Astro.url.searchParams.get('print') === '1';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{q.reference} — {q.title}</title>
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body>
+    <!--
+      No client:* directive: this React tree is rendered to static HTML on the server and
+      ships zero JavaScript. What Chrome prints is exactly what we generated.
+    -->
+    <QuotationDocument q={q} result={result} />
+
+    {
+      autoPrint && (
+        <script is:inline>
+          (async () => {
+            try {
+              if (document.fonts && document.fonts.ready) await document.fonts.ready;
+              const images = Array.from(document.images);
+              await Promise.all(
+                images.map((img) =>
+                  img.complete
+                    ? Promise.resolve()
+                    : new Promise((done) => {
+                        img.addEventListener('load', done, { once: true });
+                        img.addEventListener('error', done, { once: true });
+                      }),
+                ),
+              );
+            } catch {
+              /* print anyway */
+            }
+            window.focus();
+            window.print();
+          })();
+        </script>
+      )
+    }
+  </body>
+</html>

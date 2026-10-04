@@ -1,0 +1,83 @@
+---
+import Shell from '../layouts/Shell.astro';
+import { jsonRepo } from '../data/repo.js';
+import { toEngineInput, tripDuration, paxSummary } from '../data/schema.js';
+import { priceQuotation } from '../pricing/engine.js';
+import { formatMoney } from '../pricing/money.js';
+import AIGenerator from '../components/AIGenerator.tsx';
+
+export const prerender = false;
+
+const quotations = await jsonRepo.list();
+
+// Price each so the list can show the real headline total next to the client name. If
+// one is malformed, show '—' rather than taking the whole page down.
+const rows = quotations.map((q) => {
+  try {
+    const r = priceQuotation(toEngineInput(q));
+    const { nights } = tripDuration(q);
+    return {
+      q,
+      total: formatMoney(r.grandTotal, { showDecimals: false }),
+      nights,
+      ok: true,
+    };
+  } catch {
+    return { q, total: '—', nights: 0, ok: false };
+  }
+});
+---
+
+<Shell title="Quotations">
+  <a slot="actions" href="/new" class="btn btn-primary">+ New Manual Quotation</a>
+
+  <main class="list-wrap">
+    <AIGenerator client:load />
+
+    <div class="list-header">
+      <h1>Quotations ({rows.length})</h1>
+    </div>
+
+    {
+      rows.length === 0 ? (
+        <div class="empty">
+          <p>No quotations yet.</p>
+          <p>
+            <a href="/new" class="btn btn-primary">
+              Create the first one
+            </a>
+          </p>
+        </div>
+      ) : (
+        rows.map(({ q, total, nights, ok }) => (
+          <article class="quotation-card">
+            <div>
+              <div class="title">{q.title || 'Untitled'}</div>
+              <div class="meta">
+                <span class={`pill ${q.status === 'draft' ? 'pill-draft' : ''}`}>{q.status}</span>
+                &nbsp;·&nbsp; {q.reference} &nbsp;·&nbsp; {q.client.name} &nbsp;·&nbsp;
+                {paxSummary(q)}, {nights}N
+              </div>
+            </div>
+            <div class="total">{total}</div>
+            <div class="actions">
+              <a href={`/edit/${q.id}`} class="btn btn-sm">
+                Edit
+              </a>
+              {ok && (
+                <>
+                  <a href={`/q/${q.token}`} class="btn btn-sm">
+                    Share
+                  </a>
+                  <a href={`/api/pdf/${q.token}`} class="btn btn-sm">
+                    PDF
+                  </a>
+                </>
+              )}
+            </div>
+          </article>
+        ))
+      )
+    }
+  </main>
+</Shell>

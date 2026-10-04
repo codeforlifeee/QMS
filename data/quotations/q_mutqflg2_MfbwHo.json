@@ -1,0 +1,67 @@
+{
+  "id": "q_mutqflg2_MfbwHo",
+  "token": "MvQzacnMhecnfjtsTjG7Wz",
+  "status": "draft",
+  "reference": "TG-2026-0003",
+  "title": "New quotation",
+  "destination": "",
+  "client": {
+    "name": ""
+  },
+  "travelStart": "2026-11-03",
+  "travelEnd": "2026-11-18",
+  "pax": {
+    "adults": 2,
+    "children": 0,
+    "infants": 0
+  },
+  "quoteCurrency": "INR",
+  "fx": {
+    "AED": "23.45"
+  },
+  "pricingMode": "PER_SERVICE",
+  "defaultMarkupByType": {
+    "HOTEL": 15,
+    "ACTIVITY": 15,
+    "TRANSFER": 15,
+    "VISA": 15,
+    "MEAL": 15,
+    "MISC": 15
+  },
+  "taxRatesByClass": {
+    "standard": 5
+  },
+  "defaultTaxClass": "standard",
+  "taxLabel": "GST @ 5%",
+  "roundingUnit": 100,
+  "days": [
+    {
+      "id": "d1",
+      "index": 1,
+      "title": "Day 1",
+      "prose": ""
+    },
+    {
+      "id": "d2",
+      "index": 2,
+      "title": "Day 2",
+      "prose": ""
+    }
+  ],
+  "lines": [],
+  "paymentPolicy": [
+    "50% at the time of confirmation",
+    "Rest 30%, 20 days before travel date",
+    "Remaining 20%, 7 days before travel date"
+  ],
+  "terms": [
+    "Rates are subject to availability at the time of confirmation.",
+    "Hotel check-in is typically 1500 hrs and check-out 1200 hrs.",
+    "Any increase in government taxes or fuel surcharge will be charged extra.",
+    "Cancellation charges apply as per the policy shared at the time of booking."
+  ],
+  "createdAt": "2026-10-04T11:23:16.948Z",
+  "updatedAt": "2026-10-04T11:23:16.948Z",
+  "validUntil": "2026-11-03",
+  "viewCount": 0
+}

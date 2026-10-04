@@ -1,0 +1,18 @@
+---
+import '../../document/document.css';
+import Shell from '../../layouts/Shell.astro';
+import Editor from '../../editor/Editor.tsx';
+import { jsonRepo } from '../../data/repo.js';
+
+export const prerender = false;
+
+const q = await jsonRepo.get(Astro.params.id ?? '');
+if (!q) return new Response('Quotation not found', { status: 404 });
+---
+
+<Shell title={q.title}>
+  <a slot="actions" href={`/q/${q.token}`} target="_blank" class="btn btn-ghost">Preview share</a>
+  <a slot="actions" href={`/api/pdf/${q.token}`} class="btn btn-primary">Download PDF</a>
+
+  <Editor initial={q} client:load />
+</Shell>

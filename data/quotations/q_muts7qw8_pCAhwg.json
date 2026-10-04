@@ -1,0 +1,219 @@
+{
+  "id": "q_muts7qw8_pCAhwg",
+  "token": "RY5aKkQBDpMZvuZvjayQEG",
+  "status": "draft",
+  "reference": "TG-2026-0005",
+  "title": "Dubai Family Trip - 5N/6D",
+  "destination": "Dubai, UAE",
+  "client": {
+    "name": "Rahul Sharma",
+    "phone": "+919876543210"
+  },
+  "travelStart": "2026-11-03",
+  "travelEnd": "2026-11-18",
+  "pax": {
+    "adults": 2,
+    "children": 1,
+    "infants": 0
+  },
+  "quoteCurrency": "INR",
+  "fx": {
+    "AED": "23.45"
+  },
+  "pricingMode": "PER_SERVICE",
+  "defaultMarkupByType": {
+    "HOTEL": 15,
+    "ACTIVITY": 15,
+    "TRANSFER": 10,
+    "VISA": 15,
+    "MEAL": 15,
+    "MISC": 15
+  },
+  "taxRatesByClass": {
+    "standard": 5
+  },
+  "defaultTaxClass": "standard",
+  "taxLabel": "GST @ 5%",
+  "roundingUnit": 100,
+  "days": [
+    {
+      "id": "d2",
+      "index": 1,
+      "title": "Arrival in Dubai Prose",
+      "prose": "Arrival in Dubai Prose - some content xyz"
+    },
+    {
+      "id": "d_mutsaln9_5zx3s",
+      "index": 2,
+      "title": "Dubai city tour and burj khalifa",
+      "prose": "xyz content"
+    },
+    {
+      "id": "d_mutsbn6z_bryzs",
+      "index": 3,
+      "title": "Desert Safari and BBQ Dinner",
+      "prose": "xyz content"
+    },
+    {
+      "id": "d_mutsc3th_47uny",
+      "index": 4,
+      "title": "Abu Dhabi Day Trip",
+      "prose": "xyz content"
+    },
+    {
+      "id": "d_mutsc4at_i43wk",
+      "index": 5,
+      "title": "Theme Parks and Shopping ",
+      "prose": "xyz content"
+    },
+    {
+      "id": "d_mutsc4t4_fxcj6",
+      "index": 6,
+      "title": "Departure ",
+      "prose": "xyz content - airport to home flight."
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_mutsdg9a_32b61",
+      "dayId": "d2",
+      "type": "HOTEL",
+      "label": "JW Marriott Marquis - Deluxe Room",
+      "costCurrency": "AED",
+      "adultRate": "0",
+      "basis": "PER_ROOM_NIGHT",
+      "nights": 5,
+      "rooms": [
+        {
+          "occupancy": "SINGLE",
+          "roomCount": 2,
+          "roomRate": "450",
+          "singleSupplement": "1"
+        }
+      ],
+      "description": "5 nights with breakfast",
+      "markupPctOverride": 0,
+      "isOptional": false,
+      "markupLocked": false
+    },
+    {
+      "id": "l_mutsgxe2_66kau",
+      "dayId": "d_mutsaln9_5zx3s",
+      "type": "ACTIVITY",
+      "label": "Burj Khalifa At the Top & Sky Views Tickets",
+      "costCurrency": "AED",
+      "adultRate": "151.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "description": "The Burj Khalifa Tickets",
+      "supplier": "Rayna Tours",
+      "catalogRef": "p_be4a5cc5c36b"
+    },
+    {
+      "id": "l_mutsibv7_013wu",
+      "dayId": "d_mutsbn6z_bryzs",
+      "type": "ACTIVITY",
+      "label": "Desert Safari",
+      "costCurrency": "AED",
+      "adultRate": "110.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.75
+      },
+      "description": "Desert Safari Price & Offers",
+      "supplier": "Rayna Tours",
+      "catalogRef": "p_24af4aebca18"
+    },
+    {
+      "id": "l_mutskks6_aqytk",
+      "dayId": "d_mutsc3th_47uny",
+      "type": "ACTIVITY",
+      "label": "Louvre Museum Day Pass - Dated",
+      "costCurrency": "AED",
+      "adultRate": "51.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "description": "Louvre Abu Dhabi",
+      "supplier": "Rayna Tours",
+      "catalogRef": "p_3e3e7fe82619"
+    },
+    {
+      "id": "l_mutslnrr_hdnxp",
+      "dayId": "d_mutsc4at_i43wk",
+      "type": "ACTIVITY",
+      "label": "Atlantis Aquaventure with Dolphin discovery presentation",
+      "costCurrency": "AED",
+      "adultRate": "265.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "description": "Dolphin Bay Atlantis Price & Offers",
+      "supplier": "Rayna Tours",
+      "catalogRef": "p_aa4dcde4e44c"
+    },
+    {
+      "id": "l_mutsmrqh_lhqu6",
+      "dayId": "d_mutsc4t4_fxcj6",
+      "type": "TRANSFER",
+      "label": "Dubai Frame SIC Transfers\nFree Cancellation 12 hours Prior",
+      "costCurrency": "AED",
+      "adultRate": "35.00",
+      "basis": "PER_UNIT",
+      "qty": 1,
+      "description": "SIC Transfers To Emirate Attractions",
+      "supplier": "Rayna Tours",
+      "catalogRef": "p_4b3e4f2af8ad"
+    },
+    {
+      "id": "l_mutso1sd_agr9q",
+      "dayId": null,
+      "type": "VISA",
+      "label": "UAE Tourist visa",
+      "costCurrency": "AED",
+      "adultRate": "350",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "ABSOLUTE",
+        "multiplier": 0.05,
+        "rate": "10"
+      },
+      "description": "uae tourist visa for indian citizens",
+      "infant": {
+        "mode": "ABSOLUTE",
+        "rate": "10",
+        "multiplier": 0.5
+      }
+    }
+  ],
+  "paymentPolicy": [
+    "50% at the time of confirmation",
+    "Rest 30%, 20 days before travel date",
+    "Remaining 20%, 7 days before travelnmn"
+  ],
+  "terms": [
+    "Rates are subject to availability at the time of confirmation.",
+    "Hotel check-in is typically 1500 hrs and check-out 1200 hrs.",
+    "Any increase in government taxes or fuel surcharge will be charged extra.",
+    "Cancellation charges apply as per the policy shared at the time of booking."
+  ],
+  "createdAt": "2026-10-04T12:13:09.992Z",
+  "updatedAt": "2026-10-04T12:29:13.596Z",
+  "validUntil": "2026-11-03",
+  "viewCount": 0,
+  "agentName": "Vijay Singh",
+  "inclusions": [
+    "5Nightsaccomodationothercontetnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+  ],
+  "exclusions": [
+    "othercontentnnnnnnnnnnnnnnnn"
+  ]
+}

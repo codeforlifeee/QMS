@@ -1,0 +1,498 @@
+/*
+ * The quotation document.
+ *
+ * This is the single print template. The same markup and the same CSS produce the
+ * on-screen preview and the PDF, which is what guarantees they match.
+ *
+ * Rules that make it reliable — the previous implementation broke every one of them:
+ *   - Physical units (mm) only. No px widths, no responsive breakpoints, no vh/vw.
+ *     Content width is 186mm in both media: on screen a 210mm sheet with 12mm padding,
+ *     in print an auto-width body inside a 12mm @page margin.
+ *   - Real paged media: @page + break-inside, so Chrome's print engine paginates. The
+ *     output is vector text, not a screenshot.
+ *   - print-color-adjust: exact, so backgrounds and tints survive.
+ *   - A system font stack. No webfont race means line-wrapping cannot shift between the
+ *     preview and the PDF, which is what silently moved every page break before.
+ */
+
+:root {
+  --orange: #ff5b04;
+  --ink: #16232a;
+  --muted: #5a6b73;
+  --teal: #075056;
+  --hairline: #dfe8ea;
+  --tint: #f6f9fa;
+  --sheet: 210mm;
+  --gutter: 12mm;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  color: var(--ink);
+  font-size: 9.6pt;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.doc {
+  width: var(--sheet);
+  padding: var(--gutter);
+  margin: 0 auto;
+  background: #fff;
+}
+
+/* ---------- screen preview: show it as a sheet on a desk ---------- */
+@media screen {
+  body {
+    background: #e7edef;
+    padding: 8mm 0;
+  }
+  .doc {
+    box-shadow: 0 1mm 6mm rgba(22, 35, 42, 0.16);
+  }
+}
+
+/* ---------- print: @page owns the margin, .doc owns nothing ---------- */
+@page {
+  size: A4;
+  margin: 12mm 12mm 16mm;
+}
+
+@media print {
+  body {
+    background: none;
+    padding: 0;
+  }
+  .doc {
+    width: auto;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* ---------- pagination control ---------- */
+.avoid-break,
+.day,
+.summary,
+.panel,
+.totals,
+figure,
+tr {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+h1,
+h2,
+h3 {
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.page-break {
+  break-before: page;
+  page-break-before: always;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8mm;
+  padding-bottom: 4mm;
+  border-bottom: 0.4mm solid var(--orange);
+}
+
+.brand-name {
+  font-size: 15pt;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.brand-tag {
+  margin: 0.6mm 0 0;
+  font-size: 7.6pt;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.meta {
+  text-align: right;
+  font-size: 8pt;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.meta strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------- hero ---------- */
+.hero {
+  margin: 6mm 0 0;
+}
+
+.hero-image {
+  width: 100%;
+  height: 58mm;
+  object-fit: cover;
+  border-radius: 2mm;
+  display: block;
+}
+
+.hero-title {
+  font-size: 21pt;
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 5mm 0 1.5mm;
+}
+
+.hero-sub {
+  font-size: 10pt;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ---------- fact strip ---------- */
+.facts {
+  display: flex;
+  gap: 0;
+  margin: 5mm 0 0;
+  border: 0.25mm solid var(--hairline);
+  border-radius: 2mm;
+  overflow: hidden;
+}
+
+.fact {
+  flex: 1;
+  padding: 3mm 4mm;
+  border-right: 0.25mm solid var(--hairline);
+}
+
+.fact:last-child {
+  border-right: 0;
+}
+
+.fact-label {
+  font-size: 6.8pt;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.8mm;
+}
+
+.fact-value {
+  font-size: 9.6pt;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ---------- headline price ---------- */
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6mm;
+  margin: 5mm 0 0;
+  padding: 5mm;
+  border-radius: 2mm;
+  background: var(--ink);
+  color: #fff;
+}
+
+.summary-label {
+  font-size: 7.2pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.72;
+  margin: 0 0 1mm;
+}
+
+.summary-total {
+  font-size: 20pt;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.summary-per {
+  text-align: right;
+}
+
+.summary-per .summary-total {
+  font-size: 13pt;
+  color: var(--orange);
+}
+
+/* ---------- sections ---------- */
+.section {
+  margin: 8mm 0 0;
+}
+
+.section-title {
+  font-size: 12pt;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 3mm;
+  padding-bottom: 1.5mm;
+  border-bottom: 0.25mm solid var(--hairline);
+}
+
+.lede {
+  font-size: 9.6pt;
+  color: #33444c;
+  margin: 0;
+}
+
+/* ---------- itinerary ---------- */
+.day {
+  display: flex;
+  gap: 4mm;
+  padding: 3.5mm 0;
+  border-bottom: 0.25mm solid var(--hairline);
+}
+
+.day:last-child {
+  border-bottom: 0;
+}
+
+.day-no {
+  flex: 0 0 13mm;
+  height: 13mm;
+  border-radius: 1.5mm;
+  background: var(--tint);
+  border: 0.25mm solid var(--hairline);
+  text-align: center;
+  padding-top: 1.6mm;
+}
+
+.day-no span {
+  display: block;
+  font-size: 6.4pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.day-no strong {
+  display: block;
+  font-size: 12pt;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.day-body {
+  flex: 1;
+}
+
+.day-title {
+  font-size: 10.4pt;
+  font-weight: 650;
+  margin: 0 0 1mm;
+}
+
+.day-prose {
+  margin: 0;
+  color: #3c4d55;
+}
+
+.day-tags {
+  margin: 1.8mm 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5mm;
+}
+
+.tag {
+  font-size: 7.2pt;
+  padding: 0.6mm 2mm;
+  border-radius: 6mm;
+  background: var(--tint);
+  border: 0.25mm solid var(--hairline);
+  color: var(--teal);
+  font-weight: 600;
+}
+
+/* ---------- two-column panels ---------- */
+.panels {
+  display: flex;
+  gap: 5mm;
+}
+
+.panel {
+  flex: 1;
+  border: 0.25mm solid var(--hairline);
+  border-radius: 2mm;
+  padding: 4mm;
+}
+
+.panel h3 {
+  font-size: 9.2pt;
+  margin: 0 0 2mm;
+  font-weight: 650;
+}
+
+.panel ul {
+  margin: 0;
+  padding-left: 4mm;
+}
+
+.panel li {
+  margin-bottom: 1.2mm;
+  font-size: 8.8pt;
+}
+
+.panel.included h3 {
+  color: var(--teal);
+}
+
+.panel.excluded h3 {
+  color: #9a3412;
+}
+
+/* ---------- price table ---------- */
+table.prices {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.8pt;
+}
+
+table.prices th {
+  text-align: left;
+  font-size: 6.8pt;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 0 0 1.8mm;
+  border-bottom: 0.25mm solid var(--hairline);
+}
+
+table.prices td {
+  padding: 2.2mm 0;
+  border-bottom: 0.25mm solid var(--hairline);
+  vertical-align: top;
+}
+
+table.prices .num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.line-label {
+  font-weight: 600;
+}
+
+.line-note {
+  display: block;
+  color: var(--muted);
+  font-size: 8pt;
+  margin-top: 0.4mm;
+}
+
+.optional-row td {
+  color: var(--muted);
+}
+
+.totals {
+  margin-top: 4mm;
+  margin-left: auto;
+  width: 78mm;
+  font-size: 9.2pt;
+}
+
+.totals div {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.4mm 0;
+}
+
+.totals .rule {
+  border-top: 0.25mm solid var(--hairline);
+}
+
+.totals .grand {
+  border-top: 0.5mm solid var(--ink);
+  margin-top: 1mm;
+  padding-top: 2mm;
+  font-size: 11.5pt;
+  font-weight: 700;
+}
+
+.totals .num {
+  font-variant-numeric: tabular-nums;
+}
+
+.per-person-note {
+  margin: 2mm 0 0;
+  text-align: right;
+  font-size: 8pt;
+  color: var(--muted);
+}
+
+/* ---------- policy ---------- */
+.policy ol,
+.policy ul {
+  margin: 0;
+  padding-left: 4.5mm;
+  font-size: 8.8pt;
+}
+
+.policy li {
+  margin-bottom: 1.2mm;
+}
+
+.validity {
+  margin-top: 3mm;
+  padding: 2.5mm 3.5mm;
+  border-radius: 1.5mm;
+  background: #fff6f1;
+  border: 0.25mm solid #ffd9c4;
+  font-size: 8.6pt;
+  color: #8a3a06;
+}
+
+/* ---------- footer ---------- */
+.doc-footer {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 0.25mm solid var(--hairline);
+  display: flex;
+  justify-content: space-between;
+  gap: 6mm;
+  font-size: 7.6pt;
+  color: var(--muted);
+}
+
+.doc-footer strong {
+  color: var(--ink);
+  display: block;
+  margin-bottom: 0.6mm;
+  font-size: 8pt;
+}
