@@ -1,0 +1,76 @@
+---
+import { jsonRepo, newId, newToken } from '../data/repo.js';
+import { DEFAULT_PAYMENT_POLICY, DEFAULT_TERMS } from '../config/company.js';
+import { loadDefaults } from '../catalog/catalog.js';
+import type { StoredQuotation } from '../data/schema.js';
+
+export const prerender = false;
+
+// Minting an empty quotation is a redirect-after-POST style flow. GET /new creates one
+// with sensible defaults and immediately redirects to its editor, so the agent never
+// sees an empty-state screen.
+const id = newId();
+const now = new Date().toISOString();
+const today = now.slice(0, 10);
+const in30 = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
+const in45 = new Date(Date.now() + 45 * 86_400_000).toISOString().slice(0, 10);
+
+// A sequential-ish reference based on the day count; swap for a DB sequence when there
+// is a DB.
+const yr = today.slice(0, 4);
+const count = (await jsonRepo.list()).length + 1;
+const reference = `TG-${yr}-${String(count).padStart(4, '0')}`;
+
+// Pull the FX rate and house markup % the Calculator used so new quotations prefill
+// with the values the team actually works with today. Falls back to hard-coded
+// defaults if the catalog hasn't been imported yet.
+const catalogDefaults = await loadDefaults();
+const aedToInr = catalogDefaults
+  ? catalogDefaults.fxAedPerInr.toFixed(2)
+  : '22.85';
+const houseMarkup = catalogDefaults ? Math.round(catalogDefaults.markupPct * 100) : 15;
+
+const draft: StoredQuotation = {
+  id,
+  token: newToken(),
+  status: 'draft',
+  reference,
+  title: 'New quotation',
+  destination: '',
+  client: { name: '' },
+  travelStart: in30,
+  travelEnd: in45,
+  pax: { adults: 2, children: 0, infants: 0 },
+  quoteCurrency: 'INR',
+  fx: { AED: aedToInr },
+  pricingMode: 'PER_SERVICE',
+  // Flat house markup for every type by default; agents can tweak per type on the form
+  // or move the whole quote to FLAT or TARGET_MARGIN mode.
+  defaultMarkupByType: {
+    HOTEL: houseMarkup,
+    ACTIVITY: houseMarkup,
+    TRANSFER: houseMarkup,
+    VISA: houseMarkup,
+    MEAL: houseMarkup,
+    MISC: houseMarkup,
+  },
+  taxRatesByClass: { standard: 5 },
+  defaultTaxClass: 'standard',
+  taxLabel: 'GST @ 5%',
+  roundingUnit: 100,
+  days: [
+    { id: 'd1', index: 1, title: 'Day 1', prose: '' },
+    { id: 'd2', index: 2, title: 'Day 2', prose: '' },
+  ],
+  lines: [],
+  paymentPolicy: [...DEFAULT_PAYMENT_POLICY],
+  terms: [...DEFAULT_TERMS],
+  createdAt: now,
+  updatedAt: now,
+  validUntil: in30,
+  viewCount: 0,
+};
+
+await jsonRepo.save(draft);
+return Astro.redirect(`/edit/${id}`);
+---

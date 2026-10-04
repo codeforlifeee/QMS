@@ -1,0 +1,91 @@
+[
+  {
+    "id": "ct_afa40d0c920b",
+    "name": "Sharing Dubai City Tour",
+    "type": "sharing",
+    "rateAed": 4500
+  },
+  {
+    "id": "ct_2f79ce20b8be",
+    "name": "Private Dubai City Tour",
+    "type": "private",
+    "rateAed": 32500,
+    "duration": "5 HRS",
+    "itinerary": [
+      "Dubai Frame Photo Stop (15-20 mins)",
+      "Jumeirah Mosque (10-15 mins)",
+      "Al Marjan Islamic Art Center (20 mins)",
+      "Jumeirah Beach (20 mins)",
+      "Stunning views of Burj Al Arab (10 mins)",
+      "Drive through Al Qasr",
+      "Ruler’s Palace stop (20 mins)",
+      "Palm Jumeirah drive-through",
+      "Atlantis photo Stop (15-20 mins)",
+      "Optional Monorail ride (extra 13 AED)",
+      "Scenic Dubai Marina drive",
+      "Pass by the magnificent Burj Khalifa",
+      "Cruise down Sheikh Zayed Road"
+    ]
+  },
+  {
+    "id": "ct_2d46bd795da7",
+    "name": "Sharing Abu Dhabi Temple Tour",
+    "type": "sharing",
+    "rateAed": 5000,
+    "itinerary": [
+      "4:00 PM – Pickup: Convenient pickup from your location.",
+      "5:30 PM – Arrival at BAPS Hindu Mandir: Begin your peaceful journey at the beautifully serene temple.",
+      "7:00 PM – Ganga Aarti Pooja: Witness the enchanting Ganga Aarti Pooja, a spiritually uplifting experience.",
+      "8:00 PM – Free Time: Explore the temple grounds and starting return",
+      "9:00 PM – Drop-Off: Comfortable drop-off back to your location.",
+      "Days: Friday, Saturday, and Sunday",
+      "Pickup Location:",
+      "Deira City Centre Metro Exit - 02",
+      "Royal Ascot, Bur Dubai",
+      "Bur Juman Metro Exit - 03",
+      "IBN battuta Bus Station"
+    ]
+  },
+  {
+    "id": "ct_500ff1caab37",
+    "name": "Sharing Abu Dhabi City Tour",
+    "type": "sharing",
+    "rateAed": 8500
+  },
+  {
+    "id": "ct_fb5048ce3240",
+    "name": "Private Abu Dhabi City Tour",
+    "type": "private",
+    "rateAed": 50000,
+    "itinerary": [
+      "Pickup from select hotels (Burjman, Deira, Bur Dubai)",
+      "Immerse yourself in the tranquillity of the Hindu Temple (1 hour 30 minutes)",
+      "Explore the breathtaking Sheikh Zayed Grand Mosque (1 hour 15 minutes)",
+      "Presidential Palace: Capture stunning photos at this iconic landmark (10 minutes, Al bateen )",
+      "Emirates Palace Hotel: Drive by with a photo op of Abu Dhabi Marina Mall (10 minutes)",
+      "Heritage Village - Islamic Art Gallery Photoshop ( Marina Island )",
+      "Passing by Corniche and Dates Market",
+      "A brief 20-minute stop to experience local flavours",
+      "Passing by Saadiyat Island",
+      "Yas Island Visit - Ferrari World Photoshop",
+      "Journey back to Dubai and Drop-off at various hotels",
+      "PRIVATE FUJAIRAH & KHORFAKKAN TOUR",
+      "Enjoy a personalized and exclusive experience!",
+      "Tour Price: 80 AED Sharing Tour // 650 AED (Private Tour)",
+      "Pickup Details",
+      "⏰ Pickup Time: 09:00 AM",
+      "Private Pickup from Any Location in Dubai",
+      "Travel in Comfort | Private Vehicle | Customizable Itinerary",
+      "Exclusive Tour Highlights & Visiting Points",
+      "Fujairah Fort – Discover the rich history of one of the UAE’s oldest forts",
+      "Fujairah Mosque – Marvel at the stunning architecture of this grand mosque",
+      "V Café / Railway Café – Enjoy a refreshing coffee break in a cozy setting",
+      "Khorfakkan Waterfalls – Capture breathtaking views of this beautiful artificial waterfall",
+      "Amphitheater – Experience the grandeur of Khorfakkan’s iconic cultural venue",
+      "Shark Island – Stunning views of this famous snorkeling & diving spot (Photo Stop)",
+      "Masafi – Explore the famous Masafi region, known for its natural springs and markets",
+      "Al Rafisa Dam – Relax in nature, enjoy boating, and take in the scenic views",
+      "Back to Dubai – Comfortable drop-off at your preferred location"
+    ]
+  }
+]

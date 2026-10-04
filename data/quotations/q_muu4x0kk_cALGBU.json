@@ -1,0 +1,144 @@
+{
+  "id": "q_muu4x0kk_cALGBU",
+  "token": "fyzWBaAuTrPcMq7kyzgCaj",
+  "status": "draft",
+  "reference": "AI-2026-4594",
+  "title": "Dubai — 4N / 5D",
+  "destination": "Dubai",
+  "client": {
+    "name": "Sarah Jenkins"
+  },
+  "travelStart": "2026-10-04",
+  "travelEnd": "2026-10-08",
+  "pax": {
+    "adults": 2,
+    "children": 1,
+    "infants": 0
+  },
+  "quoteCurrency": "INR",
+  "fx": {
+    "AED": "26.23",
+    "USD": "1.00"
+  },
+  "pricingMode": "PER_SERVICE",
+  "defaultMarkupByType": {
+    "ACTIVITY": 15,
+    "HOTEL": 15,
+    "TRANSFER": 15,
+    "MEAL": 15,
+    "VISA": 15,
+    "MISC": 15,
+    "FLIGHT": 0
+  },
+  "taxRatesByClass": {
+    "standard": 5
+  },
+  "defaultTaxClass": "standard",
+  "taxLabel": "VAT",
+  "days": [
+    {
+      "id": "d_muu4x0kg_qgoec",
+      "index": 1,
+      "title": "Touchdown in Vibrant Dubai",
+      "prose": "Welcome to the dazzling city of Dubai! Upon arrival, your private transfer will comfortably whisk your family from the airport directly to your city hotel. Settle into your room and enjoy your first evening relaxing or exploring the bustling local streets."
+    },
+    {
+      "id": "d_muu4x0kg_buf46",
+      "index": 2,
+      "title": "Sky-High Views and Iconic Heights",
+      "prose": "Prepare for breathtaking panoramas as you ascend the world's tallest building with tickets to Burj Khalifa At the Top. Afterward, experience the thrilling Sky Views, offering a unique perspective of the glittering city below. It is a day of unforgettable heights and stunning photo opportunities for the whole family."
+    },
+    {
+      "id": "d_muu4x0kg_33mer",
+      "index": 3,
+      "title": "Golden Sands Desert Adventure",
+      "prose": "Rise early for an exhilarating Morning Desert Safari, where you will experience the magic of the rolling golden dunes. Enjoy a thrilling ride across the sands and capture the serene beauty of the desert before the midday heat sets in. You will return to the city with plenty of time to relax and reflect on your adventure."
+    },
+    {
+      "id": "d_muu4x0kg_t5549",
+      "index": 4,
+      "title": "Leisurely Discoveries Around the City",
+      "prose": "Enjoy a completely open day to explore Dubai at your own relaxed pace. Perhaps wander through the traditional gold and spice souks, or spend a leisurely afternoon relaxing by your hotel pool. Whatever you choose, the city's endless charm is yours to discover."
+    },
+    {
+      "id": "d_muu4x0kg_37j31",
+      "index": 5,
+      "title": "Fond Farewells and Homeward Journey",
+      "prose": "Cherish your final morning in the city before your private transfer arrives to take you back to Dubai Airport. Reflect on your incredible family adventures as you prepare for your flight home. Safe travels, and may your memories of Dubai last a lifetime!"
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_muu4x0kh_oqvwb",
+      "dayId": "d_muu4x0kg_buf46",
+      "type": "ACTIVITY",
+      "label": "Burj Khalifa At the Top & Sky Views Tickets",
+      "costCurrency": "AED",
+      "adultRate": "151.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "description": "The Burj Khalifa Tickets",
+      "catalogRef": "p_6eb114b23073",
+      "supplier": "Rayna Tours"
+    },
+    {
+      "id": "l_muu4x0kh_7mbwm",
+      "dayId": "d_muu4x0kg_33mer",
+      "type": "ACTIVITY",
+      "label": "Morning Desert Safari",
+      "costCurrency": "AED",
+      "adultRate": "85.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "description": "Morning Safari Price & Offers",
+      "catalogRef": "p_d0492a6f445b",
+      "supplier": "Rayna Tours"
+    },
+    {
+      "id": "l_muu4x0kh_0iafy",
+      "dayId": "d_muu4x0kg_qgoec",
+      "type": "TRANSFER",
+      "label": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) (7 Seater)",
+      "costCurrency": "AED",
+      "adultRate": "140.00",
+      "basis": "PER_UNIT",
+      "qty": 1,
+      "description": "Includes AED 40.00 parking",
+      "catalogRef": "t_75c50a4756d0",
+      "supplier": "Parmar Tours and Transport"
+    },
+    {
+      "id": "l_muu4x0kh_zoc80",
+      "dayId": "d_muu4x0kg_37j31",
+      "type": "TRANSFER",
+      "label": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) (7 Seater)",
+      "costCurrency": "AED",
+      "adultRate": "140.00",
+      "basis": "PER_UNIT",
+      "qty": 1,
+      "description": "Includes AED 40.00 parking",
+      "catalogRef": "t_75c50a4756d0",
+      "supplier": "Parmar Tours and Transport"
+    }
+  ],
+  "paymentPolicy": [
+    "50% at the time of confirmation",
+    "Rest 30%, 20 days before travel date",
+    "Remaining 20%, 7 days before travel date"
+  ],
+  "terms": [
+    "Rates are subject to availability at the time of confirmation.",
+    "Hotel check-in is typically 1500 hrs and check-out 1200 hrs.",
+    "Any increase in government taxes or fuel surcharge will be charged extra.",
+    "Cancellation charges apply as per the policy shared at the time of booking."
+  ],
+  "createdAt": "2026-10-04T18:08:44.321Z",
+  "updatedAt": "2026-10-04T18:14:19.971Z",
+  "inclusions": []
+}

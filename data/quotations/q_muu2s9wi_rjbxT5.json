@@ -1,0 +1,112 @@
+{
+  "clientName": "Sarah Jenkins",
+  "destination": "Dubai",
+  "durationDays": 5,
+  "startDate": "December 10th",
+  "travelers": {
+    "adults": 2,
+    "children": 1
+  },
+  "days": [
+    {
+      "id": "d_1",
+      "title": "Arrival & Airport Transfer",
+      "index": 0,
+      "prose": "Welcome to Dubai, a glittering oasis of modern luxury. Upon your arrival at Dubai International Airport, you will be greeted and seamlessly transferred to your hotel. As you drive through the city, marvel at the towering skyscrapers and futuristic architecture that define this global metropolis. Check into your hotel, unwind, and spend your first evening soaking in the vibrant atmosphere of this dynamic city at your own pace."
+    },
+    {
+      "id": "d_2",
+      "title": "Burj Khalifa Visit",
+      "index": 1,
+      "prose": "Prepare to reach new heights today as you visit the iconic Burj Khalifa, the tallest building in the world. Ascend to the observation deck in a high-speed elevator and prepare to be mesmerized by the 360-degree panoramic views of the sprawling city, the Arabian Gulf, and the golden desert beyond. Afterward, you can explore the surrounding Downtown Dubai area, perhaps watching the spectacular Dubai Fountain show or wandering through the colossal Dubai Mall."
+    },
+    {
+      "id": "d_3",
+      "title": "Desert Safari Adventure",
+      "index": 2,
+      "prose": "Trade the glittering skyscrapers for the timeless beauty of the Arabian desert. Embark on an exhilarating afternoon desert safari, starting with a thrilling dune-bashing session across the golden sands. As the sun sets, painting the sky in hues of orange and pink, arrive at a traditional Bedouin-style camp. Here, enjoy camel riding, henna painting, and a delicious barbecue dinner under the stars, accompanied by captivating live performances like belly dancing and Tanoura shows."
+    },
+    {
+      "id": "d_4",
+      "title": "Leisure Day",
+      "index": 3,
+      "prose": "Today is yours to spend entirely at your leisure. Whether you want to relax on the pristine white sands of Jumeirah Beach, indulge in some world-class shopping at the Mall of the Emirates, or explore the historic Al Fahidi neighborhood to glimpse Dubai's rich heritage, the choice is yours. Take this time to discover the city's hidden gems, savor local culinary delights, or simply unwind by your hotel pool."
+    },
+    {
+      "id": "d_5",
+      "title": "Departure Transfer",
+      "index": 4,
+      "prose": "Bid a fond farewell to the spectacular city of Dubai. After checking out of your hotel, enjoy a comfortable and convenient transfer to Dubai International Airport for your departure flight. As you fly home, carry with you the unforgettable memories of soaring skyscrapers, desert adventures, and the unparalleled luxury of this Arabian gem."
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_1",
+      "dayId": "d_1",
+      "title": "Private Airport Transfer (DXB Airport to Hotel)",
+      "type": "transfer",
+      "adultRate": "150.00",
+      "childRate": "0.00",
+      "costCurrency": "AED"
+    },
+    {
+      "id": "l_2",
+      "dayId": "d_2",
+      "title": "Burj Khalifa At the Top (Level 124 & 125) Entry Ticket",
+      "type": "activity",
+      "adultRate": "179.00",
+      "childRate": "145.00",
+      "costCurrency": "AED"
+    },
+    {
+      "id": "l_3",
+      "dayId": "d_3",
+      "title": "Premium Desert Safari with BBQ Dinner & Entertainment",
+      "type": "activity",
+      "adultRate": "250.00",
+      "childRate": "200.00",
+      "costCurrency": "AED"
+    },
+    {
+      "id": "l_4",
+      "dayId": "d_5",
+      "title": "Private Airport Transfer (Hotel to DXB Airport)",
+      "type": "transfer",
+      "adultRate": "150.00",
+      "childRate": "0.00",
+      "costCurrency": "AED"
+    }
+  ],
+  "id": "q_muu2s9wi_rjbxT5",
+  "token": "BJUsN3yt5VFmWanXuowsAk",
+  "reference": "Q-234",
+  "status": "draft",
+  "createdAt": "2026-10-04T17:09:03.911Z",
+  "updatedAt": "2026-10-04T17:09:03.911Z",
+  "pricingMode": "PER_PERSON",
+  "quoteCurrency": "USD",
+  "fx": {
+    "AED": "3.65"
+  },
+  "defaultMarkupByType": {
+    "ACTIVITY": 15
+  },
+  "paymentPolicy": [
+    "50% advance",
+    "50% before arrival"
+  ],
+  "terms": [
+    "Standard terms apply"
+  ],
+  "client": {
+    "name": "Unknown Client"
+  },
+  "pax": {
+    "adults": 2,
+    "children": 0,
+    "infants": 0
+  },
+  "travelStart": "2026-10-04",
+  "travelEnd": "2026-10-09",
+  "title": "Dubai Trip"
+}

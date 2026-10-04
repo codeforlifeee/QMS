@@ -1,0 +1,94 @@
+{
+  "quotationId": "q_dubai_2023_001",
+  "clientName": "Sarah Jenkins",
+  "destination": "Dubai",
+  "startDate": "2023-12-10",
+  "durationDays": 5,
+  "costCurrency": "AED",
+  "adultRate": "4500.00",
+  "itinerary": [
+    {
+      "dayId": "d_1",
+      "dayNumber": 1,
+      "activities": [
+        {
+          "lineId": "l_1",
+          "description": "Airport Transfer Arrival",
+          "cost": "150.00"
+        }
+      ]
+    },
+    {
+      "dayId": "d_2",
+      "dayNumber": 2,
+      "activities": [
+        {
+          "lineId": "l_2",
+          "description": "Burj Khalifa Tour",
+          "cost": "400.00"
+        }
+      ]
+    },
+    {
+      "dayId": "d_3",
+      "dayNumber": 3,
+      "activities": [
+        {
+          "lineId": "l_3",
+          "description": "Desert Safari",
+          "cost": "300.00"
+        }
+      ]
+    },
+    {
+      "dayId": "d_4",
+      "dayNumber": 4,
+      "activities": []
+    },
+    {
+      "dayId": "d_5",
+      "dayNumber": 5,
+      "activities": [
+        {
+          "lineId": "l_4",
+          "description": "Airport Transfer Departure",
+          "cost": "150.00"
+        }
+      ]
+    }
+  ],
+  "id": "q_muu2lvud_8A8Y76",
+  "token": "W8ooeQoBFQPFG5g58aTviR",
+  "reference": "Q-7922",
+  "status": "draft",
+  "createdAt": "2026-10-04T17:04:05.749Z",
+  "updatedAt": "2026-10-04T17:04:05.749Z",
+  "pricingMode": "PER_PERSON",
+  "quoteCurrency": "USD",
+  "fx": {
+    "AED": "3.65"
+  },
+  "defaultMarkupByType": {
+    "ACTIVITY": 15
+  },
+  "paymentPolicy": [
+    "50% advance",
+    "50% before arrival"
+  ],
+  "terms": [
+    "Standard terms apply"
+  ],
+  "days": [],
+  "lines": [],
+  "client": {
+    "name": "Unknown Client"
+  },
+  "pax": {
+    "adults": 2,
+    "children": 0,
+    "infants": 0
+  },
+  "travelStart": "2026-10-04",
+  "travelEnd": "2026-10-09",
+  "title": "Dubai Trip"
+}

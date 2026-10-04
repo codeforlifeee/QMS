@@ -1,0 +1,126 @@
+{
+  "l_muu4x0kh_oqvwb": [
+    {
+      "lineId": "l_muu4x0kh_oqvwb",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "p_6eb114b23073",
+        "productName": "Burj Khalifa At the Top & Sky Views Tickets",
+        "sheetName": "Package Calculator: Cost sheet",
+        "originalValueAed": 15100,
+        "matchScore": 1,
+        "matchedQuery": "Burj Khalifa"
+      },
+      "alternatives": [
+        {
+          "catalogId": "p_7eabab661e6c",
+          "productName": "BURJ KHALIFA 124 FLOOR NON PEAK",
+          "costAed": 15300,
+          "score": 1
+        },
+        {
+          "catalogId": "p_c5f375babc5b",
+          "productName": "BURJ KHALIFA 124 FLOOR PEAK HRS",
+          "costAed": 15300,
+          "score": 1
+        },
+        {
+          "catalogId": "p_a2d0757c07a5",
+          "productName": "BURJ KHALIFA 124 FLOOR+DAUZ NON PEAK",
+          "costAed": 28500,
+          "score": 1
+        }
+      ]
+    }
+  ],
+  "l_muu4x0kh_7mbwm": [
+    {
+      "lineId": "l_muu4x0kh_7mbwm",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "p_d0492a6f445b",
+        "productName": "Morning Desert Safari",
+        "sheetName": "Package Calculator: Cost sheet",
+        "originalValueAed": 8500,
+        "matchScore": 0.9699969169293094,
+        "matchedQuery": "Desert Safari"
+      },
+      "alternatives": [
+        {
+          "catalogId": "p_24af4aebca18",
+          "productName": "Desert Safari",
+          "costAed": 11000,
+          "score": 0.9699969169293094
+        },
+        {
+          "catalogId": "p_3bd4b7ef068c",
+          "productName": "Morning Desert Safari with 200 cc Polaris (Inside the Circle, beside the Camp)",
+          "costAed": 15500,
+          "score": 0.9699969169293094
+        },
+        {
+          "catalogId": "p_e5990312f70a",
+          "productName": "Desert Safari with Shisha on Table",
+          "costAed": 16200,
+          "score": 0.9699969169293094
+        }
+      ]
+    }
+  ],
+  "l_muu4x0kh_0iafy": [
+    {
+      "lineId": "l_muu4x0kh_0iafy",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "t_75c50a4756d0",
+        "productName": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) — 7 Seater",
+        "sheetName": "App Sheet: TRANSPORT",
+        "originalValueAed": 14000,
+        "matchScore": 1,
+        "matchedQuery": "Airport to Hotel"
+      },
+      "alternatives": [
+        {
+          "catalogId": "t_cd65190ffc0f",
+          "productName": "Dubai Airport to Beach Hotel(Al Barsha , Palm Jumirah, Marina) (Airport Transfers) — 7 Seater",
+          "costAed": 11000,
+          "score": 1
+        },
+        {
+          "catalogId": "t_30e74dc81a0e",
+          "productName": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) — 15 Seater",
+          "costAed": 12500,
+          "score": 1
+        }
+      ]
+    }
+  ],
+  "l_muu4x0kh_zoc80": [
+    {
+      "lineId": "l_muu4x0kh_zoc80",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "t_75c50a4756d0",
+        "productName": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) — 7 Seater",
+        "sheetName": "App Sheet: TRANSPORT",
+        "originalValueAed": 14000,
+        "matchScore": 1,
+        "matchedQuery": "Hotel to Airport"
+      },
+      "alternatives": [
+        {
+          "catalogId": "t_cd65190ffc0f",
+          "productName": "Dubai Airport to Beach Hotel(Al Barsha , Palm Jumirah, Marina) (Airport Transfers) — 7 Seater",
+          "costAed": 11000,
+          "score": 1
+        },
+        {
+          "catalogId": "t_30e74dc81a0e",
+          "productName": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) — 15 Seater",
+          "costAed": 12500,
+          "score": 1
+        }
+      ]
+    }
+  ]
+}
