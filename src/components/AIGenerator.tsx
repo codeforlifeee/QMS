@@ -21,7 +21,10 @@ export default function AIGenerator() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to generate quotation');
       
-      // Redirect to the newly generated quotation edit page
+      // Store warnings so the editor can display them after redirect
+      if (data.warnings?.length) {
+        try { sessionStorage.setItem(`ai-warnings-${data.quotationId}`, JSON.stringify(data.warnings)); } catch {}
+      }
       window.location.href = `/edit/${data.quotationId}`;
     } catch (err: any) {
       setError(err.message);

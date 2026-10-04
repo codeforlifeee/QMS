@@ -7,6 +7,7 @@ import { toEngineInput } from '../../data/schema.js';
 import type { Citation, CitationMap } from '../citations.js';
 import { newDayId, newLineId, defaultLineOf } from '../../editor/factories.js';
 import { DEFAULT_PAYMENT_POLICY, DEFAULT_TERMS } from '../../config/company.js';
+import { capacityOf } from '../../catalog/match.js';
 
 /**
  * Step 3 — build. Fully deterministic: no LLM call at all.
@@ -35,17 +36,43 @@ function fromMinor(minor: number): string {
   return `${sign}${Math.floor(abs / 100)}.${(abs % 100).toString().padStart(2, '0')}`;
 }
 
+const MONTH_NAMES: Record<string, number> = {
+  jan: 0, january: 0, feb: 1, february: 1, mar: 2, march: 2,
+  apr: 3, april: 3, may: 4, jun: 5, june: 5,
+  jul: 6, july: 6, aug: 7, august: 7, sep: 8, september: 8,
+  oct: 9, october: 9, nov: 10, november: 10, dec: 11, december: 11,
+};
+
+function monthToDate(travelMonth: string, now: Date): Date | null {
+  const cleaned = travelMonth.trim().toLowerCase();
+  const yearMatch = /\b(20\d{2})\b/.exec(cleaned);
+  const year = yearMatch ? Number(yearMatch[1]) : undefined;
+
+  for (const [name, idx] of Object.entries(MONTH_NAMES)) {
+    if (cleaned.includes(name)) {
+      if (year) return new Date(year, idx, 1);
+      // Pick the next occurrence of this month
+      const thisYear = now.getFullYear();
+      const candidate = new Date(thisYear, idx, 1);
+      return candidate >= now ? candidate : new Date(thisYear + 1, idx, 1);
+    }
+  }
+  return null;
+}
+
 export async function buildQuotation(
   intent: ParsedIntent,
   grounded: readonly GroundedItem[],
 ): Promise<BuildResult> {
   const defaults = await loadDefaults();
   const fxAedPerUsd = defaults?.fxAedPerUsd ?? 3.65;
+  const fxInrPerUsd = defaults?.fxInrPerUsd ?? 85.59;
   const markupPct = (defaults?.markupPct ?? 0.15) * 100; // schema wants 15, not 0.15
 
   const warnings: string[] = [];
   const citations: CitationMap = {};
   const lines: StoredLine[] = [];
+  const pax = Math.max(1, (intent.adults || 0) + (intent.children || 0));
 
   // ---- days ----
   const totalDays = Math.max(1, (intent.nights || 0) + 1);
@@ -59,26 +86,54 @@ export async function buildQuotation(
     n && n >= 1 && n <= days.length ? days[n - 1]!.id : null;
 
   // Activities the client didn't pin to a day get spread across the days that are
-  // actually available for sightseeing — arrival and departure days stay clear, and no
-  // single day collects everything. Leaving them unassigned instead dumps them into a
-  // trip-level bucket that reads badly on the document.
+  // actually available for sightseeing — arrival and departure days stay clear.
+  // Uses balanced assignment instead of round-robin so no single day gets overloaded.
   const sightseeingDays = days.length > 2 ? days.slice(1, -1) : days;
-  let spreadCursor = 0;
+  const dayActivityCounts = new Map<string, number>();
+  for (const d of sightseeingDays) dayActivityCounts.set(d.id, 0);
+
   const nextSpreadDay = (): string | null => {
     if (sightseeingDays.length === 0) return null;
-    const d = sightseeingDays[spreadCursor % sightseeingDays.length]!;
-    spreadCursor++;
-    return d.id;
+    let minCount = Infinity;
+    let minDay = sightseeingDays[0]!;
+    for (const d of sightseeingDays) {
+      const count = dayActivityCounts.get(d.id) ?? 0;
+      if (count < minCount) { minCount = count; minDay = d; }
+    }
+    dayActivityCounts.set(minDay.id, minCount + 1);
+    return minDay.id;
   };
 
+  // ---- deduplicate grounded activities by catalog ref ----
+  const seenCatalogRefs = new Map<string, GroundedItem>();
+  const dedupedGrounded = grounded.filter((item) => {
+    if (item.kind !== 'activity') return true;
+    const ref = item.product?.id ?? item.cityTour?.id;
+    if (!ref) return true;
+    const prev = seenCatalogRefs.get(ref);
+    if (prev) {
+      warnings.push(
+        `"${item.intentItem}" is the same catalog product as "${prev.intentItem}" — kept once`,
+      );
+      return false;
+    }
+    seenCatalogRefs.set(ref, item);
+    return true;
+  });
+
   // ---- activity + city-tour lines ----
-  for (const item of grounded) {
+  for (const item of dedupedGrounded) {
     if (item.kind !== 'activity') continue;
     const dayId = dayIdFor(item.dayNumber) ?? nextSpreadDay();
+    if (dayId) dayActivityCounts.set(dayId, (dayActivityCounts.get(dayId) ?? 0) + 1);
     const built = activityLine(item, dayId);
     if (!built) {
       warnings.push(`No catalog match for "${item.intentItem}" — add this line manually`);
       continue;
+    }
+    // Apply quantity from parsed intent
+    if (item.quantity && item.quantity > 1) {
+      (built.line as any).qty = item.quantity;
     }
     lines.push(built.line);
     citations[built.line.id] = [built.citation];
@@ -88,36 +143,51 @@ export async function buildQuotation(
           + `confidence (${Math.round(item.matchScore * 100)}%) — please verify`,
       );
     }
+    // Warn when child pricing falls back to the 0.5x multiplier
+    if (item.product && item.product.childCostAed == null && (intent.children || 0) > 0) {
+      warnings.push(
+        `"${item.product.product}" uses estimated child pricing (50% of adult) — no catalog child rate available`,
+      );
+    }
   }
 
   // ---- transfer lines ----
-  // Airport transfers belong on the days they happen: the first one on arrival, the
-  // next on departure. Leaving them trip-level reads as an unscheduled extra on the
-  // document even though the client asked for "transfers both ways".
   const arrivalDayId = days[0]!.id;
   const departureDayId = days[days.length - 1]!.id;
   let airportSeen = 0;
 
-  for (const item of grounded) {
+  for (const item of dedupedGrounded) {
     if (item.kind !== 'transfer') continue;
 
     let dayId: string | null = null;
+    let directionLabel = '';
     if (item.transferType === 'airport') {
-      dayId = airportSeen === 0 ? arrivalDayId : airportSeen === 1 ? departureDayId : null;
+      if (airportSeen === 0) {
+        dayId = arrivalDayId;
+        directionLabel = ' (Arrival)';
+      } else if (airportSeen === 1) {
+        dayId = departureDayId;
+        directionLabel = ' (Departure)';
+      }
       airportSeen++;
     }
 
-    const built = transferLine(item, dayId);
+    const built = transferLine(item, dayId, pax, directionLabel);
     if (!built) {
       warnings.push(`No transport match for "${item.intentItem}" — add this transfer manually`);
       continue;
+    }
+    if (built.vehiclesNeeded > 1) {
+      warnings.push(
+        `${built.vehiclesNeeded} vehicles needed for ${pax} passengers on "${item.intentItem}"`,
+      );
     }
     lines.push(built.line);
     citations[built.line.id] = [built.citation];
   }
 
   // ---- hotels: no catalog yet, so emit a priced-at-zero placeholder ----
-  for (const item of grounded) {
+  for (const item of dedupedGrounded) {
     if (item.kind !== 'hotel') continue;
     lines.push({
       ...defaultLineOf('HOTEL'),
@@ -150,12 +220,30 @@ export async function buildQuotation(
     warnings.push(`Meal "${m.type}" needs a rate`);
   }
 
-  // ---- assemble ----
+  // ---- travel dates: use travelMonth when available ----
   const now = new Date();
-  const travelStart = now.toISOString().slice(0, 10);
-  const travelEnd = new Date(now.getTime() + Math.max(0, intent.nights || 0) * 86_400_000)
+  let travelStartDate = now;
+  if (intent.travelMonth) {
+    const parsed = monthToDate(intent.travelMonth, now);
+    if (parsed) {
+      travelStartDate = parsed;
+    } else {
+      warnings.push(
+        `Could not interpret travel month "${intent.travelMonth}" — using today as start date`,
+      );
+    }
+  }
+  const travelStart = travelStartDate.toISOString().slice(0, 10);
+  const travelEnd = new Date(travelStartDate.getTime() + Math.max(0, intent.nights || 0) * 86_400_000)
     .toISOString()
     .slice(0, 10);
+
+  // ---- FX rates: engine expects "1 cost-unit = X quote-units" ----
+  const fxMap: Record<string, string> = {
+    AED: (1 / fxAedPerUsd).toFixed(6),
+    INR: (1 / fxInrPerUsd).toFixed(6),
+    USD: '1.00',
+  };
 
   const quotation: StoredQuotation = {
     id: newId(),
@@ -178,7 +266,7 @@ export async function buildQuotation(
       infants: Math.max(0, intent.infants || 0),
     },
     quoteCurrency: 'USD',
-    fx: { AED: fxAedPerUsd.toString(), USD: '1.00' },
+    fx: fxMap,
     pricingMode: 'PER_SERVICE',
     defaultMarkupByType: {
       ACTIVITY: markupPct,
@@ -313,7 +401,9 @@ function activityLine(
 function transferLine(
   item: GroundedTransfer,
   dayId: string | null,
-): { line: StoredLine; citation: Citation } | null {
+  pax: number,
+  directionLabel: string,
+): { line: StoredLine; citation: Citation; vehiclesNeeded: number } | null {
   const t = item.product;
   if (!t) return null;
 
@@ -321,14 +411,17 @@ function transferLine(
   // Parking is a real surcharge on most airport routes; folding it into the line cost
   // keeps the quoted total honest instead of under-quoting by AED 40 a transfer.
   const total = t.rateAed + (t.parkingAed ?? 0);
+  const vehicleCap = capacityOf(t.vehicleSize);
+  const vehiclesNeeded = Math.max(1, Math.ceil(pax / vehicleCap));
+
   const line: StoredLine = {
     ...defaultLineOf('TRANSFER', dayId),
     id,
-    label: `${t.route} (${t.vehicleSize})`,
+    label: `${t.route} (${t.vehicleSize})${directionLabel}`,
     ...(t.parkingAed ? { description: `Includes AED ${fromMinor(t.parkingAed)} parking` } : {}),
     adultRate: fromMinor(total),
     costCurrency: 'AED',
-    qty: 1,
+    qty: vehiclesNeeded,
     catalogRef: t.id,
     supplier: t.supplier,
   };
@@ -352,5 +445,6 @@ function transferLine(
         score: a.score,
       })),
     },
+    vehiclesNeeded,
   };
 }

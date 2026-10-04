@@ -11,7 +11,7 @@ export interface ParsedIntent {
   infants: number;
   clientName?: string;
   clientPhone?: string;
-  activities: Array<{ name: string; dayNumber?: number; notes?: string }>;
+  activities: Array<{ name: string; dayNumber?: number; notes?: string; quantity?: number }>;
   hotels: Array<{ name: string; roomType?: string; nights?: number }>;
   transfers: Array<{ type: 'airport' | 'intercity' | 'sightseeing'; route?: string; vehiclePreference?: string }>;
   visa: boolean;
@@ -40,6 +40,7 @@ const PARSE_SCHEMA = {
           name: { type: 'string' },
           dayNumber: { type: 'number' },
           notes: { type: 'string' },
+          quantity: { type: 'number' },
         },
         required: ['name'],
       },
@@ -111,6 +112,7 @@ Rules:
 - "nights" is the number of overnight stays, not the number of days. "5-night trip" = 5. "6-day trip" = 5 nights.
 - "dayNumber" on an activity is 1-indexed from day 1 of the trip. Only set it when the user says so ("day 2 Burj Khalifa").
 - "transfers": airport = airport pickup/drop; intercity = city-to-city; sightseeing = tour transfer during the day.
+- "quantity" on an activity is how many units or sessions. "2 desert safaris" = quantity 2. Default is 1. Only set when explicitly stated.
 - "visa" is true only if a visa service is explicitly requested.
 - Omit optional fields rather than inventing values.
 
@@ -192,11 +194,12 @@ function normalise(raw: Record<string, any>, warnings: string[]): ParsedIntent {
 
   const activities = asArray(raw.activities)
     .map((a) => (typeof a === 'string' ? { name: a } : a))
-    .filter((a): a is { name: string; dayNumber?: number; notes?: string } => !!a?.name)
+    .filter((a): a is { name: string; dayNumber?: number; notes?: string; quantity?: number } => !!a?.name)
     .map((a) => ({
       name: String(a.name).trim(),
       ...(num(a.dayNumber) > 0 ? { dayNumber: num(a.dayNumber) } : {}),
       ...(a.notes ? { notes: String(a.notes) } : {}),
+      ...(num(a.quantity) > 1 ? { quantity: num(a.quantity) } : {}),
     }));
 
   const hotels = asArray(raw.hotels)

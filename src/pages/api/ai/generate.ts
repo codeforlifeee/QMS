@@ -27,7 +27,11 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const result = await generateQuotation(prompt, provider);
-    await jsonRepo.save(result.quotation);
+    const quotationWithWarnings = {
+      ...result.quotation,
+      ...(result.warnings.length > 0 ? { aiWarnings: result.warnings } : {}),
+    };
+    await jsonRepo.save(quotationWithWarnings);
     await jsonRepo.saveCitations(result.quotation.id, result.citations);
 
     const grounded = Object.keys(result.citations).length;
