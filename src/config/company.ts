@@ -23,6 +23,24 @@ export const DEFAULT_TERMS = [
   'Cancellation charges apply as per the policy shared at the time of booking.',
 ] as const;
 
+export const DEFAULT_INCLUSIONS = [
+  'Hotel accommodation as per itinerary',
+  'All transfers as mentioned in the itinerary',
+  'All sightseeing and activities as per itinerary',
+  'All applicable hotel taxes (tourism dirham, municipality fee)',
+  '24/7 on-tour assistance',
+] as const;
+
+export const DEFAULT_EXCLUSIONS = [
+  'International or domestic airfare (unless mentioned)',
+  'Travel insurance',
+  'Personal expenses (laundry, telephone, tips, minibar)',
+  'Any services not mentioned in the inclusions',
+  'Visa fees (unless mentioned in inclusions)',
+  'Early check-in or late check-out charges',
+  'Any optional tours or excursions not listed',
+] as const;
+
 /** Brand palette. Kept in one place so the document and the app cannot drift apart. */
 export const BRAND = {
   orange: '#FF5B04',

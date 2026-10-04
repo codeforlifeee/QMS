@@ -1,11 +1,4 @@
-/**
- * Simple one-item-per-line list editor.
- *
- * Used for inclusions, exclusions, payment policy, and terms. Each of these is a
- * free-form bullet list, so a single textarea where every non-blank line becomes an
- * item is far faster to use than a dedicated row-with-plus-button component — and
- * agents already think of them this way.
- */
+import { useState, useEffect, useRef } from 'react';
 
 interface Props {
   readonly value: readonly string[] | undefined;
@@ -15,7 +8,17 @@ interface Props {
 }
 
 export default function ListEditor({ value, onChange, placeholder, rows = 5 }: Props) {
-  const text = (value ?? []).join('\n');
+  const [text, setText] = useState((value ?? []).join('\n'));
+  const localEdit = useRef(false);
+
+  useEffect(() => {
+    if (localEdit.current) {
+      localEdit.current = false;
+      return;
+    }
+    setText((value ?? []).join('\n'));
+  }, [value]);
+
   return (
     <textarea
       className="list-editor"
@@ -23,7 +26,10 @@ export default function ListEditor({ value, onChange, placeholder, rows = 5 }: P
       placeholder={placeholder ?? 'One item per line'}
       value={text}
       onChange={(e) => {
-        const next = e.target.value
+        const raw = e.target.value;
+        setText(raw);
+        localEdit.current = true;
+        const next = raw
           .split('\n')
           .map((s) => s.trimEnd())
           .filter((s) => s.length > 0);

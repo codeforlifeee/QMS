@@ -280,17 +280,36 @@ export default function Editor({ initial }: Props) {
     <div className="editor flex h-screen">
       {/* ====================== LEFT: FORM ====================== */}
       <section className="editor-form flex-1 overflow-y-auto">
-        <div className="flex justify-between items-center bg-gray-50 p-2 border-b">
+        <div className="editor-toolbar">
           <SaveBadge state={saveState} error={saveError} />
-          <div className="flex gap-2">
-            <button className="btn btn-sm bg-purple-100 text-purple-800 font-medium" onClick={() => setChatOpen(!chatOpen)}>
-              {chatOpen ? 'Hide Assistant' : '✨ AI Assistant'}
+          <div className="editor-toolbar-actions">
+            <button
+              className={`btn btn-sm editor-toggle-btn${chatOpen ? ' active' : ''}`}
+              onClick={() => { setChatOpen(!chatOpen); if (!chatOpen) setShowSources(false); }}
+            >
+              {chatOpen ? 'Hide Assistant' : 'AI Assistant'}
             </button>
-            <button className="btn btn-sm bg-blue-100 text-blue-800" onClick={() => setShowSources(!showSources)}>
-              {showSources ? 'Hide Sources' : 'Show Sources'}
+            <button
+              className={`btn btn-sm editor-toggle-btn sources${showSources ? ' active' : ''}`}
+              onClick={() => { setShowSources(!showSources); if (!showSources) setChatOpen(false); }}
+            >
+              {showSources ? 'Hide Sources' : 'Sources'}
             </button>
           </div>
         </div>
+
+        {chatOpen && (
+          <ChatPanel
+            session={chatSession}
+            onSend={handleChatSend}
+            onApplyChange={handleApplyChange}
+            onClose={() => setChatOpen(false)}
+          />
+        )}
+
+        {showSources && (
+          <SourcesPanel citations={citations} quotation={q} onClose={() => setShowSources(false)} />
+        )}
 
         {/* ---------- client & trip ---------- */}
         <div className="section-head">Client &amp; trip</div>
@@ -532,19 +551,6 @@ export default function Editor({ initial }: Props) {
           Changes autosave to <code>data/quotations/{q.id}.json</code>.
         </p>
       </section>
-
-      {showSources && (
-        <SourcesPanel citations={citations} quotation={q} onClose={() => setShowSources(false)} />
-      )}
-      
-      {chatOpen && (
-        <ChatPanel 
-          session={chatSession} 
-          onSend={handleChatSend} 
-          onApplyChange={handleApplyChange} 
-          onClose={() => setChatOpen(false)} 
-        />
-      )}
 
       {/* ====================== RIGHT: PREVIEW ====================== */}
       <section className="editor-preview flex-1 overflow-y-auto">
