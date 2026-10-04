@@ -118,19 +118,19 @@ h3 {
   justify-content: space-between;
   gap: 8mm;
   padding-bottom: 4mm;
-  border-bottom: 0.4mm solid var(--orange);
+  border-bottom: 0.5mm solid var(--orange);
 }
 
 .brand-name {
-  font-size: 15pt;
+  font-size: 16pt;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   margin: 0;
   color: var(--ink);
 }
 
 .brand-tag {
-  margin: 0.6mm 0 0;
+  margin: 1mm 0 0;
   font-size: 7.6pt;
   color: var(--muted);
   letter-spacing: 0.06em;
@@ -158,16 +158,17 @@ h3 {
   width: 100%;
   height: 58mm;
   object-fit: cover;
-  border-radius: 2mm;
+  border-radius: 2.5mm;
   display: block;
 }
 
 .hero-title {
-  font-size: 21pt;
-  line-height: 1.12;
+  font-size: 22pt;
+  line-height: 1.1;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   margin: 5mm 0 1.5mm;
+  color: var(--ink);
 }
 
 .hero-sub {
@@ -184,11 +185,12 @@ h3 {
   border: 0.25mm solid var(--hairline);
   border-radius: 2mm;
   overflow: hidden;
+  background: var(--tint);
 }
 
 .fact {
   flex: 1;
-  padding: 3mm 4mm;
+  padding: 3.5mm 4mm;
   border-right: 0.25mm solid var(--hairline);
 }
 
@@ -208,6 +210,7 @@ h3 {
   font-size: 9.6pt;
   font-weight: 600;
   margin: 0;
+  color: var(--ink);
 }
 
 /* ---------- headline price ---------- */
@@ -217,8 +220,8 @@ h3 {
   justify-content: space-between;
   gap: 6mm;
   margin: 5mm 0 0;
-  padding: 5mm;
-  border-radius: 2mm;
+  padding: 5.5mm 6mm;
+  border-radius: 2.5mm;
   background: var(--ink);
   color: #fff;
 }
@@ -259,13 +262,15 @@ h3 {
   letter-spacing: -0.01em;
   margin: 0 0 3mm;
   padding-bottom: 1.5mm;
-  border-bottom: 0.25mm solid var(--hairline);
+  border-bottom: 0.3mm solid var(--hairline);
+  color: var(--ink);
 }
 
 .lede {
   font-size: 9.6pt;
   color: #33444c;
   margin: 0;
+  line-height: 1.6;
 }
 
 /* ---------- itinerary ---------- */
@@ -283,19 +288,18 @@ h3 {
 .day-no {
   flex: 0 0 13mm;
   height: 13mm;
-  border-radius: 1.5mm;
-  background: var(--tint);
-  border: 0.25mm solid var(--hairline);
+  border-radius: 2mm;
+  background: var(--teal);
   text-align: center;
   padding-top: 1.6mm;
 }
 
 .day-no span {
   display: block;
-  font-size: 6.4pt;
+  font-size: 6pt;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1;
 }
 
@@ -304,6 +308,7 @@ h3 {
   font-size: 12pt;
   font-weight: 700;
   line-height: 1.25;
+  color: #fff;
 }
 
 .day-body {
@@ -330,10 +335,10 @@ h3 {
 
 .tag {
   font-size: 7.2pt;
-  padding: 0.6mm 2mm;
+  padding: 0.6mm 2.5mm;
   border-radius: 6mm;
-  background: var(--tint);
-  border: 0.25mm solid var(--hairline);
+  background: #edf6f7;
+  border: 0.25mm solid #c8dfe3;
   color: var(--teal);
   font-weight: 600;
 }
@@ -341,38 +346,69 @@ h3 {
 /* ---------- two-column panels ---------- */
 .panels {
   display: flex;
-  gap: 5mm;
+  gap: 4mm;
 }
 
 .panel {
   flex: 1;
   border: 0.25mm solid var(--hairline);
-  border-radius: 2mm;
+  border-radius: 2.5mm;
   padding: 4mm;
+  border-top: 0.8mm solid var(--hairline);
 }
 
 .panel h3 {
   font-size: 9.2pt;
-  margin: 0 0 2mm;
-  font-weight: 650;
+  margin: 0 0 2.5mm;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .panel ul {
   margin: 0;
   padding-left: 4mm;
+  list-style: none;
 }
 
 .panel li {
-  margin-bottom: 1.2mm;
+  margin-bottom: 1.4mm;
   font-size: 8.8pt;
+  position: relative;
+  padding-left: 3mm;
+}
+
+.panel li::before {
+  position: absolute;
+  left: -1mm;
+  font-weight: 700;
+}
+
+.panel.included {
+  border-top-color: var(--teal);
+  background: #f7fbfb;
 }
 
 .panel.included h3 {
   color: var(--teal);
 }
 
+.panel.included li::before {
+  content: "+";
+  color: var(--teal);
+}
+
+.panel.excluded {
+  border-top-color: #c2410c;
+  background: #fffbf7;
+}
+
 .panel.excluded h3 {
   color: #9a3412;
+}
+
+.panel.excluded li::before {
+  content: "\2013";
+  color: #c2410c;
 }
 
 /* ---------- price table ---------- */
@@ -382,6 +418,10 @@ table.prices {
   font-size: 8.8pt;
 }
 
+table.prices thead {
+  background: var(--tint);
+}
+
 table.prices th {
   text-align: left;
   font-size: 6.8pt;
@@ -389,12 +429,12 @@ table.prices th {
   text-transform: uppercase;
   color: var(--muted);
   font-weight: 600;
-  padding: 0 0 1.8mm;
-  border-bottom: 0.25mm solid var(--hairline);
+  padding: 2mm 1mm 2mm 0;
+  border-bottom: 0.3mm solid var(--hairline);
 }
 
 table.prices td {
-  padding: 2.2mm 0;
+  padding: 2.4mm 1mm 2.4mm 0;
   border-bottom: 0.25mm solid var(--hairline);
   vertical-align: top;
 }
@@ -403,6 +443,7 @@ table.prices .num {
   text-align: right;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  padding-right: 0;
 }
 
 .line-label {
@@ -438,10 +479,10 @@ table.prices .num {
 }
 
 .totals .grand {
-  border-top: 0.5mm solid var(--ink);
+  border-top: 0.6mm solid var(--ink);
   margin-top: 1mm;
-  padding-top: 2mm;
-  font-size: 11.5pt;
+  padding-top: 2.5mm;
+  font-size: 12pt;
   font-weight: 700;
 }
 
@@ -481,8 +522,8 @@ table.prices .num {
 /* ---------- footer ---------- */
 .doc-footer {
   margin-top: 8mm;
-  padding-top: 3mm;
-  border-top: 0.25mm solid var(--hairline);
+  padding-top: 3.5mm;
+  border-top: 0.3mm solid var(--hairline);
   display: flex;
   justify-content: space-between;
   gap: 6mm;

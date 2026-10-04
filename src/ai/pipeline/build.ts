@@ -6,7 +6,7 @@ import type { StoredQuotation, StoredLine, StoredDay } from '../../data/schema';
 import { toEngineInput } from '../../data/schema.js';
 import type { Citation, CitationMap } from '../citations.js';
 import { newDayId, newLineId, defaultLineOf } from '../../editor/factories.js';
-import { DEFAULT_PAYMENT_POLICY, DEFAULT_TERMS } from '../../config/company.js';
+import { DEFAULT_PAYMENT_POLICY, DEFAULT_TERMS, DEFAULT_INCLUSIONS, DEFAULT_EXCLUSIONS } from '../../config/company.js';
 import { capacityOf } from '../../catalog/match.js';
 
 /**
@@ -283,6 +283,8 @@ export async function buildQuotation(
     days,
     lines,
     ...(intent.specialRequests ? { overview: intent.specialRequests } : {}),
+    inclusions: [...DEFAULT_INCLUSIONS],
+    exclusions: [...DEFAULT_EXCLUSIONS],
     paymentPolicy: [...DEFAULT_PAYMENT_POLICY],
     terms: [...DEFAULT_TERMS],
     createdAt: now.toISOString(),

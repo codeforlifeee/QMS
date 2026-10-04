@@ -8,41 +8,67 @@ interface SourcesPanelProps {
   onClose: () => void;
 }
 
+function scoreBadge(score: number): string {
+  if (score >= 0.8) return 'high';
+  if (score >= 0.5) return 'mid';
+  return 'low';
+}
+
 export function SourcesPanel({ citations, quotation, onClose }: SourcesPanelProps) {
   const lines = quotation.lines;
-  const groundedCount = Object.keys(citations).length;
-  
+  const groundedCount = lines.filter(l => citations[l.id]?.length).length;
+  const pct = lines.length > 0 ? Math.round((groundedCount / lines.length) * 100) : 0;
+
   return (
-    <div className="flex flex-col h-full bg-white border-l border-gray-200 w-80">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Sources & Citations</h2>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-xl font-bold">
-          ×
+    <div className="inline-panel sources-panel">
+      <div className="inline-panel-header sources-header">
+        <div className="inline-panel-title">
+          <span className="inline-panel-icon sources-icon">S</span>
+          <span>Sources &amp; Citations</span>
+        </div>
+        <button onClick={onClose} className="inline-panel-close" aria-label="Close sources">
+          &times;
         </button>
       </div>
-      <div className="p-4 bg-gray-50 border-b border-gray-200 text-sm text-gray-600">
-        {groundedCount} of {lines.length} lines grounded in catalog.
+
+      <div className="sources-summary">
+        <div className="sources-summary-text">
+          <strong>{groundedCount}</strong> of <strong>{lines.length}</strong> lines grounded in catalog
+        </div>
+        <div className="sources-progress-bar">
+          <div className="sources-progress-fill" style={{ width: `${pct}%` }} />
+        </div>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+
+      <div className="sources-list">
         {lines.map((line: StoredLine) => {
           const lineCitations = citations[line.id];
+          const isGrounded = lineCitations && lineCitations.length > 0;
           return (
-            <div key={line.id} className="border border-gray-200 rounded p-3 bg-gray-50 shadow-sm">
-              <div className="font-medium text-sm mb-2">{line.label}</div>
-              {lineCitations && lineCitations.length > 0 ? (
+            <div key={line.id} className={`sources-card ${isGrounded ? 'grounded' : 'manual'}`}>
+              <div className="sources-card-header">
+                <span className={`sources-status-dot ${isGrounded ? 'grounded' : 'manual'}`} />
+                <span className="sources-card-label">{line.label}</span>
+              </div>
+              {isGrounded ? (
                 lineCitations.map((c: Citation, i: number) => (
-                  <div key={i} className="text-xs bg-white border border-gray-100 rounded p-2 mb-2 last:mb-0">
-                    <div className="text-green-700 font-medium truncate" title={c.source.productName}>{c.source.productName}</div>
-                    <div className="text-gray-500 mt-1">Sheet: {c.source.sheetName}</div>
-                    <div className="text-gray-500 truncate" title={c.source.matchedQuery}>Matched: "{c.source.matchedQuery}"</div>
-                    <div className="text-gray-500">Score: {(c.source.matchScore * 100).toFixed(0)}%</div>
-                    <div className="text-gray-500">Original AED: {c.source.originalValueAed / 100}</div>
+                  <div key={i} className="sources-citation">
+                    <div className="sources-citation-name" title={c.source.productName}>
+                      {c.source.productName}
+                    </div>
+                    <div className="sources-citation-meta">
+                      <span className="sources-citation-sheet">{c.source.sheetName}</span>
+                      <span className={`sources-score ${scoreBadge(c.source.matchScore)}`}>
+                        {(c.source.matchScore * 100).toFixed(0)}%
+                      </span>
+                      <span className="sources-citation-cost">
+                        AED {(c.source.originalValueAed / 100).toFixed(0)}
+                      </span>
+                    </div>
                   </div>
                 ))
               ) : (
-                <div className="text-xs text-red-600 font-medium">
-                  Manual entry — no catalog match
-                </div>
+                <div className="sources-manual-tag">Manual entry</div>
               )}
             </div>
           );
