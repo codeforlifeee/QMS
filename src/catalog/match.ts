@@ -107,6 +107,23 @@ function termWeight(idf: Map<string, number>, term: string): number {
 }
 
 /**
+ * Presence score for an unknown term that appears directly in a product name.
+ * "BBQ" in "Desert Safari with BBQ Dinner" is a variant-discriminating signal even
+ * though the IDF map doesn't know it — the term narrows which variant the client wants.
+ */
+function unknownTermNameBonus(
+  term: string,
+  nameTokens: ReadonlySet<string>,
+  nameLower: string,
+  idf: Map<string, number>,
+): number {
+  if (idf.has(term)) return 0;
+  if (nameTokens.has(term)) return 0.8;
+  if (term.length >= 4 && nameLower.includes(term)) return 0.5;
+  return 0;
+}
+
+/**
  * How well a query term is present in a tokenised field, 0..1.
  *
  * Token-aware on purpose. A naive `includes` scores "Ain Dubai" against
@@ -271,11 +288,18 @@ export function matchProducts(
       }
     }
 
+    // Variant bonus: unknown terms that appear in the product name differentiate
+    // variants (e.g. "BBQ" in "Desert Safari with BBQ Dinner")
+    let variantBonus = 0;
+    for (const t of terms) {
+      variantBonus += unknownTermNameBonus(t, nameTokens, name, idf) * 0.1;
+    }
+
     // Coverage alone is a ratio, so IDF cancels out for a single-term query and
     // "Dubai" would score a confident 1.00 against any Dubai row. Temper coverage by
     // how distinctive the strongest matched term actually is.
     const specificity = Math.min(1, 0.45 + bestMatchedIdf);
-    let score = (earned / totalWeight) * specificity;
+    let score = (earned / totalWeight) * specificity + variantBonus;
 
     // Whole-phrase hits are far stronger evidence than the sum of their parts — but
     // only when the phrase itself is distinctive. "skydive" naming one product earns
@@ -387,14 +411,16 @@ function dedupeBy<T>(items: readonly T[], key: (t: T) => string): T[] {
 export function matchCityTours(
   all: readonly CatalogCityTour[],
   query: string,
-  opts: { threshold?: number; limit?: number } = {},
+  opts: { threshold?: number; limit?: number; type?: 'sharing' | 'private' } = {},
 ): MatchResult<CatalogCityTour> {
-  const { threshold = PRODUCT_MATCH_THRESHOLD, limit = 3 } = opts;
+  const { threshold = PRODUCT_MATCH_THRESHOLD, limit = 3, type: tourType } = opts;
   const terms = significantTerms(query);
   if (terms.length === 0) return { alternatives: [] };
 
+  const filtered = tourType ? all.filter((c) => c.type === tourType) : all;
+
   const scored: MatchCandidate<CatalogCityTour>[] = [];
-  for (const c of all) {
+  for (const c of filtered) {
     const name = c.name.toLowerCase();
     let earned = 0;
     let hits = 0;
@@ -412,6 +438,10 @@ export function matchCityTours(
     const q = terms.join(' ');
     if (name === q) score = 1;
     else if (name.includes(q)) score = Math.min(1, score + 0.15);
+
+    // Boost when the query explicitly names the tour type and it matches
+    if (tourType && c.type === tourType) score = Math.min(1, score + 0.15);
+
     scored.push({ item: c, score, matchedOn: 'cityTour' });
   }
 
@@ -435,7 +465,7 @@ export interface TransportMatchOptions {
 }
 
 /** Seat capacity parsed out of labels like "15 Seater", "Standard Sedan", "Minivan". */
-function capacityOf(vehicleSize: string): number {
+export function capacityOf(vehicleSize: string): number {
   const v = vehicleSize.toLowerCase();
   const n = /(\d+)\s*seat/.exec(v)?.[1];
   if (n) return Number(n);
@@ -443,6 +473,16 @@ function capacityOf(vehicleSize: string): number {
   if (v.includes('minivan') || v.includes('van')) return 6;
   if (v.includes('bus') || v.includes('coach')) return 40;
   return 4;
+}
+
+/**
+ * Reverse a route string: "Hotel to Airport" → "Airport to Hotel".
+ * Returns undefined when no " to " separator is found.
+ */
+function reverseRoute(query: string): string | undefined {
+  const idx = query.toLowerCase().indexOf(' to ');
+  if (idx < 0) return undefined;
+  return `${query.slice(idx + 4).trim()} to ${query.slice(0, idx).trim()}`;
 }
 
 export function matchTransport(
@@ -454,6 +494,8 @@ export function matchTransport(
   if (all.length === 0) return { alternatives: [] };
 
   const terms = significantTerms(query);
+  const reversed = reverseRoute(query);
+  const reverseTerms = reversed ? significantTerms(reversed) : [];
   const airportish = ['airport', 'dxb', 'auh', 'shj', 'terminal', 'arrival', 'departure'];
 
   const scored: MatchCandidate<CatalogTransport>[] = [];
@@ -473,9 +515,22 @@ export function matchTransport(
       }
     }
 
+    // Try the reversed route as a fallback when the forward query scores poorly
+    let reverseEarned = 0;
+    let reverseHits = 0;
+    for (const term of reverseTerms) {
+      if (route.includes(term)) { reverseEarned += 1; reverseHits++; }
+      else if (vehicle.includes(term)) { reverseEarned += 0.5; reverseHits++; }
+    }
+
+    const forwardScore = terms.length > 0 ? earned / terms.length : 0;
+    const reverseScore = reverseTerms.length > 0 ? reverseEarned / reverseTerms.length : 0;
+
+    let score = Math.max(forwardScore, reverseScore * 0.95);
+    hits = Math.max(hits, reverseHits);
+
     // Even with no literal term overlap an airport route is a reasonable default for
     // an airport transfer, so give type-based credit.
-    let score = terms.length > 0 ? earned / terms.length : 0;
     if (transferType === 'airport' && airportish.some((a) => route.includes(a))) {
       score = Math.max(score, 0.55);
       hits++;

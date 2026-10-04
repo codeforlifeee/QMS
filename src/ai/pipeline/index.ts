@@ -45,8 +45,13 @@ export async function generateQuotation(
 
   const warnings = [...parsed.warnings, ...built.warnings, ...narrated.warnings];
 
+  const quotation: StoredQuotation = {
+    ...narrated.quotation,
+    ...(warnings.length > 0 ? { aiWarnings: warnings } : {}),
+  };
+
   return {
-    quotation: narrated.quotation,
+    quotation,
     citations: built.citations,
     warnings,
     intent: parsed.intent,

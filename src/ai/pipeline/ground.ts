@@ -32,6 +32,7 @@ export interface GroundedActivity extends GroundedBase {
   readonly kind: 'activity';
   readonly dayNumber?: number;
   readonly notes?: string;
+  readonly quantity?: number;
   readonly product?: CatalogProduct;
   readonly cityTour?: CatalogCityTour;
 }
@@ -62,7 +63,7 @@ export async function groundIntent(intent: ParsedIntent): Promise<GroundedItem[]
   const pax = Math.max(1, (intent.adults || 0) + (intent.children || 0));
 
   for (const act of intent.activities) {
-    items.push(groundActivity(act, catalog, cityTours, preferLocation));
+    items.push(groundActivity(act, catalog, cityTours, preferLocation, pax));
   }
 
   for (const tr of intent.transfers) {
@@ -104,16 +105,24 @@ export async function groundIntent(intent: ParsedIntent): Promise<GroundedItem[]
   return items;
 }
 
+function detectTourType(name: string): 'private' | 'sharing' | undefined {
+  if (/\bprivate\b/i.test(name)) return 'private';
+  if (/\b(sharing|shared|group)\b/i.test(name)) return 'sharing';
+  return undefined;
+}
+
 function groundActivity(
-  act: { name: string; dayNumber?: number; notes?: string },
+  act: { name: string; dayNumber?: number; notes?: string; quantity?: number },
   catalog: readonly CatalogProduct[],
   cityTours: readonly CatalogCityTour[],
   preferLocation: string | undefined,
+  _pax: number,
 ): GroundedActivity {
   const prod = matchProducts(catalog, act.name, {
     ...(preferLocation ? { preferLocation } : {}),
   });
-  const tour = matchCityTours(cityTours, act.name);
+  const tourType = detectTourType(act.name);
+  const tour = matchCityTours(cityTours, act.name, { type: tourType });
 
   const alternatives: GroundedAlternative[] = [
     ...prod.alternatives.map((a) => ({
@@ -137,6 +146,7 @@ function groundActivity(
     intentItem: act.name,
     ...(act.dayNumber !== undefined ? { dayNumber: act.dayNumber } : {}),
     ...(act.notes ? { notes: act.notes } : {}),
+    ...(act.quantity && act.quantity > 1 ? { quantity: act.quantity } : {}),
     alternatives,
   };
 
