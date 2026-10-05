@@ -6,6 +6,7 @@ interface Props {
   title?: string;
 }
 const { title = 'Quotations' } = Astro.props;
+const path = Astro.url.pathname;
 ---
 
 <!doctype html>
@@ -18,8 +19,15 @@ const { title = 'Quotations' } = Astro.props;
   </head>
   <body>
     <header class="topbar">
-      <div class="topbar-brand">
-        <a href="/">QMS</a><small>{COMPANY.name}</small>
+      <div class="topbar-left">
+        <div class="topbar-brand">
+          <a href="/">QMS</a><small>{COMPANY.name}</small>
+        </div>
+        <nav class="topbar-nav">
+          <a href="/" class:list={['topbar-nav-link', { active: path === '/' }]}>Dashboard</a>
+          <a href="/leads" class:list={['topbar-nav-link', { active: path.startsWith('/leads') }]}>Leads</a>
+          <a href="/quotations" class:list={['topbar-nav-link', { active: path.startsWith('/quotations') || path.startsWith('/edit') }]}>Quotations</a>
+        </nav>
       </div>
       <div class="topbar-actions">
         <slot name="actions" />

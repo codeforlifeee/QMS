@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Lead, CallResponse, PriorityBucket } from '../data/leadSchema.js';
+import type { Lead, PriorityBucket } from '../data/leadSchema.js';
 import { PRIORITY_BUCKETS } from '../data/leadSchema.js';
-import { LeadDetail } from './LeadDetail.js';
+import { showToast } from '../components/Toast.js';
 
 const BUCKET_COLORS: Record<PriorityBucket, string> = {
   'Untouched Leads': '#6366f1',
@@ -12,16 +12,9 @@ const BUCKET_COLORS: Record<PriorityBucket, string> = {
   Rejected: '#6b7280',
 };
 
-interface PipelineProps {
-  onQuickGenerate?: (lead: Lead, call: CallResponse) => void;
-  onCustomQuote?: (lead: Lead, call: CallResponse) => void;
-}
-
-export default function PipelineView({ onQuickGenerate, onCustomQuote }: PipelineProps) {
+export default function PipelineView() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [stats, setStats] = useState<Record<string, number>>({});
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [calls, setCalls] = useState<CallResponse[]>([]);
   const [search, setSearch] = useState('');
   const [view, setView] = useState<'pipeline' | 'list'>('pipeline');
   const [loading, setLoading] = useState(true);
@@ -39,15 +32,6 @@ export default function PipelineView({ onQuickGenerate, onCustomQuote }: Pipelin
 
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
 
-  const selectLead = async (lead: Lead) => {
-    setSelectedLead(lead);
-    try {
-      const res = await fetch(`/api/leads/${lead.id}`);
-      const data = await res.json();
-      setCalls(data.calls ?? []);
-    } catch {}
-  };
-
   const handleSync = async () => {
     setSyncing(true);
     try {
@@ -55,36 +39,14 @@ export default function PipelineView({ onQuickGenerate, onCustomQuote }: Pipelin
       const data = await res.json();
       if (data.ok) {
         await fetchLeads();
-        alert(`Synced ${data.imported} leads from Google Sheet`);
+        showToast(`Synced ${data.imported} leads from Google Sheet`, 'success');
       } else {
-        alert(`Sync error: ${data.error}`);
+        showToast(`Sync error: ${data.error}`, 'error');
       }
     } catch (err: any) {
-      alert(`Sync failed: ${err.message}`);
+      showToast(`Sync failed: ${err.message}`, 'error');
     }
     setSyncing(false);
-  };
-
-  const handleBucketChange = async (leadId: string, bucket: PriorityBucket) => {
-    await fetch(`/api/leads/${leadId}`, {
-      method: 'PUT',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ priority_bucket: bucket }),
-    });
-    await fetchLeads();
-    if (selectedLead?.id === leadId) {
-      setSelectedLead((prev) => prev ? { ...prev, priority_bucket: bucket } : null);
-    }
-  };
-
-  const handleCallSaved = async () => {
-    await fetchLeads();
-    if (selectedLead) {
-      const res = await fetch(`/api/leads/${selectedLead.id}`);
-      const data = await res.json();
-      setSelectedLead(data.lead);
-      setCalls(data.calls ?? []);
-    }
   };
 
   const filtered = leads.filter(
@@ -97,20 +59,6 @@ export default function PipelineView({ onQuickGenerate, onCustomQuote }: Pipelin
 
   const bucketLeads = (bucket: PriorityBucket) =>
     filtered.filter((l) => l.priority_bucket === bucket);
-
-  if (selectedLead) {
-    return (
-      <LeadDetail
-        lead={selectedLead}
-        calls={calls}
-        onBack={() => { setSelectedLead(null); setCalls([]); }}
-        onCallSaved={handleCallSaved}
-        onBucketChange={(b) => handleBucketChange(selectedLead.id, b)}
-        onQuickGenerate={onQuickGenerate}
-        onCustomQuote={onCustomQuote}
-      />
-    );
-  }
 
   return (
     <div className="crm-pipeline">
@@ -166,11 +114,7 @@ export default function PipelineView({ onQuickGenerate, onCustomQuote }: Pipelin
                 <div className="crm-column-body">
                   {bl.length === 0 && <div className="crm-column-empty">No leads</div>}
                   {bl.map((lead) => (
-                    <LeadCard
-                      key={lead.id}
-                      lead={lead}
-                      onClick={() => selectLead(lead)}
-                    />
+                    <LeadCard key={lead.id} lead={lead} />
                   ))}
                 </div>
               </div>
@@ -192,7 +136,11 @@ export default function PipelineView({ onQuickGenerate, onCustomQuote }: Pipelin
             </thead>
             <tbody>
               {filtered.map((lead) => (
-                <tr key={lead.id} onClick={() => selectLead(lead)} className="crm-table-row">
+                <tr
+                  key={lead.id}
+                  onClick={() => { window.location.href = `/leads/${lead.id}`; }}
+                  className="crm-table-row"
+                >
                   <td className="crm-table-name">{lead.customer_name}</td>
                   <td>{lead.phone || '-'}</td>
                   <td>{lead.city || '-'}</td>
@@ -218,9 +166,9 @@ export default function PipelineView({ onQuickGenerate, onCustomQuote }: Pipelin
   );
 }
 
-function LeadCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
+function LeadCard({ lead }: { lead: Lead }) {
   return (
-    <button type="button" className="crm-card" onClick={onClick}>
+    <a href={`/leads/${lead.id}`} className="crm-card" style={{ textDecoration: 'none', color: 'inherit' }}>
       <div className="crm-card-name">{lead.customer_name}</div>
       <div className="crm-card-meta">
         {lead.phone && <span>{lead.phone}</span>}
@@ -229,6 +177,6 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: () => void }) {
       {lead.travelling_month && (
         <div className="crm-card-tag">{lead.travelling_month}</div>
       )}
-    </button>
+    </a>
   );
 }

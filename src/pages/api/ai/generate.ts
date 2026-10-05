@@ -40,6 +40,8 @@ export const POST: APIRoute = async ({ request }) => {
     return json({
       ok: true,
       quotationId: result.quotation.id,
+      token: result.quotation.token,
+      reference: result.quotation.reference,
       citations: result.citations,
       warnings: result.warnings,
       usage: result.usage,

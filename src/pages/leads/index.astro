@@ -1,0 +1,15 @@
+---
+import Shell from '../../layouts/Shell.astro';
+import PipelineView from '../../crm/PipelineView.tsx';
+import { ToastContainer } from '../../components/Toast.tsx';
+import '../../styles/crm.css';
+
+export const prerender = false;
+---
+
+<Shell title="Leads">
+  <main class="page-wide">
+    <PipelineView client:load />
+    <ToastContainer client:load />
+  </main>
+</Shell>
