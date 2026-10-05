@@ -626,6 +626,11 @@
   color: #fff;
 }
 
+@media (max-width: 768px) {
+  .lead-page-cols {
+    grid-template-columns: 1fr !important;
+  }
+}
 @media (max-width: 640px) {
   .crm-info-grid,
   .crm-call-grid,

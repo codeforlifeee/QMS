@@ -1,0 +1,23 @@
+---
+import Shell from '../../layouts/Shell.astro';
+import PromptBuilder from '../../components/PromptBuilder.tsx';
+import { ToastContainer } from '../../components/Toast.tsx';
+
+export const prerender = false;
+
+const leadId = Astro.url.searchParams.get('lead_id') || undefined;
+const callId = Astro.url.searchParams.get('call_id') || undefined;
+---
+
+<Shell title="Generate Quotation">
+  <main class="page-wrap">
+    <PromptBuilder client:load leadId={leadId} callId={callId} />
+    <ToastContainer client:load />
+  </main>
+</Shell>
+
+<style>
+  .page-wrap {
+    max-width: 800px;
+  }
+</style>

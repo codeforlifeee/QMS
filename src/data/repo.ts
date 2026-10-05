@@ -13,6 +13,7 @@ import type { CitationMap } from '../ai/citations.js';
  */
 export interface QuotationRepo {
   list(): Promise<StoredQuotation[]>;
+  listByLead(leadId: string): Promise<StoredQuotation[]>;
   get(id: string): Promise<StoredQuotation | null>;
   getByToken(token: string): Promise<StoredQuotation | null>;
   save(q: StoredQuotation): Promise<void>;
@@ -58,6 +59,11 @@ export const jsonRepo: QuotationRepo = {
       }
     }
     return all.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+  },
+
+  async listByLead(leadId) {
+    const all = await this.list();
+    return all.filter((q) => q.lead_id === leadId);
   },
 
   async get(id) {

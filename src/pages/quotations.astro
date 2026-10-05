@@ -1,0 +1,17 @@
+---
+import Shell from '../layouts/Shell.astro';
+import QuotationList from '../components/QuotationList.tsx';
+import { ToastContainer } from '../components/Toast.tsx';
+
+export const prerender = false;
+---
+
+<Shell title="Quotations">
+  <a slot="actions" href="/quotations/generate" class="btn btn-primary">AI Generate</a>
+  <a slot="actions" href="/new" class="btn">+ Manual</a>
+
+  <main class="page-wrap">
+    <QuotationList client:load />
+    <ToastContainer client:load />
+  </main>
+</Shell>

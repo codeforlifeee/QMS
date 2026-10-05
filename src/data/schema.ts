@@ -149,6 +149,8 @@ export interface StoredQuotation {
   readonly viewCount?: number;
   readonly firstViewedAt?: string;
   readonly aiWarnings?: readonly string[];
+  readonly version?: number;
+  readonly parent_id?: string;
 }
 
 /* ------------------------------------------------------------------ *

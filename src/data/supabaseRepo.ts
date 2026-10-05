@@ -14,6 +14,17 @@ export const supabaseRepo: QuotationRepo = {
     return (data ?? []).map((r) => r.data as StoredQuotation);
   },
 
+  async listByLead(leadId) {
+    const sb = getSupabase();
+    const { data, error } = await sb
+      .from('quotations')
+      .select('data')
+      .eq('lead_id', leadId)
+      .order('updated_at', { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map((r) => r.data as StoredQuotation);
+  },
+
   async get(id) {
     const sb = getSupabase();
     const { data, error } = await sb

@@ -4,25 +4,39 @@ import { getRepo } from '../data/repo.js';
 import { toEngineInput, tripDuration, paxSummary } from '../data/schema.js';
 import { priceQuotation } from '../pricing/engine.js';
 import { formatMoney } from '../pricing/money.js';
-import AIGenerator from '../components/AIGenerator.tsx';
-import PipelineView from '../crm/PipelineView.tsx';
 import '../styles/crm.css';
 
 export const prerender = false;
 
 const repo = await getRepo();
 const quotations = await repo.list();
+const recentQuotes = quotations.slice(0, 5);
 
-const rows = quotations.map((q) => {
+let stats: Record<string, number> = {};
+let totalLeads = 0;
+let followUpCount = 0;
+let recentLeads: any[] = [];
+
+try {
+  const { leadRepo } = await import('../data/leadRepo.js');
+  const [s, leads, followUps] = await Promise.all([
+    leadRepo.getStats(),
+    leadRepo.list(),
+    leadRepo.getFollowUpsDue(),
+  ]);
+  stats = s;
+  totalLeads = Object.values(s).reduce((a, b) => a + b, 0);
+  followUpCount = followUps.length;
+  recentLeads = leads.slice(0, 5);
+} catch {
+  // Supabase not configured — leads features won't show
+}
+
+const quoteRows = recentQuotes.map((q) => {
   try {
     const r = priceQuotation(toEngineInput(q));
     const { nights } = tripDuration(q);
-    return {
-      q,
-      total: formatMoney(r.grandTotal, { showDecimals: false }),
-      nights,
-      ok: true,
-    };
+    return { q, total: formatMoney(r.grandTotal, { showDecimals: false }), nights, ok: true };
   } catch {
     return { q, total: '—', nights: 0, ok: false };
   }
@@ -30,58 +44,194 @@ const rows = quotations.map((q) => {
 ---
 
 <Shell title="Dashboard">
-  <a slot="actions" href="/new" class="btn btn-primary">+ New Manual Quotation</a>
+  <main class="page-wrap">
+    <h1 style="font-size:24px; margin:0 0 20px;">Dashboard</h1>
 
-  <main class="list-wrap">
-    <PipelineView client:load />
-
-    <AIGenerator client:load />
-
-    <div class="list-header">
-      <h1>Quotations ({rows.length})</h1>
+    <!-- Stats Bar -->
+    <div class="crm-stats-bar">
+      <div class="crm-stat-card highlight">
+        <div class="crm-stat-value">{totalLeads}</div>
+        <div class="crm-stat-label">Total Leads</div>
+      </div>
+      <div class="crm-stat-card">
+        <div class="crm-stat-value">{stats['My Hot'] ?? 0}</div>
+        <div class="crm-stat-label">Hot Leads</div>
+      </div>
+      <div class="crm-stat-card">
+        <div class="crm-stat-value">{stats['In Progress'] ?? 0}</div>
+        <div class="crm-stat-label">In Progress</div>
+      </div>
+      <div class="crm-stat-card">
+        <div class="crm-stat-value">{followUpCount}</div>
+        <div class="crm-stat-label">Follow-ups Due</div>
+      </div>
+      <div class="crm-stat-card">
+        <div class="crm-stat-value">{quotations.length}</div>
+        <div class="crm-stat-label">Quotations</div>
+      </div>
     </div>
 
-    {
-      rows.length === 0 ? (
-        <div class="empty">
-          <p>No quotations yet.</p>
-          <p>
-            <a href="/new" class="btn btn-primary">
-              Create the first one
-            </a>
-          </p>
-        </div>
-      ) : (
-        rows.map(({ q, total, nights, ok }) => (
-          <article class="quotation-card">
-            <div>
-              <div class="title">{q.title || 'Untitled'}</div>
-              <div class="meta">
-                <span class={`pill ${q.status === 'draft' ? 'pill-draft' : ''}`}>{q.status}</span>
-                &nbsp;&middot;&nbsp; {q.reference} &nbsp;&middot;&nbsp; {q.client.name} &nbsp;&middot;&nbsp;
-                {paxSummary(q)}, {nights}N
-                {q.lead_id && <span class="pill" style="margin-left:6px;background:#e0f2fe;color:#0369a1;">From Lead</span>}
-              </div>
-            </div>
-            <div class="total">{total}</div>
-            <div class="actions">
-              <a href={`/edit/${q.id}`} class="btn btn-sm">
-                Edit
+    <!-- Quick Actions -->
+    <div class="dash-actions">
+      <a href="/leads" class="dash-action-card">
+        <span class="dash-action-icon">&#128101;</span>
+        <span class="dash-action-label">View Leads</span>
+      </a>
+      <a href="/quotations/generate" class="dash-action-card">
+        <span class="dash-action-icon">&#9889;</span>
+        <span class="dash-action-label">AI Generate</span>
+      </a>
+      <a href="/new" class="dash-action-card">
+        <span class="dash-action-icon">&#128196;</span>
+        <span class="dash-action-label">Manual Quote</span>
+      </a>
+      <a href="/quotations" class="dash-action-card">
+        <span class="dash-action-icon">&#128203;</span>
+        <span class="dash-action-label">All Quotations</span>
+      </a>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="dash-grid">
+      <div>
+        <h2 class="dash-section-title">Recent Leads</h2>
+        {recentLeads.length === 0 ? (
+          <div class="empty" style="padding:20px;">
+            <p>No leads yet. <a href="/leads">Set up lead sync</a></p>
+          </div>
+        ) : (
+          <div class="dash-list">
+            {recentLeads.map((l: any) => (
+              <a href={`/leads/${l.id}`} class="dash-list-item">
+                <div>
+                  <div class="dash-list-name">{l.customer_name}</div>
+                  <div class="dash-list-meta">
+                    {l.city || 'No city'} &middot; {l.priority_bucket}
+                  </div>
+                </div>
+                <span class="dash-list-date">{new Date(l.updated_at).toLocaleDateString()}</span>
               </a>
-              {ok && (
-                <>
-                  <a href={`/q/${q.token}`} class="btn btn-sm">
-                    Share
-                  </a>
-                  <a href={`/api/pdf/${q.token}`} class="btn btn-sm">
-                    PDF
-                  </a>
-                </>
-              )}
-            </div>
-          </article>
-        ))
-      )
-    }
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 class="dash-section-title">Recent Quotations</h2>
+        {quoteRows.length === 0 ? (
+          <div class="empty" style="padding:20px;">
+            <p>No quotations yet. <a href="/new">Create one</a></p>
+          </div>
+        ) : (
+          <div class="dash-list">
+            {quoteRows.map(({ q, total, nights }) => (
+              <a href={`/edit/${q.id}`} class="dash-list-item">
+                <div>
+                  <div class="dash-list-name">{q.title || 'Untitled'}</div>
+                  <div class="dash-list-meta">
+                    {q.reference} &middot; {q.client.name} &middot; {nights}N
+                  </div>
+                </div>
+                <span class="dash-list-total">{total}</span>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   </main>
 </Shell>
+
+<style>
+  .dash-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .dash-action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 16px;
+    background: #fff;
+    border: 1px solid var(--app-hairline);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--app-ink);
+    font-weight: 600;
+    font-size: 13px;
+    transition: box-shadow 0.12s, transform 0.12s;
+  }
+  .dash-action-card:hover {
+    box-shadow: 0 4px 16px rgba(22, 35, 42, 0.08);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .dash-action-icon {
+    font-size: 24px;
+  }
+  .dash-action-label {
+    text-align: center;
+  }
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 768px) {
+    .dash-grid { grid-template-columns: 1fr; }
+  }
+  .dash-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--app-ink);
+  }
+  .dash-list {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--app-hairline);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .dash-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--app-tint);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.1s;
+  }
+  .dash-list-item:last-child {
+    border-bottom: 0;
+  }
+  .dash-list-item:hover {
+    background: var(--app-tint);
+    text-decoration: none;
+  }
+  .dash-list-name {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+  .dash-list-meta {
+    font-size: 12px;
+    color: var(--app-muted);
+  }
+  .dash-list-date {
+    font-size: 12px;
+    color: var(--app-muted);
+    white-space: nowrap;
+  }
+  .dash-list-total {
+    font-weight: 700;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+</style>
