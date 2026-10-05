@@ -22,10 +22,11 @@ export const GET: APIRoute = async ({ params, url, request }) => {
   const q = await repo.getByToken(token);
   if (!q) return new Response('Quotation not found', { status: 404 });
 
-  // Rebuild the print URL from this request's own origin so dev + production both work.
-  // Astro's `url.origin` already includes the scheme and host (e.g. http://localhost:4321).
-  // The `?pdf=1` flag is a signal to the print page that nothing extra should be shown.
-  const printUrl = new URL(`/print/${token}`, url.origin);
+  // Rebuild the print URL. When on Render (behind a proxy), url.origin might resolve
+  // incorrectly to https://localhost. We bypass the load balancer by hitting our own local port.
+  const port = process.env.PORT || 4321;
+  const origin = process.env.RENDER ? `http://127.0.0.1:${port}` : url.origin;
+  const printUrl = new URL(`/print/${token}`, origin);
   printUrl.searchParams.set('pdf', '1');
 
   // Pass the Accept-Language header through so Intl.NumberFormat renders INR with the
