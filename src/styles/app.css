@@ -218,6 +218,22 @@ a:hover {
   background: #fff4e6;
   color: #a2510a;
 }
+.pill-sent {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.pill-accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+.pill-expired {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.pill-void {
+  background: #fee2e2;
+  color: #991b1b;
+}
 
 .empty {
   background: #fff;

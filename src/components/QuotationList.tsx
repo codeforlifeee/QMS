@@ -46,11 +46,19 @@ const ALL_STATUSES: Status[] = ['draft', 'sent', 'accepted', 'expired', 'void'];
 
 type SortKey = 'newest' | 'oldest' | 'updated' | 'title' | 'client' | 'nights_desc' | 'nights_asc';
 
+const STATUS_COLORS: Record<Status, string> = {
+  draft: '#f59e0b',
+  sent: '#3b82f6',
+  accepted: '#22c55e',
+  expired: '#6b7280',
+  void: '#ef4444',
+};
+
 function paxSummary(pax: Pax): string {
-  const bits: string[] = [`${pax.adults} Adult${pax.adults === 1 ? '' : 's'}`];
-  if (pax.children > 0) bits.push(`${pax.children} Child${pax.children === 1 ? '' : 'ren'}`);
-  if (pax.infants > 0) bits.push(`${pax.infants} Infant${pax.infants === 1 ? '' : 's'}`);
-  return bits.join(', ');
+  const bits: string[] = [`${pax.adults}A`];
+  if (pax.children > 0) bits.push(`${pax.children}C`);
+  if (pax.infants > 0) bits.push(`${pax.infants}I`);
+  return bits.join('+');
 }
 
 function nightsCount(days: unknown[]): number {
@@ -59,18 +67,12 @@ function nightsCount(days: unknown[]): number {
 
 function pillClass(status: Status): string {
   switch (status) {
-    case 'draft':
-      return 'pill pill-draft';
-    case 'sent':
-      return 'pill pill-sent';
-    case 'accepted':
-      return 'pill pill-accepted';
-    case 'expired':
-      return 'pill pill-expired';
-    case 'void':
-      return 'pill pill-void';
-    default:
-      return 'pill';
+    case 'draft': return 'pill pill-draft';
+    case 'sent': return 'pill pill-sent';
+    case 'accepted': return 'pill pill-accepted';
+    case 'expired': return 'pill pill-expired';
+    case 'void': return 'pill pill-void';
+    default: return 'pill';
   }
 }
 
@@ -94,6 +96,7 @@ export default function QuotationList() {
   const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [view, setView] = useState<'card' | 'table'>('card');
   const [showFilters, setShowFilters] = useState(false);
 
   const [statusFilter, setStatusFilter] = useState<Status | ''>('');
@@ -220,29 +223,48 @@ export default function QuotationList() {
     }
   };
 
+  /* Status summary counts */
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    quotations.forEach((q) => {
+      counts[q.status] = (counts[q.status] || 0) + 1;
+    });
+    return counts;
+  }, [quotations]);
+
   if (loading) {
-    return (
-      <div className="empty" style={{ padding: '32px', textAlign: 'center' }}>
-        Loading quotations...
-      </div>
-    );
+    return <div className="crm-loading">Loading quotations...</div>;
   }
 
   return (
-    <div>
+    <div className="crm-pipeline">
+      {/* Stats bar */}
+      <div className="crm-stats-bar">
+        <div className="crm-stat-card highlight">
+          <div className="crm-stat-value">{quotations.length}</div>
+          <div className="crm-stat-label">Total</div>
+        </div>
+        {ALL_STATUSES.map((s) => (
+          <div key={s} className="crm-stat-card">
+            <div className="crm-stat-value">{statusCounts[s] || 0}</div>
+            <div className="crm-stat-label">{s.charAt(0).toUpperCase() + s.slice(1)}</div>
+          </div>
+        ))}
+      </div>
+
       {/* Toolbar */}
-      <div className="quot-toolbar">
-        <div className="quot-toolbar-left">
+      <div className="crm-toolbar">
+        <div className="crm-toolbar-left">
+          <h2>Quotations</h2>
           <span className="crm-count">{filtered.length} quotation{filtered.length !== 1 ? 's' : ''}</span>
         </div>
-        <div className="quot-toolbar-right">
+        <div className="crm-toolbar-right">
           <input
             type="search"
             placeholder="Search title, reference, client, destination..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="crm-search"
-            style={{ width: 280 }}
           />
           <button
             className={`btn btn-sm ${showFilters ? 'active' : ''}`}
@@ -250,6 +272,22 @@ export default function QuotationList() {
           >
             Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
           </button>
+          <div className="crm-view-toggle">
+            <button
+              className={`btn btn-sm ${view === 'card' ? 'active' : ''}`}
+              onClick={() => setView('card')}
+            >
+              Card
+            </button>
+            <button
+              className={`btn btn-sm ${view === 'table' ? 'active' : ''}`}
+              onClick={() => setView('table')}
+            >
+              Table
+            </button>
+          </div>
+          <a href="/quotations/generate" className="btn btn-sm btn-primary">AI Generate</a>
+          <a href="/new" className="btn btn-sm">+ Manual</a>
         </div>
       </div>
 
@@ -302,23 +340,11 @@ export default function QuotationList() {
             </div>
             <div className="filter-field">
               <label>Min Nights</label>
-              <input
-                type="number"
-                min="0"
-                placeholder="Any"
-                value={nightsMin}
-                onChange={(e) => setNightsMin(e.target.value)}
-              />
+              <input type="number" min="0" placeholder="Any" value={nightsMin} onChange={(e) => setNightsMin(e.target.value)} />
             </div>
             <div className="filter-field">
               <label>Max Nights</label>
-              <input
-                type="number"
-                min="0"
-                placeholder="Any"
-                value={nightsMax}
-                onChange={(e) => setNightsMax(e.target.value)}
-              />
+              <input type="number" min="0" placeholder="Any" value={nightsMax} onChange={(e) => setNightsMax(e.target.value)} />
             </div>
             <div className="filter-field">
               <label>Sort By</label>
@@ -341,81 +367,120 @@ export default function QuotationList() {
         </div>
       )}
 
-      {/* List */}
+      {/* Content */}
       {filtered.length === 0 ? (
         <div className="empty">
           <p>No quotations match your filters.</p>
         </div>
+      ) : view === 'table' ? (
+        <div className="crm-list-view">
+          <table className="crm-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Reference</th>
+                <th>Client</th>
+                <th>Destination</th>
+                <th>Pax</th>
+                <th>Nights</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((q) => (
+                <tr key={q.id} className="crm-table-row">
+                  <td className="crm-table-name">
+                    <a href={`/edit/${q.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                      {q.title || 'Untitled'}
+                    </a>
+                  </td>
+                  <td>{q.reference}</td>
+                  <td>{q.client?.name || '-'}</td>
+                  <td>{q.destination || '-'}</td>
+                  <td>{paxSummary(q.pax)}</td>
+                  <td>{nightsCount(q.days)}N</td>
+                  <td>
+                    <span className="crm-bucket-pill" style={{ background: STATUS_COLORS[q.status] }}>
+                      {q.status}
+                    </span>
+                  </td>
+                  <td className="crm-table-date">{formatDate(q.createdAt)}</td>
+                  <td>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <a href={`/edit/${q.id}`} className="btn btn-sm">Edit</a>
+                      <a href={`/q/${q.token}`} className="btn btn-sm">Share</a>
+                      <a href={`/api/pdf/${q.token}`} className="btn btn-sm">PDF</a>
+                      <button
+                        className="btn btn-sm"
+                        style={{ color: 'var(--app-bad)', borderColor: 'var(--app-bad)' }}
+                        onClick={() => handleDelete(q.id)}
+                      >
+                        Del
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
-        filtered.map((q) => (
-          <article key={q.id} className="quotation-card">
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="title">{q.title || 'Untitled'}</div>
-              <div className="meta">
-                <span className={pillClass(q.status)}>{q.status}</span>
-                {' · '}
-                {q.reference}
-                {' · '}
-                {q.client?.name}
-                {' · '}
-                {paxSummary(q.pax)}, {nightsCount(q.days)}N
-                {q.destination && (
-                  <span
-                    className="pill"
-                    style={{ marginLeft: 6, background: '#ecfdf5', color: '#065f46' }}
-                  >
-                    {q.destination}
-                  </span>
-                )}
-                {q.lead_id && (
-                  <a
-                    href={`/leads/${q.lead_id}`}
-                    className="pill"
-                    style={{
-                      marginLeft: 6,
-                      background: '#e0f2fe',
-                      color: '#0369a1',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    From Lead
-                  </a>
-                )}
-                {q.version > 1 && (
-                  <span
-                    className="pill"
-                    style={{ marginLeft: 6, background: '#f3e8ff', color: '#7c3aed' }}
-                  >
-                    v{q.version}
-                  </span>
-                )}
+        <div>
+          {filtered.map((q) => (
+            <article key={q.id} className="quotation-card">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="title">{q.title || 'Untitled'}</div>
+                <div className="meta">
+                  <span className={pillClass(q.status)}>{q.status}</span>
+                  {' · '}
+                  {q.reference}
+                  {' · '}
+                  {q.client?.name}
+                  {' · '}
+                  {paxSummary(q.pax)}, {nightsCount(q.days)}N
+                  {q.destination && (
+                    <span className="pill" style={{ marginLeft: 6, background: '#ecfdf5', color: '#065f46' }}>
+                      {q.destination}
+                    </span>
+                  )}
+                  {q.lead_id && (
+                    <a
+                      href={`/leads/${q.lead_id}`}
+                      className="pill"
+                      style={{ marginLeft: 6, background: '#e0f2fe', color: '#0369a1', textDecoration: 'none' }}
+                    >
+                      From Lead
+                    </a>
+                  )}
+                  {q.version > 1 && (
+                    <span className="pill" style={{ marginLeft: 6, background: '#f3e8ff', color: '#7c3aed' }}>
+                      v{q.version}
+                    </span>
+                  )}
+                </div>
+                <div className="meta" style={{ marginTop: 4 }}>
+                  Created {formatDate(q.createdAt)}
+                  {q.quoteCurrency && <span style={{ marginLeft: 8, opacity: 0.7 }}>{q.quoteCurrency}</span>}
+                </div>
               </div>
-              <div className="meta" style={{ marginTop: 4 }}>
-                Created {formatDate(q.createdAt)}
-                {q.quoteCurrency && <span style={{ marginLeft: 8, opacity: 0.7 }}>{q.quoteCurrency}</span>}
-              </div>
-            </div>
 
-            <div className="actions">
-              <a href={`/edit/${q.id}`} className="btn btn-sm">
-                Edit
-              </a>
-              <a href={`/q/${q.token}`} className="btn btn-sm">
-                Share
-              </a>
-              <a href={`/api/pdf/${q.token}`} className="btn btn-sm">
-                PDF
-              </a>
-              <button
-                className="btn btn-sm"
-                style={{ color: 'var(--app-bad)', borderColor: 'var(--app-bad)' }}
-                onClick={() => handleDelete(q.id)}
-              >
-                Delete
-              </button>
-            </div>
-          </article>
-        ))
+              <div className="actions">
+                <a href={`/edit/${q.id}`} className="btn btn-sm">Edit</a>
+                <a href={`/q/${q.token}`} className="btn btn-sm">Share</a>
+                <a href={`/api/pdf/${q.token}`} className="btn btn-sm">PDF</a>
+                <button
+                  className="btn btn-sm"
+                  style={{ color: 'var(--app-bad)', borderColor: 'var(--app-bad)' }}
+                  onClick={() => handleDelete(q.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
       )}
     </div>
   );
