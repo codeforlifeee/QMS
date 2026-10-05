@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { runReactAgent } from '../../../ai/chat/agent.js';
-import { jsonRepo } from '../../../data/repo.js';
+import { getRepo } from '../../../data/repo.js';
 import type { ChatSession, ChatTurn } from '../../../ai/chat/types.js';
 
 export const prerender = false;
@@ -17,7 +17,8 @@ export const POST: APIRoute = async ({ request }) => {
       return json({ error: 'message is required' }, 400);
     }
 
-    const quotation = await jsonRepo.get(quotationId);
+    const repo = await getRepo();
+    const quotation = await repo.get(quotationId);
     if (!quotation) return json({ error: 'Quotation not found' }, 404);
 
     const safeHistory: ChatTurn[] = Array.isArray(history) ? history : [];
@@ -37,7 +38,7 @@ export const POST: APIRoute = async ({ request }) => {
       provider: provider || 'groq',
       turns: [...safeHistory, assistantTurn],
     };
-    await jsonRepo.saveChat(quotationId, session);
+    await repo.saveChat(quotationId, session);
 
     return json({ response: result.response, proposedChanges: result.proposedChanges });
   } catch (err: any) {

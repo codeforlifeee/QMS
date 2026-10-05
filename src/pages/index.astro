@@ -1,17 +1,18 @@
 ---
 import Shell from '../layouts/Shell.astro';
-import { jsonRepo } from '../data/repo.js';
+import { getRepo } from '../data/repo.js';
 import { toEngineInput, tripDuration, paxSummary } from '../data/schema.js';
 import { priceQuotation } from '../pricing/engine.js';
 import { formatMoney } from '../pricing/money.js';
 import AIGenerator from '../components/AIGenerator.tsx';
+import PipelineView from '../crm/PipelineView.tsx';
+import '../styles/crm.css';
 
 export const prerender = false;
 
-const quotations = await jsonRepo.list();
+const repo = await getRepo();
+const quotations = await repo.list();
 
-// Price each so the list can show the real headline total next to the client name. If
-// one is malformed, show '—' rather than taking the whole page down.
 const rows = quotations.map((q) => {
   try {
     const r = priceQuotation(toEngineInput(q));
@@ -28,10 +29,12 @@ const rows = quotations.map((q) => {
 });
 ---
 
-<Shell title="Quotations">
+<Shell title="Dashboard">
   <a slot="actions" href="/new" class="btn btn-primary">+ New Manual Quotation</a>
 
   <main class="list-wrap">
+    <PipelineView client:load />
+
     <AIGenerator client:load />
 
     <div class="list-header">
@@ -55,8 +58,9 @@ const rows = quotations.map((q) => {
               <div class="title">{q.title || 'Untitled'}</div>
               <div class="meta">
                 <span class={`pill ${q.status === 'draft' ? 'pill-draft' : ''}`}>{q.status}</span>
-                &nbsp;·&nbsp; {q.reference} &nbsp;·&nbsp; {q.client.name} &nbsp;·&nbsp;
+                &nbsp;&middot;&nbsp; {q.reference} &nbsp;&middot;&nbsp; {q.client.name} &nbsp;&middot;&nbsp;
                 {paxSummary(q)}, {nights}N
+                {q.lead_id && <span class="pill" style="margin-left:6px;background:#e0f2fe;color:#0369a1;">From Lead</span>}
               </div>
             </div>
             <div class="total">{total}</div>

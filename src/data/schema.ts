@@ -96,6 +96,8 @@ export interface StoredQuotation {
   readonly token: string;
   readonly status: QuotationStatus;
   readonly reference: string;
+  /** FK to leads table when quotation was generated from a lead. */
+  readonly lead_id?: string;
 
   readonly title: string;
   readonly destination: string;
