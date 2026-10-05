@@ -42,13 +42,22 @@ export const GET: APIRoute = async ({ params, url, request }) => {
     return new Response(`PDF rendering failed: ${msg}`, { status: 500 });
   }
 
-  // A filename a client would recognise — reference + a slug of the title.
-  const slug = q.title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 40);
-  const filename = `${q.reference}-${slug}.pdf`;
+  const sanitize = (s: string) =>
+    s.replace(/[^a-zA-Z0-9]+/g, '').slice(0, 40);
+
+  const customerName = sanitize(q.client?.name || 'Customer');
+  const destination = sanitize(q.destination || 'Trip');
+
+  let travelMonth = '';
+  if (q.travelStart) {
+    const d = new Date(q.travelStart + 'T00:00:00');
+    const mon = d.toLocaleString('en', { month: 'short' });
+    travelMonth = `${mon}${d.getFullYear()}`;
+  }
+
+  const filename = [customerName, destination, travelMonth, q.reference]
+    .filter(Boolean)
+    .join('_') + '.pdf';
 
   return new Response(pdf as unknown as BodyInit, {
     status: 200,
