@@ -42,12 +42,9 @@ interface Quotation {
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-const STATUS_FILTERS: Array<{ label: string; value: Status | 'all' }> = [
-  { label: 'All', value: 'all' },
-  { label: 'Draft', value: 'draft' },
-  { label: 'Sent', value: 'sent' },
-  { label: 'Accepted', value: 'accepted' },
-];
+const ALL_STATUSES: Status[] = ['draft', 'sent', 'accepted', 'expired', 'void'];
+
+type SortKey = 'newest' | 'oldest' | 'updated' | 'title' | 'client' | 'nights_desc' | 'nights_asc';
 
 function paxSummary(pax: Pax): string {
   const bits: string[] = [`${pax.adults} Adult${pax.adults === 1 ? '' : 's'}`];
@@ -97,9 +94,18 @@ export default function QuotationList() {
   const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<Status | 'all'>('all');
+  const [showFilters, setShowFilters] = useState(false);
 
-  /* Fetch on mount */
+  const [statusFilter, setStatusFilter] = useState<Status | ''>('');
+  const [destinationFilter, setDestinationFilter] = useState('');
+  const [currencyFilter, setCurrencyFilter] = useState('');
+  const [fromLeadFilter, setFromLeadFilter] = useState<'' | 'yes' | 'no'>('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [nightsMin, setNightsMin] = useState('');
+  const [nightsMax, setNightsMax] = useState('');
+  const [sortBy, setSortBy] = useState<SortKey>('newest');
+
   useEffect(() => {
     fetch('/api/quotations')
       .then((r) => r.json())
@@ -114,23 +120,87 @@ export default function QuotationList() {
       .finally(() => setLoading(false));
   }, []);
 
-  /* Filtered list */
+  const uniqueDestinations = useMemo(() => {
+    const set = new Set<string>();
+    quotations.forEach((q) => { if (q.destination) set.add(q.destination); });
+    return Array.from(set).sort();
+  }, [quotations]);
+
+  const uniqueCurrencies = useMemo(() => {
+    const set = new Set<string>();
+    quotations.forEach((q) => { if (q.quoteCurrency) set.add(q.quoteCurrency); });
+    return Array.from(set).sort();
+  }, [quotations]);
+
+  const activeFilterCount = [statusFilter, destinationFilter, currencyFilter, fromLeadFilter, dateFrom, dateTo, nightsMin, nightsMax]
+    .filter(Boolean).length;
+
+  const clearFilters = () => {
+    setStatusFilter('');
+    setDestinationFilter('');
+    setCurrencyFilter('');
+    setFromLeadFilter('');
+    setDateFrom('');
+    setDateTo('');
+    setNightsMin('');
+    setNightsMax('');
+    setSortBy('newest');
+  };
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
-    return quotations.filter((item) => {
-      if (statusFilter !== 'all' && item.status !== statusFilter) return false;
+
+    let result = quotations.filter((item) => {
+      if (statusFilter && item.status !== statusFilter) return false;
+
       if (q) {
-        const haystack = [item.title, item.reference, item.client?.name]
+        const haystack = [item.title, item.reference, item.client?.name, item.destination]
           .filter(Boolean)
           .join(' ')
           .toLowerCase();
         if (!haystack.includes(q)) return false;
       }
+
+      if (destinationFilter && item.destination !== destinationFilter) return false;
+      if (currencyFilter && item.quoteCurrency !== currencyFilter) return false;
+
+      if (fromLeadFilter === 'yes' && !item.lead_id) return false;
+      if (fromLeadFilter === 'no' && item.lead_id) return false;
+
+      if (dateFrom) {
+        const d = new Date(item.createdAt);
+        if (d < new Date(dateFrom)) return false;
+      }
+      if (dateTo) {
+        const d = new Date(item.createdAt);
+        const to = new Date(dateTo);
+        to.setHours(23, 59, 59);
+        if (d > to) return false;
+      }
+
+      const nights = nightsCount(item.days);
+      if (nightsMin && nights < parseInt(nightsMin)) return false;
+      if (nightsMax && nights > parseInt(nightsMax)) return false;
+
       return true;
     });
-  }, [quotations, search, statusFilter]);
 
-  /* Delete handler */
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest': return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 'updated': return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        case 'title': return (a.title || '').localeCompare(b.title || '');
+        case 'client': return (a.client?.name || '').localeCompare(b.client?.name || '');
+        case 'nights_desc': return nightsCount(b.days) - nightsCount(a.days);
+        case 'nights_asc': return nightsCount(a.days) - nightsCount(b.days);
+        case 'newest':
+        default: return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+    });
+
+    return result;
+  }, [quotations, search, statusFilter, destinationFilter, currencyFilter, fromLeadFilter, dateFrom, dateTo, nightsMin, nightsMax, sortBy]);
+
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this quotation?')) return;
 
@@ -150,8 +220,6 @@ export default function QuotationList() {
     }
   };
 
-  /* ---- Render ---- */
-
   if (loading) {
     return (
       <div className="empty" style={{ padding: '32px', textAlign: 'center' }}>
@@ -162,45 +230,116 @@ export default function QuotationList() {
 
   return (
     <div>
-      {/* Search bar */}
-      <div style={{ marginBottom: 12 }}>
-        <input
-          type="text"
-          placeholder="Search by title, reference or client name..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '10px 14px',
-            border: '1px solid var(--app-hairline)',
-            borderRadius: 8,
-            fontSize: 14,
-            outline: 'none',
-          }}
-        />
+      {/* Toolbar */}
+      <div className="quot-toolbar">
+        <div className="quot-toolbar-left">
+          <span className="crm-count">{filtered.length} quotation{filtered.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div className="quot-toolbar-right">
+          <input
+            type="search"
+            placeholder="Search title, reference, client, destination..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="crm-search"
+            style={{ width: 280 }}
+          />
+          <button
+            className={`btn btn-sm ${showFilters ? 'active' : ''}`}
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+          </button>
+        </div>
       </div>
 
-      {/* Status filter pills */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
-        {STATUS_FILTERS.map((f) => (
-          <button
-            key={f.value}
-            onClick={() => setStatusFilter(f.value)}
-            className="pill"
-            style={{
-              cursor: 'pointer',
-              border: 'none',
-              background:
-                statusFilter === f.value ? 'var(--app-teal)' : 'var(--app-tint)',
-              color: statusFilter === f.value ? '#fff' : 'var(--app-teal)',
-              padding: '4px 12px',
-              fontSize: 12,
-            }}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+      {/* Filter panel */}
+      {showFilters && (
+        <div className="filter-panel">
+          <div className="filter-grid">
+            <div className="filter-field">
+              <label>Status</label>
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as Status | '')}>
+                <option value="">All Statuses</option>
+                {ALL_STATUSES.map((s) => (
+                  <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                ))}
+              </select>
+            </div>
+            <div className="filter-field">
+              <label>Destination</label>
+              <select value={destinationFilter} onChange={(e) => setDestinationFilter(e.target.value)}>
+                <option value="">All Destinations</option>
+                {uniqueDestinations.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+            <div className="filter-field">
+              <label>Currency</label>
+              <select value={currencyFilter} onChange={(e) => setCurrencyFilter(e.target.value)}>
+                <option value="">All Currencies</option>
+                {uniqueCurrencies.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+            <div className="filter-field">
+              <label>From Lead</label>
+              <select value={fromLeadFilter} onChange={(e) => setFromLeadFilter(e.target.value as '' | 'yes' | 'no')}>
+                <option value="">All</option>
+                <option value="yes">Linked to Lead</option>
+                <option value="no">No Lead</option>
+              </select>
+            </div>
+            <div className="filter-field">
+              <label>Created From</label>
+              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+            </div>
+            <div className="filter-field">
+              <label>Created To</label>
+              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+            </div>
+            <div className="filter-field">
+              <label>Min Nights</label>
+              <input
+                type="number"
+                min="0"
+                placeholder="Any"
+                value={nightsMin}
+                onChange={(e) => setNightsMin(e.target.value)}
+              />
+            </div>
+            <div className="filter-field">
+              <label>Max Nights</label>
+              <input
+                type="number"
+                min="0"
+                placeholder="Any"
+                value={nightsMax}
+                onChange={(e) => setNightsMax(e.target.value)}
+              />
+            </div>
+            <div className="filter-field">
+              <label>Sort By</label>
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)}>
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="updated">Recently Updated</option>
+                <option value="title">Title A-Z</option>
+                <option value="client">Client A-Z</option>
+                <option value="nights_desc">Most Nights</option>
+                <option value="nights_asc">Fewest Nights</option>
+              </select>
+            </div>
+          </div>
+          {activeFilterCount > 0 && (
+            <button className="btn btn-sm filter-clear" onClick={clearFilters}>
+              Clear All Filters
+            </button>
+          )}
+        </div>
+      )}
 
       {/* List */}
       {filtered.length === 0 ? (
@@ -220,6 +359,14 @@ export default function QuotationList() {
                 {q.client?.name}
                 {' · '}
                 {paxSummary(q.pax)}, {nightsCount(q.days)}N
+                {q.destination && (
+                  <span
+                    className="pill"
+                    style={{ marginLeft: 6, background: '#ecfdf5', color: '#065f46' }}
+                  >
+                    {q.destination}
+                  </span>
+                )}
                 {q.lead_id && (
                   <a
                     href={`/leads/${q.lead_id}`}
@@ -245,6 +392,7 @@ export default function QuotationList() {
               </div>
               <div className="meta" style={{ marginTop: 4 }}>
                 Created {formatDate(q.createdAt)}
+                {q.quoteCurrency && <span style={{ marginLeft: 8, opacity: 0.7 }}>{q.quoteCurrency}</span>}
               </div>
             </div>
 

@@ -147,6 +147,11 @@ a:hover {
   padding: 4px 10px;
   font-size: 12px;
 }
+.btn-sm.active {
+  background: var(--app-teal);
+  color: #fff;
+  border-color: var(--app-teal);
+}
 
 /* ---------- index page ---------- */
 .list-wrap {
