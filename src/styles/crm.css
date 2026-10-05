@@ -631,6 +631,82 @@
     grid-template-columns: 1fr !important;
   }
 }
+/* ---------- filter panel ---------- */
+.filter-panel {
+  background: #fff;
+  border: 1px solid var(--app-hairline);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.filter-field label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--app-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.filter-field select,
+.filter-field input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--app-hairline);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--app-ink);
+  background: #fff;
+}
+.filter-field select:focus,
+.filter-field input:focus {
+  outline: 2px solid var(--app-orange);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+.filter-clear {
+  margin-top: 12px;
+  color: var(--app-bad);
+  border-color: var(--app-bad);
+}
+@media (max-width: 900px) {
+  .filter-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .filter-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---------- quotation toolbar ---------- */
+.quot-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.quot-toolbar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.quot-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 640px) {
   .crm-info-grid,
   .crm-call-grid,
