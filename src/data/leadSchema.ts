@@ -10,14 +10,25 @@ export const PRIORITY_BUCKETS = [
 export type PriorityBucket = (typeof PRIORITY_BUCKETS)[number];
 
 export const CALL_STATUSES = [
-  'Call not connected',
-  'Talk in Progress',
-  'Traveler will finalise and is My Hot',
+  'Not Connected',
+  'Follow-up',
+  'Leave the Lead',
+  'Not Sure about the Plan',
+  'Already Booked',
+  'Send Quote',
+  'Initial Stage - Quote Not Seen',
+  'Getting Customisation',
+  'Negociating',
+  'Converted',
+  'Interested - Will Book later',
   'Warm Lead',
-  "Won't book with me/ Rejected",
+  'Group Tour',
+  'WA Only',
 ] as const;
 
 export type CallStatus = (typeof CALL_STATUSES)[number];
+
+export const LEAD_SOURCES = ['Meta', 'Google Sheet', 'Referral', 'Direct Call', 'FB/IG Message', 'Website', 'Other'] as const;
 
 export const HOTEL_CATEGORIES = ['3 Star', '4 Star', '5 Star'] as const;
 export const BUDGET_OPTIONS = ['Affordable', 'Medium', 'Premium', 'Luxury'] as const;
@@ -38,6 +49,7 @@ export interface Lead {
   planning_with?: string;
   pax_summary?: string;
   special_arrangements?: string;
+  source?: string;
   priority_bucket: PriorityBucket;
   latest_status?: string;
   created_at: string;
@@ -75,15 +87,18 @@ export interface CallResponse {
 
 export function callStatusToBucket(status: CallStatus): PriorityBucket {
   switch (status) {
-    case 'Call not connected':
+    case 'Not Connected':
       return 'Call Not Connected';
-    case 'Talk in Progress':
-      return 'In Progress';
-    case 'Traveler will finalise and is My Hot':
+    case 'Leave the Lead':
+    case 'Already Booked':
+      return 'Rejected';
+    case 'Negociating':
+    case 'Converted':
       return 'My Hot';
+    case 'Interested - Will Book later':
     case 'Warm Lead':
       return 'Warm Lead';
-    case "Won't book with me/ Rejected":
-      return 'Rejected';
+    default:
+      return 'In Progress';
   }
 }

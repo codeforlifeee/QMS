@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Lead, PriorityBucket } from '../data/leadSchema.js';
 import { PRIORITY_BUCKETS } from '../data/leadSchema.js';
 import { showToast } from '../components/Toast.js';
+import { AddLeadForm } from './AddLeadForm.js';
 
 const BUCKET_COLORS: Record<PriorityBucket, string> = {
   'Untouched Leads': '#6366f1',
@@ -19,6 +20,7 @@ export default function PipelineView() {
   const [view, setView] = useState<'pipeline' | 'list'>('pipeline');
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [showAddLead, setShowAddLead] = useState(false);
 
   const fetchLeads = useCallback(async () => {
     try {
@@ -92,8 +94,18 @@ export default function PipelineView() {
           <button className="btn btn-sm" onClick={handleSync} disabled={syncing}>
             {syncing ? 'Syncing...' : 'Sync Sheet'}
           </button>
+          <button className="btn btn-sm btn-primary" onClick={() => setShowAddLead(true)}>
+            + Add Lead
+          </button>
         </div>
       </div>
+
+      {showAddLead && (
+        <AddLeadForm
+          onSave={() => { setShowAddLead(false); fetchLeads(); }}
+          onClose={() => setShowAddLead(false)}
+        />
+      )}
 
       {loading ? (
         <div className="crm-loading">Loading leads...</div>

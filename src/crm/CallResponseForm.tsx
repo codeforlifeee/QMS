@@ -117,18 +117,15 @@ export function CallResponseForm({ lead, latestCall, onSave, onClose }: Props) {
 
             <div className="crm-form-field full-width">
               <label>Call Status</label>
-              <div className="crm-segment">
+              <select
+                value={form.call_status || ''}
+                onChange={(e) => set('call_status', e.target.value)}
+              >
+                <option value="">Select status...</option>
                 {CALL_STATUSES.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    className={`crm-segment-btn ${form.call_status === s ? 'active' : ''}`}
-                    onClick={() => set('call_status', s)}
-                  >
-                    {s}
-                  </button>
+                  <option key={s} value={s}>{s}</option>
                 ))}
-              </div>
+              </select>
             </div>
 
             <div className="crm-form-field full-width">

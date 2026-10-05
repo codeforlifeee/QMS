@@ -162,6 +162,10 @@ export function LeadPage({ leadId }: Props) {
                 <label>Pax Summary</label>
                 <span>{lead.pax_summary || '-'}</span>
               </div>
+              <div className="crm-info-item">
+                <label>Source</label>
+                <span>{lead.source || '-'}</span>
+              </div>
               {lead.special_arrangements && (
                 <div className="crm-info-item full-width">
                   <label>Special Arrangements</label>

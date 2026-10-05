@@ -34,6 +34,7 @@ export const POST: APIRoute = async ({ request }) => {
     planning_with: body.planning_with,
     pax_summary: body.pax_summary,
     special_arrangements: body.special_arrangements,
+    source: body.source,
     priority_bucket: body.priority_bucket || 'Untouched Leads',
   });
 
