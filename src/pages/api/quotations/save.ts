@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { jsonRepo } from '../../../data/repo.js';
+import { getRepo } from '../../../data/repo.js';
 import type { StoredQuotation } from '../../../data/schema.js';
 
 export const prerender = false;
@@ -18,7 +18,8 @@ export const POST: APIRoute = async ({ request }) => {
     if (!payload?.id || !payload?.token) {
       return new Response('Missing id or token', { status: 400 });
     }
-    await jsonRepo.save(payload);
+    const repo = await getRepo();
+    await repo.save(payload);
     return new Response(JSON.stringify({ ok: true, savedAt: new Date().toISOString() }), {
       status: 200,
       headers: { 'content-type': 'application/json' },

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { jsonRepo } from '../../../data/repo.js';
+import { getRepo } from '../../../data/repo.js';
 import { renderPdf } from '../../../pdf/render.js';
 
 export const prerender = false;
@@ -18,7 +18,8 @@ export const GET: APIRoute = async ({ params, url, request }) => {
   const token = params.token;
   if (!token) return new Response('Missing token', { status: 400 });
 
-  const q = await jsonRepo.getByToken(token);
+  const repo = await getRepo();
+  const q = await repo.getByToken(token);
   if (!q) return new Response('Quotation not found', { status: 404 });
 
   // Rebuild the print URL from this request's own origin so dev + production both work.

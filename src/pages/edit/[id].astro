@@ -2,11 +2,12 @@
 import '../../document/document.css';
 import Shell from '../../layouts/Shell.astro';
 import Editor from '../../editor/Editor.tsx';
-import { jsonRepo } from '../../data/repo.js';
+import { getRepo } from '../../data/repo.js';
 
 export const prerender = false;
 
-const q = await jsonRepo.get(Astro.params.id ?? '');
+const repo = await getRepo();
+const q = await repo.get(Astro.params.id ?? '');
 if (!q) return new Response('Quotation not found', { status: 404 });
 ---
 

@@ -1,51 +1,72 @@
 ---
-import { jsonRepo, newId, newToken } from '../data/repo.js';
+import { getRepo, newId, newToken } from '../data/repo.js';
 import { DEFAULT_PAYMENT_POLICY, DEFAULT_TERMS } from '../config/company.js';
 import { loadDefaults } from '../catalog/catalog.js';
 import type { StoredQuotation } from '../data/schema.js';
 
 export const prerender = false;
 
-// Minting an empty quotation is a redirect-after-POST style flow. GET /new creates one
-// with sensible defaults and immediately redirects to its editor, so the agent never
-// sees an empty-state screen.
+const repo = await getRepo();
+const url = Astro.url;
+
+// Pre-fill from lead data via query params
+const clientName = url.searchParams.get('client_name') || '';
+const clientPhone = url.searchParams.get('client_phone') || '';
+const clientEmail = url.searchParams.get('client_email') || '';
+const destination = url.searchParams.get('destination') || '';
+const adults = parseInt(url.searchParams.get('adults') || '2', 10);
+const children = parseInt(url.searchParams.get('children') || '0', 10);
+const nights = parseInt(url.searchParams.get('nights') || '0', 10);
+const travelDate = url.searchParams.get('travel_date') || '';
+const leadId = url.searchParams.get('lead_id') || undefined;
+
 const id = newId();
 const now = new Date().toISOString();
 const today = now.slice(0, 10);
-const in30 = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
-const in45 = new Date(Date.now() + 45 * 86_400_000).toISOString().slice(0, 10);
 
-// A sequential-ish reference based on the day count; swap for a DB sequence when there
-// is a DB.
+// Use travel_date from lead if provided, otherwise default
+const startDate = travelDate || new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
+const endDate = nights > 0
+  ? new Date(new Date(startDate).getTime() + nights * 86_400_000).toISOString().slice(0, 10)
+  : new Date(new Date(startDate).getTime() + 15 * 86_400_000).toISOString().slice(0, 10);
+const validUntil = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
+
 const yr = today.slice(0, 4);
-const count = (await jsonRepo.list()).length + 1;
+const count = (await repo.list()).length + 1;
 const reference = `TG-${yr}-${String(count).padStart(4, '0')}`;
 
-// Pull the FX rate and house markup % the Calculator used so new quotations prefill
-// with the values the team actually works with today. Falls back to hard-coded
-// defaults if the catalog hasn't been imported yet.
 const catalogDefaults = await loadDefaults();
-const aedToInr = catalogDefaults
-  ? catalogDefaults.fxAedPerInr.toFixed(2)
-  : '22.85';
+const aedToInr = catalogDefaults ? catalogDefaults.fxAedPerInr.toFixed(2) : '22.85';
 const houseMarkup = catalogDefaults ? Math.round(catalogDefaults.markupPct * 100) : 15;
+
+// Generate days based on nights
+const dayCount = nights > 0 ? nights + 1 : 2;
+const days = Array.from({ length: dayCount }, (_, i) => ({
+  id: `d${i + 1}`,
+  index: i + 1,
+  title: `Day ${i + 1}`,
+  prose: '',
+}));
 
 const draft: StoredQuotation = {
   id,
   token: newToken(),
   status: 'draft',
   reference,
-  title: 'New quotation',
-  destination: '',
-  client: { name: '' },
-  travelStart: in30,
-  travelEnd: in45,
-  pax: { adults: 2, children: 0, infants: 0 },
+  ...(leadId ? { lead_id: leadId } : {}),
+  title: destination ? `${destination} Trip` : 'New quotation',
+  destination: destination || '',
+  client: {
+    name: clientName,
+    ...(clientPhone ? { phone: clientPhone } : {}),
+    ...(clientEmail ? { email: clientEmail } : {}),
+  },
+  travelStart: startDate,
+  travelEnd: endDate,
+  pax: { adults, children, infants: 0 },
   quoteCurrency: 'INR',
   fx: { AED: aedToInr },
   pricingMode: 'PER_SERVICE',
-  // Flat house markup for every type by default; agents can tweak per type on the form
-  // or move the whole quote to FLAT or TARGET_MARGIN mode.
   defaultMarkupByType: {
     HOTEL: houseMarkup,
     ACTIVITY: houseMarkup,
@@ -58,19 +79,16 @@ const draft: StoredQuotation = {
   defaultTaxClass: 'standard',
   taxLabel: 'GST @ 5%',
   roundingUnit: 100,
-  days: [
-    { id: 'd1', index: 1, title: 'Day 1', prose: '' },
-    { id: 'd2', index: 2, title: 'Day 2', prose: '' },
-  ],
+  days,
   lines: [],
   paymentPolicy: [...DEFAULT_PAYMENT_POLICY],
   terms: [...DEFAULT_TERMS],
   createdAt: now,
   updatedAt: now,
-  validUntil: in30,
+  validUntil,
   viewCount: 0,
 };
 
-await jsonRepo.save(draft);
+await repo.save(draft);
 return Astro.redirect(`/edit/${id}`);
 ---

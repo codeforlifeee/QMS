@@ -140,3 +140,13 @@ export function newToken(length = 22): string {
 export function newId(): string {
   return `q_${Date.now().toString(36)}_${newToken(6)}`;
 }
+
+/** Active repo — Supabase when configured, JSON files otherwise. */
+export async function getRepo(): Promise<QuotationRepo> {
+  const { hasSupabase } = await import('./supabase.js');
+  if (hasSupabase()) {
+    const { supabaseRepo } = await import('./supabaseRepo.js');
+    return supabaseRepo;
+  }
+  return jsonRepo;
+}

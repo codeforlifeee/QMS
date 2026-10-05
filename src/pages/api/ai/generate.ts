@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getProvider } from '../../../ai/config.js';
 import { generateQuotation } from '../../../ai/pipeline/index.js';
-import { jsonRepo } from '../../../data/repo.js';
+import { getRepo } from '../../../data/repo.js';
 
 export const prerender = false;
 
@@ -13,7 +13,7 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'Invalid JSON body' }, 400);
   }
 
-  const { prompt, provider: providerName } = body ?? {};
+  const { prompt, provider: providerName, lead_id } = body ?? {};
   if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
     return json({ error: 'Prompt is required' }, 400);
   }
@@ -26,13 +26,15 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
+    const repo = await getRepo();
     const result = await generateQuotation(prompt, provider);
-    const quotationWithWarnings = {
+    const quotationWithExtras = {
       ...result.quotation,
       ...(result.warnings.length > 0 ? { aiWarnings: result.warnings } : {}),
+      ...(lead_id ? { lead_id } : {}),
     };
-    await jsonRepo.save(quotationWithWarnings);
-    await jsonRepo.saveCitations(result.quotation.id, result.citations);
+    await repo.save(quotationWithExtras);
+    await repo.saveCitations(result.quotation.id, result.citations);
 
     const grounded = Object.keys(result.citations).length;
     return json({
