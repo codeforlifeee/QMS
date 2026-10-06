@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { leadRepo } from '../../../data/leadRepo'; // Ensure correct path to your leadRepo
 
-const VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN || 'my_secure_verify_token_123';
+const VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN || 'qms_vt_9f8d7b6c5a4b3c2d1e2f3a4b5c6d7e8f';
 const PAGE_ACCESS_TOKEN = process.env.FB_PAGE_ACCESS_TOKEN || '';
 
 // 1. GET: Facebook uses this to verify your Webhook URL
