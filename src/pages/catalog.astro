@@ -1,0 +1,22 @@
+---
+import Shell from '../layouts/Shell.astro';
+import { StubPage } from '../components/StubPage.tsx';
+
+export const prerender = false;
+---
+
+<Shell title="Catalog">
+  <StubPage
+    iconName="catalog"
+    title="Catalog"
+    description="Hotels, activities, transfers, and visa services with pricing and availability."
+    bullets={[
+      'Browse the full supplier catalog with search and filters',
+      'Edit prices and inventory in-place',
+      'Upload new items via spreadsheet',
+      'Mark favorites for quick picks in the editor',
+      'Track price history and margin',
+    ]}
+    client:load
+  />
+</Shell>

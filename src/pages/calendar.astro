@@ -1,0 +1,22 @@
+---
+import Shell from '../layouts/Shell.astro';
+import { StubPage } from '../components/StubPage.tsx';
+
+export const prerender = false;
+---
+
+<Shell title="Calendar">
+  <StubPage
+    iconName="calendar"
+    title="Calendar"
+    description="Follow-ups, travel dates, and reminders in a unified calendar view."
+    bullets={[
+      'Day / week / month views',
+      'Follow-up calls auto-scheduled from lead activity',
+      'Trip departure and return dates from accepted quotations',
+      'Google Calendar sync (optional)',
+      'Drag to reschedule',
+    ]}
+    client:load
+  />
+</Shell>
