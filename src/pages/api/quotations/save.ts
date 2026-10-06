@@ -19,8 +19,12 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response('Missing id or token', { status: 400 });
     }
     const repo = await getRepo();
-    await repo.save(payload);
-    return new Response(JSON.stringify({ ok: true, savedAt: new Date().toISOString() }), {
+    
+    // Ensure the updated timestamp reflects the exact time of the save
+    const updatedPayload = { ...payload, updatedAt: new Date().toISOString() };
+    
+    await repo.save(updatedPayload);
+    return new Response(JSON.stringify({ ok: true, savedAt: updatedPayload.updatedAt }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
     });

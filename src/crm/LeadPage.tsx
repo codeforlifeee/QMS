@@ -4,8 +4,8 @@ import { PRIORITY_BUCKETS } from '../data/leadSchema.js';
 import { CallResponseForm } from './CallResponseForm.js';
 import { generateWALink } from '../lib/whatsapp.js';
 import { showToast } from '../components/Toast.js';
-import { NotesPanel } from '../components/notes/NotesPanel.js';
 import { EmailComposer } from '../components/email/EmailComposer.js';
+import { formatPhone, copyAndToast } from '../lib/contact.js';
 
 interface Quotation {
   id: string;
@@ -97,8 +97,9 @@ export function LeadPage({ leadId }: Props) {
 
   const latestCall = calls[0] ?? null;
 
-  const waLink = lead.phone
-    ? generateWALink(lead.phone, 'greeting', {
+  const cleanPhone = formatPhone(lead.phone);
+  const waLink = cleanPhone
+    ? generateWALink(cleanPhone, 'greeting', {
         name: lead.customer_name,
         destination: lead.city || '',
       })
@@ -107,7 +108,7 @@ export function LeadPage({ leadId }: Props) {
   const manualQuoteParams = new URLSearchParams();
   manualQuoteParams.set('lead_id', leadId);
   if (lead.customer_name) manualQuoteParams.set('client_name', lead.customer_name);
-  if (lead.phone) manualQuoteParams.set('client_phone', lead.phone);
+  if (cleanPhone) manualQuoteParams.set('client_phone', cleanPhone);
   if (latestCall?.destination_city) manualQuoteParams.set('destination', latestCall.destination_city);
   if (lead.email) manualQuoteParams.set('client_email', lead.email);
 
@@ -143,11 +144,31 @@ export function LeadPage({ leadId }: Props) {
             <div className="crm-info-grid">
               <div className="crm-info-item">
                 <label>Phone</label>
-                <span>{lead.phone || '-'}</span>
+                {lead.phone ? (
+                  <span
+                    className="crm-copyable"
+                    title="Click to copy"
+                    onClick={() => copyAndToast(formatPhone(lead.phone), 'Phone copied')}
+                  >
+                    {formatPhone(lead.phone)}
+                  </span>
+                ) : (
+                  <span>-</span>
+                )}
               </div>
               <div className="crm-info-item">
                 <label>Email</label>
-                <span>{lead.email || '-'}</span>
+                {lead.email ? (
+                  <span
+                    className="crm-copyable"
+                    title="Click to copy"
+                    onClick={() => copyAndToast(lead.email!, 'Email copied')}
+                  >
+                    {lead.email}
+                  </span>
+                ) : (
+                  <span>-</span>
+                )}
               </div>
               <div className="crm-info-item">
                 <label>City</label>
@@ -382,12 +403,7 @@ export function LeadPage({ leadId }: Props) {
         </div>
       </div>
 
-      {/* Notes */}
-      <div style={{ marginTop: 24 }}>
-        <NotesPanel entityType="lead" entityId={leadId} />
-      </div>
-
-      {/* CallResponseForm modal */}
+      {/* Inline Call Response Form — appears when "+ New Call" is clicked */}
       {showCallForm && (
         <CallResponseForm
           lead={lead}
@@ -396,7 +412,7 @@ export function LeadPage({ leadId }: Props) {
             setShowCallForm(false);
             fetchData();
           }}
-          onClose={() => setShowCallForm(false)}
+          onCancel={() => setShowCallForm(false)}
         />
       )}
 

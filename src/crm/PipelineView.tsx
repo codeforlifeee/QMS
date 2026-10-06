@@ -3,16 +3,8 @@ import type { Lead, PriorityBucket } from '../data/leadSchema.js';
 import { PRIORITY_BUCKETS, LEAD_SOURCES, CALL_STATUSES } from '../data/leadSchema.js';
 import { showToast } from '../components/Toast.js';
 import { AddLeadForm } from './AddLeadForm.js';
-import {
-  DndContext,
-  closestCenter,
-  type DragEndEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { GripVertical } from 'lucide-react';
+import { Filter, RefreshCw, Plus, X } from 'lucide-react';
+import { formatPhone, copyAndToast } from '../lib/contact.js';
 
 const BUCKET_COLORS: Record<PriorityBucket, string> = {
   'Untouched Leads': '#6366f1',
@@ -27,9 +19,7 @@ type SortKey = 'name' | 'date_new' | 'date_old' | 'updated';
 
 export default function PipelineView() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [stats, setStats] = useState<Record<string, number>>({});
   const [search, setSearch] = useState('');
-  const [view, setView] = useState<'pipeline' | 'list'>('list');
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [showAddLead, setShowAddLead] = useState(false);
@@ -49,39 +39,11 @@ export default function PipelineView() {
       const res = await fetch('/api/leads');
       const data = await res.json();
       setLeads(data.leads ?? []);
-      setStats(data.stats ?? {});
     } catch {}
     setLoading(false);
   }, []);
 
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
-
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
-
-  async function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over) return;
-    const leadId = String(active.id);
-    const newBucket = String(over.id) as PriorityBucket;
-    const lead = leads.find((l) => l.id === leadId);
-    if (!lead || lead.priority_bucket === newBucket) return;
-    const previous = lead.priority_bucket;
-    // Optimistic update
-    setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, priority_bucket: newBucket } : l)));
-    try {
-      const res = await fetch(`/api/leads/${leadId}`, {
-        method: 'PUT',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ priority_bucket: newBucket }),
-      });
-      if (!res.ok) throw new Error('Update failed');
-      showToast(`Moved to ${newBucket}`, 'success');
-    } catch {
-      // Revert
-      setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, priority_bucket: previous } : l)));
-      showToast('Failed to move lead', 'error');
-    }
-  }
 
   const handleSync = async () => {
     setSyncing(true);
@@ -138,7 +100,7 @@ export default function PipelineView() {
         const q = search.toLowerCase();
         if (
           !l.customer_name.toLowerCase().includes(q) &&
-          !(l.phone ?? '').includes(q) &&
+          !formatPhone(l.phone).includes(q) &&
           !(l.city ?? '').toLowerCase().includes(q) &&
           !(l.email ?? '').toLowerCase().includes(q)
         ) return false;
@@ -174,11 +136,10 @@ export default function PipelineView() {
     return result;
   }, [leads, search, bucketFilter, sourceFilter, cityFilter, monthFilter, statusFilter, dateFrom, dateTo, sortBy]);
 
-  const bucketLeads = (bucket: PriorityBucket) =>
-    filtered.filter((l) => l.priority_bucket === bucket);
-
   return (
     <div className="crm-pipeline">
+
+      {/* ── Toolbar ── */}
       <div className="crm-toolbar">
         <div className="crm-toolbar-left">
           <h2>Lead Pipeline</h2>
@@ -192,35 +153,35 @@ export default function PipelineView() {
             onChange={(e) => setSearch(e.target.value)}
             className="crm-search"
           />
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortKey)}
+            className="crm-select"
+          >
+            <option value="date_new">Newest First</option>
+            <option value="date_old">Oldest First</option>
+            <option value="updated">Recently Updated</option>
+            <option value="name">Name A–Z</option>
+          </select>
           <button
             className={`btn btn-sm ${showFilters ? 'active' : ''}`}
             onClick={() => setShowFilters(!showFilters)}
           >
+            <Filter size={14} style={{ marginRight: 4 }} />
             Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
           </button>
-          <div className="crm-view-toggle">
-            <button
-              className={`btn btn-sm ${view === 'pipeline' ? 'active' : ''}`}
-              onClick={() => setView('pipeline')}
-            >
-              Board
-            </button>
-            <button
-              className={`btn btn-sm ${view === 'list' ? 'active' : ''}`}
-              onClick={() => setView('list')}
-            >
-              List
-            </button>
-          </div>
           <button className="btn btn-sm" onClick={handleSync} disabled={syncing}>
+            <RefreshCw size={14} style={{ marginRight: 4 }} />
             {syncing ? 'Syncing...' : 'Sync Sheet'}
           </button>
           <button className="btn btn-sm btn-primary" onClick={() => setShowAddLead(true)}>
-            + Add Lead
+            <Plus size={14} style={{ marginRight: 4 }} />
+            Add Lead
           </button>
         </div>
       </div>
 
+      {/* ── Filter Panel ── */}
       {showFilters && (
         <div className="filter-panel">
           <div className="filter-grid">
@@ -234,7 +195,7 @@ export default function PipelineView() {
               </select>
             </div>
             <div className="filter-field">
-              <label>Latest Status</label>
+              <label>Call Status</label>
               <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                 <option value="">All Statuses</option>
                 {CALL_STATUSES.map((s) => (
@@ -277,18 +238,10 @@ export default function PipelineView() {
               <label>Created To</label>
               <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
             </div>
-            <div className="filter-field">
-              <label>Sort By</label>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)}>
-                <option value="date_new">Newest First</option>
-                <option value="date_old">Oldest First</option>
-                <option value="updated">Recently Updated</option>
-                <option value="name">Name A-Z</option>
-              </select>
-            </div>
           </div>
           {activeFilterCount > 0 && (
             <button className="btn btn-sm filter-clear" onClick={clearFilters}>
+              <X size={13} style={{ marginRight: 4 }} />
               Clear All Filters
             </button>
           )}
@@ -302,28 +255,9 @@ export default function PipelineView() {
         />
       )}
 
+      {/* ── Table ── */}
       {loading ? (
         <div className="crm-loading">Loading leads...</div>
-      ) : view === 'pipeline' ? (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="crm-board">
-            {PRIORITY_BUCKETS.map((bucket) => {
-              const bl = bucketLeads(bucket);
-              return (
-                <DroppableColumn key={bucket} bucket={bucket} color={BUCKET_COLORS[bucket]} count={bl.length}>
-                  {bl.length === 0 && <div className="crm-column-empty">Drop here</div>}
-                  {bl.map((lead) => (
-                    <DraggableLeadCard key={lead.id} lead={lead} />
-                  ))}
-                </DroppableColumn>
-              );
-            })}
-          </div>
-        </DndContext>
       ) : (
         <div className="crm-list-view">
           <table className="crm-table">
@@ -342,15 +276,42 @@ export default function PipelineView() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((lead) => (
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={10} style={{ textAlign: 'center', padding: '32px', color: 'var(--color-muted-ink)' }}>
+                    No leads match your current filters.
+                  </td>
+                </tr>
+              ) : filtered.map((lead) => (
                 <tr
                   key={lead.id}
                   onClick={() => { window.location.href = `/leads/${lead.id}`; }}
                   className="crm-table-row"
                 >
                   <td className="crm-table-name">{lead.customer_name}</td>
-                  <td>{lead.phone || '-'}</td>
-                  <td>{lead.email || '-'}</td>
+                  <td
+                    onClick={(e) => {
+                      const p = formatPhone(lead.phone);
+                      if (!p) return;
+                      e.stopPropagation();
+                      copyAndToast(p, 'Phone copied');
+                    }}
+                    className={formatPhone(lead.phone) ? 'crm-copyable' : undefined}
+                    title={formatPhone(lead.phone) ? 'Click to copy' : undefined}
+                  >
+                    {formatPhone(lead.phone) || '-'}
+                  </td>
+                  <td
+                    onClick={(e) => {
+                      if (!lead.email) return;
+                      e.stopPropagation();
+                      copyAndToast(lead.email, 'Email copied');
+                    }}
+                    className={lead.email ? 'crm-copyable' : undefined}
+                    title={lead.email ? 'Click to copy' : undefined}
+                  >
+                    {lead.email || '-'}
+                  </td>
                   <td>{lead.city || '-'}</td>
                   <td>{lead.pax_summary || '-'}</td>
                   <td>{lead.travelling_month || '-'}</td>
@@ -380,88 +341,6 @@ export default function PipelineView() {
           </table>
         </div>
       )}
-    </div>
-  );
-}
-
-function LeadCard({ lead }: { lead: Lead }) {
-  return (
-    <a href={`/leads/${lead.id}`} className="crm-card" style={{ textDecoration: 'none', color: 'inherit' }}>
-      <div className="crm-card-name">{lead.customer_name}</div>
-      <div className="crm-card-meta">
-        {lead.phone && <span>{lead.phone}</span>}
-        {lead.city && <span>{lead.city}</span>}
-      </div>
-      {lead.latest_status && (
-        <div className="crm-card-tag">{lead.latest_status}</div>
-      )}
-      {lead.travelling_month && (
-        <div className="crm-card-tag" style={{ marginTop: 2 }}>{lead.travelling_month}</div>
-      )}
-    </a>
-  );
-}
-
-function DraggableLeadCard({ lead }: { lead: Lead }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: lead.id });
-  const style: React.CSSProperties = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0) rotate(${isDragging ? 1.5 : 0}deg)`,
-        opacity: isDragging ? 0.85 : 1,
-        boxShadow: isDragging ? '0 10px 20px rgba(0,0,0,0.15)' : undefined,
-        zIndex: isDragging ? 50 : undefined,
-      }
-    : {};
-  return (
-    <div
-      ref={setNodeRef}
-      style={{ ...style, position: 'relative', touchAction: 'none' }}
-    >
-      <span
-        {...listeners}
-        {...attributes}
-        aria-label="Drag lead"
-        style={{
-          position: 'absolute',
-          top: 6,
-          right: 6,
-          cursor: 'grab',
-          color: '#94A3B8',
-          padding: 2,
-        }}
-      >
-        <GripVertical size={14} />
-      </span>
-      <LeadCard lead={lead} />
-    </div>
-  );
-}
-
-function DroppableColumn({
-  bucket, color, count, children,
-}: {
-  bucket: PriorityBucket;
-  color: string;
-  count: number;
-  children: React.ReactNode;
-}) {
-  const { setNodeRef, isOver } = useDroppable({ id: bucket });
-  return (
-    <div
-      ref={setNodeRef}
-      className="crm-column"
-      style={{
-        outline: isOver ? `2px dashed ${color}` : undefined,
-        background: isOver ? `${color}0f` : undefined,
-        transition: 'background 0.15s, outline 0.15s',
-      }}
-    >
-      <div className="crm-column-header">
-        <span className="crm-column-dot" style={{ background: color }} />
-        <span className="crm-column-title">{bucket}</span>
-        <span className="crm-column-count">{count}</span>
-      </div>
-      <div className="crm-column-body">{children}</div>
     </div>
   );
 }

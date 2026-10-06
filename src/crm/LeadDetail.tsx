@@ -3,6 +3,7 @@ import type { Lead, CallResponse, PriorityBucket } from '../data/leadSchema.js';
 import { PRIORITY_BUCKETS } from '../data/leadSchema.js';
 import { CallResponseForm } from './CallResponseForm.js';
 import { generateWALink } from '../lib/whatsapp.js';
+import { formatPhone, copyAndToast } from '../lib/contact.js';
 
 interface Props {
   lead: Lead;
@@ -26,8 +27,9 @@ export function LeadDetail({
   const [showCallForm, setShowCallForm] = useState(false);
   const latestCall = calls[0] ?? null;
 
-  const waLink = lead.phone
-    ? generateWALink(lead.phone, 'greeting', {
+  const cleanPhone = formatPhone(lead.phone);
+  const waLink = cleanPhone
+    ? generateWALink(cleanPhone, 'greeting', {
         name: lead.customer_name,
         destination: lead.city || '',
       })
@@ -60,11 +62,31 @@ export function LeadDetail({
             <div className="crm-info-grid">
               <div className="crm-info-item">
                 <label>Phone</label>
-                <span>{lead.phone || '-'}</span>
+                {cleanPhone ? (
+                  <span
+                    className="crm-copyable"
+                    title="Click to copy"
+                    onClick={() => copyAndToast(cleanPhone, 'Phone copied')}
+                  >
+                    {cleanPhone}
+                  </span>
+                ) : (
+                  <span>-</span>
+                )}
               </div>
               <div className="crm-info-item">
                 <label>Email</label>
-                <span>{lead.email || '-'}</span>
+                {lead.email ? (
+                  <span
+                    className="crm-copyable"
+                    title="Click to copy"
+                    onClick={() => copyAndToast(lead.email!, 'Email copied')}
+                  >
+                    {lead.email}
+                  </span>
+                ) : (
+                  <span>-</span>
+                )}
               </div>
               <div className="crm-info-item">
                 <label>City</label>
@@ -117,13 +139,25 @@ export function LeadDetail({
               </a>
             )}
           </div>
+
+          {showCallForm && (
+            <CallResponseForm
+              lead={lead}
+              latestCall={latestCall}
+              onSave={() => {
+                setShowCallForm(false);
+                onCallSaved();
+              }}
+              onCancel={() => setShowCallForm(false)}
+            />
+          )}
         </div>
 
         <div className="crm-call-history">
           <h3>Call History ({calls.length})</h3>
           {calls.length === 0 ? (
             <div className="crm-empty-calls">
-              No calls yet. Click "+ New Call" to log your first call.
+              No calls yet. Click &quot;+ New Call&quot; to log your first call.
             </div>
           ) : (
             <div className="crm-call-timeline">
@@ -134,18 +168,6 @@ export function LeadDetail({
           )}
         </div>
       </div>
-
-      {showCallForm && (
-        <CallResponseForm
-          lead={lead}
-          latestCall={latestCall}
-          onSave={() => {
-            setShowCallForm(false);
-            onCallSaved();
-          }}
-          onClose={() => setShowCallForm(false)}
-        />
-      )}
     </div>
   );
 }

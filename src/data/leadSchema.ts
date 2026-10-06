@@ -10,23 +10,32 @@ export const PRIORITY_BUCKETS = [
 export type PriorityBucket = (typeof PRIORITY_BUCKETS)[number];
 
 export const CALL_STATUSES = [
-  'Not Connected',
-  'Follow-up',
-  'Leave the Lead',
-  'Not Sure about the Plan',
-  'Already Booked',
-  'Send Quote',
-  'Initial Stage - Quote Not Seen',
-  'Getting Customisation',
-  'Negociating',
-  'Converted',
-  'Interested - Will Book later',
+  'Call Not Connected',
+  'Talk in Progress',
+  'Traveler Will Finalize – My Hot',
   'Warm Lead',
-  'Group Tour',
-  'WA Only',
+  "Won't Book / Rejected",
 ] as const;
 
 export type CallStatus = (typeof CALL_STATUSES)[number];
+
+export const CALL_PROGRESS_OPTIONS = [
+  'Not connected',
+  'Follow up',
+  'Leave the lead - not sure about the plan',
+  'Already booked',
+  'Send quote',
+  'Initial stage - quote not seen',
+  'Getting customization',
+  'Negotiating',
+  'Converted',
+  'Interested - will book later',
+  'Warm lead',
+  'Group tour',
+  'WA only',
+] as const;
+
+export type CallProgress = (typeof CALL_PROGRESS_OPTIONS)[number];
 
 export const LEAD_SOURCES = ['Meta', 'Google Sheet', 'Referral', 'Direct Call', 'FB/IG Message', 'Website', 'Other'] as const;
 
@@ -87,17 +96,15 @@ export interface CallResponse {
 
 export function callStatusToBucket(status: CallStatus): PriorityBucket {
   switch (status) {
-    case 'Not Connected':
+    case 'Call Not Connected':
       return 'Call Not Connected';
-    case 'Leave the Lead':
-    case 'Already Booked':
-      return 'Rejected';
-    case 'Negociating':
-    case 'Converted':
+    case 'Traveler Will Finalize – My Hot':
       return 'My Hot';
-    case 'Interested - Will Book later':
     case 'Warm Lead':
       return 'Warm Lead';
+    case "Won't Book / Rejected":
+      return 'Rejected';
+    case 'Talk in Progress':
     default:
       return 'In Progress';
   }
