@@ -23,7 +23,7 @@
     "@astrojs/node": "^9.5.5",
     "@astrojs/react": "^4.4.2",
     "@google/generative-ai": "^0.24.1",
-    "@supabase/supabase-js": "^2.117.2",
+    "@supabase/supabase-js": "^2.39.0",
     "astro": "^5.18.2",
     "googleapis": "^183.0.0",
     "groq-sdk": "^1.6.0",

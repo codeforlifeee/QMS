@@ -1,0 +1,172 @@
+{
+  "l_muu8tmbg_96m45": [
+    {
+      "lineId": "l_muu8tmbg_96m45",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "ct_2f79ce20b8be",
+        "productName": "Private Dubai City Tour",
+        "sheetName": "App Sheet: CITY TOURS",
+        "originalValueAed": 32500,
+        "matchScore": 1,
+        "matchedQuery": "Dubai City Tour (private)"
+      },
+      "alternatives": [
+        {
+          "catalogId": "ct_fb5048ce3240",
+          "productName": "Private Abu Dhabi City Tour",
+          "costAed": 50000,
+          "score": 0.8166666666666667
+        },
+        {
+          "catalogId": "p_e7938d4a7444",
+          "productName": "Suburban Limousine - 18 Pax Capacity",
+          "costAed": 60000,
+          "score": 0.6670146573714483
+        },
+        {
+          "catalogId": "p_ddea19c15212",
+          "productName": "Cadillac Limousine - 18 Pax Capacity",
+          "costAed": 65000,
+          "score": 0.6670146573714483
+        },
+        {
+          "catalogId": "p_4197c4a4674a",
+          "productName": "Expo City Dubai - Attractions Pass",
+          "costAed": 12800,
+          "score": 0.5886506742174584
+        }
+      ]
+    }
+  ],
+  "l_muu8tmbh_9t938": [
+    {
+      "lineId": "l_muu8tmbh_9t938",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "p_6eb114b23073",
+        "productName": "Burj Khalifa At the Top & Sky Views Tickets",
+        "sheetName": "Package Calculator: Cost sheet",
+        "originalValueAed": 15100,
+        "matchScore": 1,
+        "matchedQuery": "Burj Khalifa At The Top"
+      },
+      "alternatives": [
+        {
+          "catalogId": "p_7eabab661e6c",
+          "productName": "BURJ KHALIFA 124 FLOOR NON PEAK",
+          "costAed": 15300,
+          "score": 0.5878077039375577
+        },
+        {
+          "catalogId": "p_c5f375babc5b",
+          "productName": "BURJ KHALIFA 124 FLOOR PEAK HRS",
+          "costAed": 15300,
+          "score": 0.5878077039375577
+        },
+        {
+          "catalogId": "p_a2d0757c07a5",
+          "productName": "BURJ KHALIFA 124 FLOOR+DAUZ NON PEAK",
+          "costAed": 28500,
+          "score": 0.5878077039375577
+        }
+      ]
+    }
+  ],
+  "l_muu8tmbh_db06j": [
+    {
+      "lineId": "l_muu8tmbh_db06j",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "ct_500ff1caab37",
+        "productName": "Sharing Abu Dhabi City Tour",
+        "sheetName": "App Sheet: CITY TOURS",
+        "originalValueAed": 8500,
+        "matchScore": 1,
+        "matchedQuery": "Abu Dhabi City Tour"
+      },
+      "alternatives": [
+        {
+          "catalogId": "ct_fb5048ce3240",
+          "productName": "Private Abu Dhabi City Tour",
+          "costAed": 50000,
+          "score": 1
+        },
+        {
+          "catalogId": "p_081869550972",
+          "productName": "Abu Dhabi City Tour with Qasr Al Watan",
+          "costAed": 15100,
+          "score": 0.9449020893653659
+        },
+        {
+          "catalogId": "p_656399c2e230",
+          "productName": "Abu Dhabi City tour with Yas Water World tickets",
+          "costAed": 30400,
+          "score": 0.9449020893653659
+        },
+        {
+          "catalogId": "p_b12c3abcb86c",
+          "productName": "Abu Dhabi City tour with Ferrari World Entry Ticket",
+          "costAed": 32500,
+          "score": 0.9449020893653659
+        }
+      ]
+    }
+  ],
+  "l_muu8tmbh_yz90v": [
+    {
+      "lineId": "l_muu8tmbh_yz90v",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "t_75c50a4756d0",
+        "productName": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) — 7 Seater",
+        "sheetName": "App Sheet: TRANSPORT",
+        "originalValueAed": 14000,
+        "matchScore": 1,
+        "matchedQuery": "Airport to Hotel"
+      },
+      "alternatives": [
+        {
+          "catalogId": "t_cd65190ffc0f",
+          "productName": "Dubai Airport to Beach Hotel(Al Barsha , Palm Jumirah, Marina) (Airport Transfers) — 7 Seater",
+          "costAed": 11000,
+          "score": 1
+        },
+        {
+          "catalogId": "t_30e74dc81a0e",
+          "productName": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) — 15 Seater",
+          "costAed": 12500,
+          "score": 1
+        }
+      ]
+    }
+  ],
+  "l_muu8tmbh_i0kv3": [
+    {
+      "lineId": "l_muu8tmbh_i0kv3",
+      "field": "adultRate",
+      "source": {
+        "catalogId": "t_75c50a4756d0",
+        "productName": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) — 7 Seater",
+        "sheetName": "App Sheet: TRANSPORT",
+        "originalValueAed": 14000,
+        "matchScore": 1,
+        "matchedQuery": "Hotel to Airport"
+      },
+      "alternatives": [
+        {
+          "catalogId": "t_cd65190ffc0f",
+          "productName": "Dubai Airport to Beach Hotel(Al Barsha , Palm Jumirah, Marina) (Airport Transfers) — 7 Seater",
+          "costAed": 11000,
+          "score": 1
+        },
+        {
+          "catalogId": "t_30e74dc81a0e",
+          "productName": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) — 15 Seater",
+          "costAed": 12500,
+          "score": 1
+        }
+      ]
+    }
+  ]
+}
