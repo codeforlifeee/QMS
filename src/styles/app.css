@@ -1387,13 +1387,14 @@ textarea.list-editor:focus {
 }
 
 /* ---------- page wrappers ---------- */
+/* Shell.astro now provides outer max-width + horizontal padding. These wrappers
+   collapse to a thin top-margin layer for legacy pages. */
 .page-wrap {
-  max-width: 1200px;
-  margin: 24px auto;
-  padding: 0 20px;
+  margin: 0;
+  padding: 0;
 }
 .page-wide {
-  margin: 24px 20px;
+  margin: 0;
 }
 
 /* ---------- prompt builder ---------- */
