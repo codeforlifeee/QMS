@@ -26,21 +26,21 @@ export async function syncFromSheet(): Promise<{ imported: number; errors: strin
       obj[h] = (row[idx] ?? '').trim();
     });
 
-    if (!obj.customer_name && !obj.name) continue;
+    if (!obj.customer_name && !obj.name && !obj.full_name) continue;
 
     try {
       await leadRepo.upsertByExternalId({
         external_id: obj.id || obj._rowid || `sheet_${i}`,
-        customer_name: obj.customer_name || obj.name || 'Unknown',
+        customer_name: obj.customer_name || obj.name || obj.full_name || 'Unknown',
         phone: obj.phone || obj.mobile || obj.phone_number,
         email: obj.email,
         city: obj.city || obj.destination_city,
-        travelling_month: obj.travelling_month || obj.travel_month,
-        planning_with: obj.planning_with,
+        travelling_month: obj.travelling_month || obj.travel_month || obj['when_are_you_planning?'],
+        planning_with: obj.planning_with || obj['who_are_you_travell?'],
         pax_summary: obj.pax_summary || obj['number_of_adults_and_child_(below_9)?'],
-        special_arrangements: obj.special_arrangements || obj.requirements,
-        priority_bucket: mapBucket(obj.priority_bucket || obj.status) as any || 'Untouched Leads',
-        latest_status: obj.latest_status || obj.status,
+        special_arrangements: obj.special_arrangements || obj.requirements || obj['any_special_arrangements(if_any)?'],
+        priority_bucket: mapBucket(obj.priority_bucket || obj.lead_status) as any || 'Untouched Leads',
+        latest_status: obj.latest_status || obj.lead_status,
       });
       imported++;
     } catch (err: any) {
