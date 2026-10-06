@@ -1,0 +1,184 @@
+{
+  "id": "q_muu8tmbh_CgXnuM",
+  "token": "XqSahdZ5cKmsgdSqSLkgnh",
+  "status": "draft",
+  "reference": "AI-2026-0481",
+  "title": "Dubai — 5N / 6D",
+  "destination": "Dubai",
+  "client": {
+    "name": "Rajesh Mehta",
+    "phone": "+91 9876543210"
+  },
+  "travelStart": "2026-10-04",
+  "travelEnd": "2026-10-09",
+  "pax": {
+    "adults": 2,
+    "children": 1,
+    "infants": 0
+  },
+  "quoteCurrency": "INR",
+  "fx": {
+    "AED": "27",
+    "INR": "0.011684",
+    "USD": "1.00"
+  },
+  "pricingMode": "PER_SERVICE",
+  "defaultMarkupByType": {
+    "ACTIVITY": 15,
+    "HOTEL": 15,
+    "TRANSFER": 15,
+    "MEAL": 15,
+    "VISA": 15,
+    "MISC": 15,
+    "FLIGHT": 0
+  },
+  "taxRatesByClass": {
+    "standard": 5
+  },
+  "defaultTaxClass": "standard",
+  "taxLabel": "VAT",
+  "days": [
+    {
+      "id": "d_muu8tmbg_6moli",
+      "index": 1,
+      "title": "Welcome to Glitzy Dubai",
+      "prose": "Touch down in the city of gold, where your private transfer awaits to whisk your family comfortably to your hotel. Settle into your room and take in your first views of the sparkling skyline as you prepare for the adventures ahead."
+    },
+    {
+      "id": "d_muu8tmbg_9f4d4",
+      "index": 2,
+      "title": "Historic Sights and Sky-High Views",
+      "prose": "Discover the city's rich heritage and modern wonders on a private tour of Dubai's most iconic landmarks. Afterward, ascend the legendary Burj Khalifa to the At the Top observation deck, then brave the thrilling Sky Views for a breathtaking panorama of the glittering metropolis below."
+    },
+    {
+      "id": "d_muu8tmbg_2r06t",
+      "index": 3,
+      "title": "Sunny Leisure and City Wandering",
+      "prose": "Enjoy a relaxing day exploring Dubai at your own pace, perhaps lounging by the pool or visiting a bustling local souk. It is the perfect opportunity to sample delicious Emirati cuisine or search for unique treasures in the world-class shopping malls."
+    },
+    {
+      "id": "d_muu8tmbg_3jk1b",
+      "index": 4,
+      "title": "A Day in Abu Dhabi",
+      "prose": "Journey to the UAE's majestic capital on a shared city tour to experience its grand architecture and rich culture. Marvel at the stunning Sheikh Zayed Grand Mosque and explore the city's vibrant waterfront districts before returning to Dubai."
+    },
+    {
+      "id": "d_muu8tmbg_3legr",
+      "index": 5,
+      "title": "Relaxing Discoveries at Your Pace",
+      "prose": "Spend your final full day soaking up the warm sunshine at a sandy beach or strolling through the historic Al Fahidi neighborhood. Whether you choose to relax at your hotel or seek out last-minute souvenirs, the day is entirely yours to enjoy."
+    },
+    {
+      "id": "d_muu8tmbg_77rwc",
+      "index": 6,
+      "title": "Farewell to the Emirates",
+      "prose": "Savor your final morning in Dubai before boarding your comfortable private transfer back to the airport. Reflect on your family's unforgettable desert memories as you begin your journey home."
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_muu8tmbg_96m45",
+      "dayId": "d_muu8tmbg_9f4d4",
+      "type": "ACTIVITY",
+      "label": "Private Dubai City Tour",
+      "costCurrency": "AED",
+      "adultRate": "325.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "description": "Dubai Frame Photo Stop (15-20 mins) · Jumeirah Mosque (10-15 mins) · Al Marjan Islamic Art Center (20 mins) · Jumeirah Beach (20 mins) · Stunning views of Burj Al Arab (10 mins) · Drive through Al Qasr · Ruler’s Palace stop (20 mins) · Palm Jumeirah drive-through · Atlantis photo Stop (15-20 mins) · Optional Monorail ride (extra 13 AED) · Scenic Dubai Marina drive · Pass by the magnificent Burj Khalifa · Cruise down Sheikh Zayed Road",
+      "catalogRef": "ct_2f79ce20b8be"
+    },
+    {
+      "id": "l_muu8tmbh_9t938",
+      "dayId": "d_muu8tmbg_9f4d4",
+      "type": "ACTIVITY",
+      "label": "Burj Khalifa At the Top & Sky Views Tickets",
+      "costCurrency": "AED",
+      "adultRate": "151.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "description": "The Burj Khalifa Tickets",
+      "catalogRef": "p_6eb114b23073",
+      "supplier": "Rayna Tours"
+    },
+    {
+      "id": "l_muu8tmbh_db06j",
+      "dayId": "d_muu8tmbg_3jk1b",
+      "type": "ACTIVITY",
+      "label": "Sharing Abu Dhabi City Tour",
+      "costCurrency": "AED",
+      "adultRate": "85.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "MULTIPLIER",
+        "multiplier": 0.5
+      },
+      "catalogRef": "ct_500ff1caab37"
+    },
+    {
+      "id": "l_muu8tmbh_yz90v",
+      "dayId": "d_muu8tmbg_6moli",
+      "type": "TRANSFER",
+      "label": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) (7 Seater) (Arrival)",
+      "costCurrency": "AED",
+      "adultRate": "140.00",
+      "basis": "PER_UNIT",
+      "qty": 1,
+      "description": "Includes AED 40.00 parking",
+      "catalogRef": "t_75c50a4756d0",
+      "supplier": "Parmar Tours and Transport"
+    },
+    {
+      "id": "l_muu8tmbh_i0kv3",
+      "dayId": "d_muu8tmbg_77rwc",
+      "type": "TRANSFER",
+      "label": "Dubai Airport to City Hotel-Deira Bur Dxb-SZR (Airport Transfers) (7 Seater) (Departure)",
+      "costCurrency": "AED",
+      "adultRate": "140.00",
+      "basis": "PER_UNIT",
+      "qty": 1,
+      "description": "Includes AED 40.00 parking",
+      "catalogRef": "t_75c50a4756d0",
+      "supplier": "Parmar Tours and Transport"
+    },
+    {
+      "id": "l_muu8tmbh_ftgjm",
+      "dayId": null,
+      "type": "VISA",
+      "label": "UAE Tourist Visa",
+      "costCurrency": "AED",
+      "adultRate": "0.00",
+      "basis": "PER_PERSON",
+      "child": {
+        "mode": "SAME_AS_ADULT"
+      }
+    }
+  ],
+  "paymentPolicy": [
+    "50% at the time of confirmation",
+    "Rest 30%, 20 days before travel date",
+    "Remaining 20%, 7 days before travel date"
+  ],
+  "terms": [
+    "Rates are subject to availability at the time of confirmation.",
+    "Hotel check-in is typically 1500 hrs and check-out 1200 hrs.",
+    "Any increase in government taxes or fuel surcharge will be charged extra.",
+    "Cancellation charges apply as per the policy shared at the time of booking."
+  ],
+  "createdAt": "2026-10-04T19:58:04.349Z",
+  "updatedAt": "2026-10-04T20:04:16.903Z",
+  "aiWarnings": [
+    "\"Burj Khalifa At the Top & Sky Views Tickets\" uses estimated child pricing (50% of adult) — no catalog child rate available",
+    "No catalog match for \"Desert Safari with BBQ Dinner (sharing)\" — add this line manually",
+    "Visa line needs a rate"
+  ],
+  "inclusions": [
+    "kk"
+  ]
+}

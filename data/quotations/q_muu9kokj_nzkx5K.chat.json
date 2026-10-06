@@ -1,0 +1,25 @@
+{
+  "quotationId": "q_muu9kokj_nzkx5K",
+  "turns": [
+    {
+      "id": "c7tm1mfbz56",
+      "role": "user",
+      "content": "i dont want the third day i want only 5 days trip",
+      "timestamp": "2026-10-04T20:22:31.877Z"
+    },
+    {
+      "id": "62wwj34dpjk",
+      "role": "assistant",
+      "content": "I will remove the third day (\"A Relaxing Day of Discovery\") from your itinerary, which will shorten the trip to 5 days. The activities and transfers on the other days will remain intact and shift accordingly.",
+      "timestamp": "2026-10-04T20:22:46.700Z",
+      "proposedChanges": [
+        {
+          "type": "remove_day",
+          "id": "d_muu9kokf_g2ua1"
+        }
+      ],
+      "applied": true
+    }
+  ],
+  "provider": "gemini-3.5-flash"
+}
