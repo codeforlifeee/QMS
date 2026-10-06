@@ -1,14 +1,15 @@
 import type { APIRoute } from 'astro';
-import { productsAdmin, transportAdmin, cityToursAdmin } from '../../../../catalog/catalogAdmin.js';
+import { productsAdmin, transportAdmin, cityToursAdmin, hotelsAdmin } from '../../../../catalog/catalogAdmin.js';
 
 export const prerender = false;
 
-type Section = 'products' | 'transport' | 'city-tours';
+type Section = 'products' | 'transport' | 'city-tours' | 'hotels';
 
 function pick(section: string | undefined) {
   if (section === 'products') return productsAdmin;
   if (section === 'transport') return transportAdmin;
   if (section === 'city-tours') return cityToursAdmin;
+  if (section === 'hotels') return hotelsAdmin;
   return null;
 }
 

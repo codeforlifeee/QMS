@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Plus, Trash2, Edit3, Package, Car, MapPin, Save } from 'lucide-react';
+import { Plus, Trash2, Edit3, Package, Car, MapPin, Save, Hotel, Star } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -12,18 +12,20 @@ import { Skeleton } from '../ui/Skeleton';
 import { EmptyState } from '../ui/EmptyState';
 import { showToast } from '../ui/Toast';
 
-type Section = 'products' | 'transport' | 'city-tours';
+type Section = 'products' | 'transport' | 'city-tours' | 'hotels';
 
 const sectionLabel: Record<Section, string> = {
   'products': 'Products / Activities',
   'transport': 'Transport',
   'city-tours': 'City Tours',
+  'hotels': 'Hotels',
 };
 
 const sectionIcon: Record<Section, ReactNode> = {
   'products': <Package className="h-4 w-4" />,
   'transport': <Car className="h-4 w-4" />,
   'city-tours': <MapPin className="h-4 w-4" />,
+  'hotels': <Hotel className="h-4 w-4" />,
 };
 
 export function CatalogAdmin() {
@@ -140,8 +142,10 @@ export function CatalogAdmin() {
               <ProductTable rows={filtered} onEdit={setEditing} onDelete={removeRow} />
             ) : section === 'transport' ? (
               <TransportTable rows={filtered} onEdit={setEditing} onDelete={removeRow} />
-            ) : (
+            ) : section === 'city-tours' ? (
               <CityToursTable rows={filtered} onEdit={setEditing} onDelete={removeRow} />
+            ) : (
+              <HotelsTable rows={filtered} onEdit={setEditing} onDelete={removeRow} />
             )}
           </div>
         </Card>
@@ -160,7 +164,8 @@ export function CatalogAdmin() {
         >
           {section === 'products' ? <ProductForm value={editing} onChange={setEditing} />
             : section === 'transport' ? <TransportForm value={editing} onChange={setEditing} />
-              : <CityTourForm value={editing} onChange={setEditing} />}
+              : section === 'city-tours' ? <CityTourForm value={editing} onChange={setEditing} />
+                : <HotelForm value={editing} onChange={setEditing} />}
         </Modal>
       )}
     </div>
@@ -274,6 +279,69 @@ function TransportForm({ value, onChange }: { value: any; onChange: (v: any) => 
       <Input label="Supplier" value={value.supplier || ''} onChange={(e) => upd('supplier', e.target.value)} />
       <Input label="Rate AED (minor units)" type="number" value={value.rateAed ?? 0} onChange={(e) => upd('rateAed', Number(e.target.value))} />
       <Input label="Parking AED (minor units)" type="number" value={value.parkingAed ?? ''} onChange={(e) => upd('parkingAed', e.target.value === '' ? undefined : Number(e.target.value))} />
+    </div>
+  );
+}
+
+function HotelsTable({ rows, onEdit, onDelete }: { rows: any[]; onEdit: (r: any) => void; onDelete: (id: string) => void }) {
+  return (
+    <table className="w-full text-sm">
+      <Thead cols={['Hotel', 'Stars', 'Location', 'Supplier', 'Rooms']} />
+      <tbody className="divide-y divide-[color:var(--color-hairline)]">
+        {rows.map((r) => (
+          <tr key={r.id} className="hover:bg-[color:var(--color-tint)]/50">
+            <td className="px-3 py-2 font-semibold">{r.name}</td>
+            <td className="px-3 py-2">
+              <span className="inline-flex items-center gap-0.5 text-amber-500">
+                {Array.from({ length: r.starRating ?? 3 }).map((_, i) => <Star key={i} className="h-3 w-3 fill-amber-400" />)}
+              </span>
+            </td>
+            <td className="px-3 py-2">{r.location || '—'}</td>
+            <td className="px-3 py-2">{r.supplier || '—'}</td>
+            <td className="px-3 py-2 tabular-nums">{Array.isArray(r.roomTypes) ? r.roomTypes.length : 0} type{(r.roomTypes?.length ?? 0) === 1 ? '' : 's'}</td>
+            <Actions onEdit={() => onEdit(r)} onDelete={() => onDelete(r.id)} />
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function HotelForm({ value, onChange }: { value: any; onChange: (v: any) => void }) {
+  const upd = (k: string, v: any) => onChange({ ...value, [k]: v });
+  const rooms: Array<{ name: string; rackRateAed: number; capacity?: number }> = Array.isArray(value.roomTypes) ? value.roomTypes : [];
+  const setRooms = (next: typeof rooms) => upd('roomTypes', next);
+  const amenities: string[] = Array.isArray(value.amenities) ? value.amenities : [];
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <Input label="Hotel name" value={value.name || ''} onChange={(e) => upd('name', e.target.value)} />
+        <Select label="Star rating" value={String(value.starRating ?? 3)} onChange={(e) => upd('starRating', Number(e.target.value))}>
+          {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} star{n > 1 ? 's' : ''}</option>)}
+        </Select>
+        <Input label="Location" value={value.location || ''} onChange={(e) => upd('location', e.target.value)} />
+        <Input label="Supplier" value={value.supplier || ''} onChange={(e) => upd('supplier', e.target.value)} />
+        <Input label="Image URL" value={value.imageUrl || ''} onChange={(e) => upd('imageUrl', e.target.value)} />
+        <Input label="Amenities (comma separated)" value={amenities.join(', ')} onChange={(e) => upd('amenities', e.target.value.split(',').map((s) => s.trim()).filter(Boolean))} />
+      </div>
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs font-semibold text-[color:var(--color-ink)]">Room types</label>
+          <button type="button" onClick={() => setRooms([...rooms, { name: '', rackRateAed: 0 }])} className="text-xs font-semibold text-[color:var(--color-brand-orange)] hover:underline">+ Add room type</button>
+        </div>
+        <div className="space-y-2">
+          {rooms.length === 0 && <p className="text-xs text-[color:var(--color-muted-ink)]">No room types yet.</p>}
+          {rooms.map((rt, idx) => (
+            <div key={idx} className="grid grid-cols-6 gap-2">
+              <Input label={idx === 0 ? 'Name' : ''} value={rt.name} onChange={(e) => { const n = [...rooms]; n[idx] = { ...rt, name: e.target.value }; setRooms(n); }} className="col-span-3" />
+              <Input label={idx === 0 ? 'Rack rate AED (minor units)' : ''} type="number" value={rt.rackRateAed} onChange={(e) => { const n = [...rooms]; n[idx] = { ...rt, rackRateAed: Number(e.target.value) }; setRooms(n); }} className="col-span-2" />
+              <div className="flex items-end">
+                <button type="button" onClick={() => setRooms(rooms.filter((_, i) => i !== idx))} aria-label="Remove room" className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-[color:var(--color-danger)] hover:bg-rose-50 dark:hover:bg-rose-950/30"><Trash2 className="h-4 w-4" /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

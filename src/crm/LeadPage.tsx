@@ -4,6 +4,8 @@ import { PRIORITY_BUCKETS } from '../data/leadSchema.js';
 import { CallResponseForm } from './CallResponseForm.js';
 import { generateWALink } from '../lib/whatsapp.js';
 import { showToast } from '../components/Toast.js';
+import { NotesPanel } from '../components/notes/NotesPanel.js';
+import { EmailComposer } from '../components/email/EmailComposer.js';
 
 interface Quotation {
   id: string;
@@ -24,6 +26,7 @@ export function LeadPage({ leadId }: Props) {
   const [loading, setLoading] = useState(true);
   const [showCallForm, setShowCallForm] = useState(false);
   const [expandedCalls, setExpandedCalls] = useState<Set<string>>(new Set());
+  const [showEmail, setShowEmail] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -201,6 +204,11 @@ export function LeadPage({ leadId }: Props) {
                 WhatsApp
               </a>
             )}
+            {lead.email && (
+              <button className="btn" onClick={() => setShowEmail(true)}>
+                Email
+              </button>
+            )}
           </div>
 
           {/* Two-column content area */}
@@ -374,6 +382,11 @@ export function LeadPage({ leadId }: Props) {
         </div>
       </div>
 
+      {/* Notes */}
+      <div style={{ marginTop: 24 }}>
+        <NotesPanel entityType="lead" entityId={leadId} />
+      </div>
+
       {/* CallResponseForm modal */}
       {showCallForm && (
         <CallResponseForm
@@ -386,6 +399,14 @@ export function LeadPage({ leadId }: Props) {
           onClose={() => setShowCallForm(false)}
         />
       )}
+
+      <EmailComposer
+        open={showEmail}
+        onClose={() => setShowEmail(false)}
+        defaultTo={lead.email || ''}
+        defaultSubject={`Following up — ${lead.city || 'Traverse Globe'}`}
+        defaultBody={`Hi ${lead.customer_name || 'there'},\n\nThanks for your interest in travelling with Traverse Globe. I'd love to help plan the perfect trip for you.\n\n— Traverse Globe`}
+      />
     </div>
   );
 }

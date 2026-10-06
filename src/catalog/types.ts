@@ -40,6 +40,24 @@ export interface CatalogCityTour {
   readonly itinerary?: string[];
 }
 
+export interface CatalogHotelRoomType {
+  readonly name: string;
+  readonly rackRateAed: number;   // minor units (fils)
+  readonly capacity?: number;
+}
+
+export interface CatalogHotel {
+  readonly id: string;
+  readonly name: string;
+  readonly starRating: number;    // 1..5
+  readonly location: string;
+  readonly supplier: string;
+  readonly roomTypes: readonly CatalogHotelRoomType[];
+  readonly amenities?: readonly string[];
+  readonly description?: string;
+  readonly imageUrl?: string;
+}
+
 export interface CatalogDefaults {
   readonly markupPct: number;
   readonly fxAedPerUsd: number;

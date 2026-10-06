@@ -2,6 +2,9 @@
 import '../../document/document.css';
 import Shell from '../../layouts/Shell.astro';
 import Editor from '../../editor/Editor.tsx';
+import { NotesPanel } from '../../components/notes/NotesPanel.tsx';
+import { CommissionPanel } from '../../components/commission/CommissionPanel.tsx';
+import { QualityScoreBadge } from '../../components/ai/QualityScoreBadge.tsx';
 import { getRepo } from '../../data/repo.js';
 
 export const prerender = false;
@@ -11,9 +14,18 @@ const q = await repo.get(Astro.params.id ?? '');
 if (!q) return new Response('Quotation not found', { status: 404 });
 ---
 
-<Shell title={q.title}>
+<Shell title={q.title} width="wide">
   <a slot="actions" href={`/q/${q.token}`} target="_blank" class="btn btn-ghost">Preview share</a>
   <a slot="actions" href={`/api/pdf/${q.token}`} class="btn btn-primary">Download PDF</a>
 
+  <div class="flex items-center gap-2 mb-3">
+    <QualityScoreBadge quotationId={q.id} client:visible />
+  </div>
+
   <Editor initial={q} client:load />
+
+  <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <CommissionPanel quotationId={q.id} currency={q.quoteCurrency} client:visible />
+    <NotesPanel entityType="quotation" entityId={q.id} client:visible />
+  </div>
 </Shell>
