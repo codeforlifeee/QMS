@@ -19,7 +19,7 @@ export default function PipelineView() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [stats, setStats] = useState<Record<string, number>>({});
   const [search, setSearch] = useState('');
-  const [view, setView] = useState<'pipeline' | 'list'>('pipeline');
+  const [view, setView] = useState<'pipeline' | 'list'>('list');
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [showAddLead, setShowAddLead] = useState(false);
