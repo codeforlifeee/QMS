@@ -11,7 +11,7 @@ import { getStoredTheme, setTheme, type Theme } from '../lib/theme';
 
 export function SettingsPanel({ company }: { company: { name: string; email?: string; phone?: string; website?: string } }) {
   const toast = useToast();
-  const [theme, setLocalTheme] = useState<Theme>('system');
+  const [theme, setLocalTheme] = useState<Theme>('light');
   const [currency, setCurrency] = useState('INR');
   const [markup, setMarkup] = useState('10');
   const [provider, setProvider] = useState('claude');
@@ -56,12 +56,8 @@ export function SettingsPanel({ company }: { company: { name: string; email?: st
               options={[
                 { value: 'light', label: 'Light', icon: <Sun className="h-4 w-4" /> },
                 { value: 'dark', label: 'Dark', icon: <Moon className="h-4 w-4" /> },
-                { value: 'system', label: 'System', icon: <Monitor className="h-4 w-4" /> },
               ]}
             />
-            <p className="mt-2 text-xs text-[color:var(--color-muted-ink)]">
-              System follows your OS color scheme preference.
-            </p>
           </div>
         </div>
       </Card>

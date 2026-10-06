@@ -62,7 +62,7 @@ export const POST: APIRoute = async ({ request }) => {
               customer_name: getField('full_name') || 'Unknown FB Lead',
               phone: getField('phone_number'),
               email: getField('email'),
-              lead_source: 'Facebook Ads',
+              source: 'Facebook Ads',
               priority_bucket: 'Untouched Leads'
             });
 

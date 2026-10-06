@@ -11,7 +11,7 @@ export const supabaseRepo: QuotationRepo = {
       .select('data')
       .order('updated_at', { ascending: false });
     if (error) throw error;
-    return (data ?? []).map((r) => r.data as StoredQuotation);
+    return (data ?? []).map((r: any) => r.data as StoredQuotation);
   },
 
   async listByLead(leadId) {
@@ -22,7 +22,7 @@ export const supabaseRepo: QuotationRepo = {
       .eq('lead_id', leadId)
       .order('updated_at', { ascending: false });
     if (error) throw error;
-    return (data ?? []).map((r) => r.data as StoredQuotation);
+    return (data ?? []).map((r: any) => r.data as StoredQuotation);
   },
 
   async get(id) {
