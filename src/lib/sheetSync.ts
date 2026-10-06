@@ -1,7 +1,7 @@
 import { leadRepo } from '../data/leadRepo.js';
 
 const SHEET_ID = '1niYNMdUZsWGnH2BxsnmG8DtKUfI3gecWNKp4jkOGmPA';
-const TAB_NAME = 'appsheet';
+const TAB_NAME = 'reel_43000';
 
 export async function syncFromSheet(): Promise<{ imported: number; errors: string[] }> {
   const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
