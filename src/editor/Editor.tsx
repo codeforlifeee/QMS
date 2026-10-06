@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { StoredDay, StoredDiscount, StoredLine, StoredQuotation } from '../data/schema.js';
 import { paxSummary, toEngineInput, tripDuration } from '../data/schema.js';
 import { priceQuotation, PricingError } from '../pricing/engine.js';
@@ -14,6 +14,12 @@ import { SourcesPanel } from './parts/SourcesPanel.js';
 import { ChatPanel } from './parts/ChatPanel.js';
 import type { CitationMap } from '../ai/citations.js';
 import type { ChatSession, ChatTurn, ProposedChange } from '../ai/chat/types.js';
+import {
+  DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent,
+} from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from 'lucide-react';
 
 /**
  * The editor.
@@ -156,6 +162,22 @@ export default function Editor({ initial }: Props) {
     const idx = q.lines.findIndex((l) => l.id === id);
     if (idx === -1) return;
     setLines(moveItem(q.lines, idx, direction));
+  };
+
+  const lineSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const linesRef = useRef(q.lines);
+  linesRef.current = q.lines;
+  const handleLineDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const current = linesRef.current;
+    const oldIdx = current.findIndex((l) => l.id === active.id);
+    const newIdx = current.findIndex((l) => l.id === over.id);
+    if (oldIdx < 0 || newIdx < 0) return;
+    setLines(arrayMove([...current], oldIdx, newIdx));
   };
 
   const toggleExpand = (id: string) => {
@@ -488,22 +510,27 @@ export default function Editor({ initial }: Props) {
           {q.lines.length === 0 && (
             <div className="rooms-empty">No line items yet. Use the buttons above to add one.</div>
           )}
-          {q.lines.map((line, idx) => (
-            <LineEditor
-              key={line.id}
-              line={line}
-              days={q.days}
-              expanded={!!expanded[line.id]}
-              priced={linePricing.get(line.id)}
-              citations={citations[line.id]}
-              onToggle={() => toggleExpand(line.id)}
-              onChange={(patch) => updateLine(line.id, patch)}
-              onRemove={() => removeLine(line.id)}
-              onMove={(direction) => moveLine(line.id, direction)}
-              canMoveUp={idx > 0}
-              canMoveDown={idx < q.lines.length - 1}
-            />
-          ))}
+          <DndContext sensors={lineSensors} collisionDetection={closestCenter} onDragEnd={handleLineDragEnd}>
+            <SortableContext items={q.lines.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+              {q.lines.map((line, idx) => (
+                <SortableLineRow key={line.id} id={line.id}>
+                  <LineEditor
+                    line={line}
+                    days={q.days}
+                    expanded={!!expanded[line.id]}
+                    priced={linePricing.get(line.id)}
+                    citations={citations[line.id]}
+                    onToggle={() => toggleExpand(line.id)}
+                    onChange={(patch) => updateLine(line.id, patch)}
+                    onRemove={() => removeLine(line.id)}
+                    onMove={(direction) => moveLine(line.id, direction)}
+                    canMoveUp={idx > 0}
+                    canMoveDown={idx < q.lines.length - 1}
+                  />
+                </SortableLineRow>
+              ))}
+            </SortableContext>
+          </DndContext>
         </div>
 
         {/* ---------- discounts ---------- */}
@@ -577,6 +604,43 @@ export default function Editor({ initial }: Props) {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function SortableLineRow({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.65 : 1,
+    position: 'relative',
+    boxShadow: isDragging ? '0 10px 20px rgba(0,0,0,0.15)' : undefined,
+    zIndex: isDragging ? 50 : undefined,
+  };
+  return (
+    <div ref={setNodeRef} style={style}>
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        aria-label="Drag to reorder line item"
+        style={{
+          position: 'absolute',
+          top: 8,
+          left: -4,
+          background: 'transparent',
+          border: 'none',
+          cursor: 'grab',
+          padding: 4,
+          color: 'var(--app-muted)',
+          touchAction: 'none',
+          zIndex: 1,
+        }}
+      >
+        <GripVertical size={16} />
+      </button>
+      <div style={{ paddingLeft: 18 }}>{children}</div>
     </div>
   );
 }

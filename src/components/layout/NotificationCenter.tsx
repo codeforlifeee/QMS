@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
-  Bell, UserPlus, Phone, FileText, DollarSign, Receipt, RefreshCw, Sparkles, Info, Check, AlertTriangle,
+  Bell, UserPlus, Phone, FileText, DollarSign, Receipt, RefreshCw, Sparkles, Info, Check, AlertTriangle, BellRing,
 } from 'lucide-react';
 import { cn } from '../../lib/cn';
+import {
+  registerServiceWorker, requestPushPermission, hasPushPermission, hasAskedForPermission, showPushNotification,
+} from '../../lib/notificationPush';
 
 interface AppNotification {
   id: string;
@@ -50,14 +53,32 @@ export function NotificationCenter() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [count, setCount] = useState(0);
+  const [pushGranted, setPushGranted] = useState(false);
+  const [pushAsked, setPushAsked] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const lastSeenCountRef = useRef<number | null>(null);
+  const lastSeenIdRef = useRef<string | null>(null);
 
   async function refreshCount() {
     try {
       const res = await fetch('/api/notifications/unread-count');
       if (!res.ok) return;
       const data = await res.json();
-      setCount(data.count || 0);
+      const nextCount = data.count || 0;
+      // When the unread count rises, fetch the newest to surface it as a push.
+      if (lastSeenCountRef.current !== null && nextCount > lastSeenCountRef.current && hasPushPermission()) {
+        try {
+          const listRes = await fetch('/api/notifications?limit=5');
+          const listData = await listRes.json();
+          const newest = (listData.notifications || []).find((n: AppNotification) => !n.read && n.id !== lastSeenIdRef.current);
+          if (newest) {
+            lastSeenIdRef.current = newest.id;
+            showPushNotification(newest.title, newest.message || '', newest.link || '/');
+          }
+        } catch { /* silent */ }
+      }
+      lastSeenCountRef.current = nextCount;
+      setCount(nextCount);
     } catch { /* offline */ }
   }
 
@@ -70,10 +91,19 @@ export function NotificationCenter() {
   }
 
   useEffect(() => {
+    void registerServiceWorker();
+    setPushGranted(hasPushPermission());
+    setPushAsked(hasAskedForPermission());
     void refreshCount();
     const t = setInterval(refreshCount, 30_000);
     return () => clearInterval(t);
   }, []);
+
+  async function enablePush() {
+    const perm = await requestPushPermission();
+    setPushAsked(true);
+    setPushGranted(perm === 'granted');
+  }
 
   useEffect(() => {
     if (open) void loadList();
@@ -130,11 +160,18 @@ export function NotificationCenter() {
         <div className="absolute right-0 top-full mt-2 w-[360px] max-w-[calc(100vw-2rem)] rounded-2xl border border-[color:var(--color-hairline)] bg-[color:var(--color-surface)] shadow-[var(--shadow-soft-xl)] overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-[color:var(--color-hairline)]">
             <h3 className="font-heading text-sm font-bold">Notifications</h3>
-            {count > 0 && (
-              <button type="button" onClick={markAllRead} className="text-xs font-semibold text-[color:var(--color-brand-orange)] hover:underline inline-flex items-center gap-1">
-                <Check className="h-3 w-3" /> Mark all read
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {!pushGranted && !pushAsked && (
+                <button type="button" onClick={enablePush} className="text-xs font-semibold text-[color:var(--color-brand-orange)] hover:underline inline-flex items-center gap-1">
+                  <BellRing className="h-3 w-3" /> Enable push
+                </button>
+              )}
+              {count > 0 && (
+                <button type="button" onClick={markAllRead} className="text-xs font-semibold text-[color:var(--color-brand-orange)] hover:underline inline-flex items-center gap-1">
+                  <Check className="h-3 w-3" /> Mark all read
+                </button>
+              )}
+            </div>
           </div>
           <div className="max-h-[70vh] overflow-y-auto">
             {notifications.length === 0 ? (

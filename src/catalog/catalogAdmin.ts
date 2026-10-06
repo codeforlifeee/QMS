@@ -1,6 +1,6 @@
 import { readFile, writeFile, rename } from 'node:fs/promises';
 import path from 'node:path';
-import type { CatalogProduct, CatalogTransport, CatalogCityTour } from './types.js';
+import type { CatalogProduct, CatalogTransport, CatalogCityTour, CatalogHotel } from './types.js';
 
 /**
  * Direct-to-disk CRUD against the catalog JSON files.
@@ -16,6 +16,7 @@ const DATA_DIR = path.resolve(process.cwd(), 'data', 'catalog');
 const PRODUCTS = path.join(DATA_DIR, 'products.json');
 const TRANSPORT = path.join(DATA_DIR, 'transport.json');
 const CITY_TOURS = path.join(DATA_DIR, 'city-tours.json');
+const HOTELS = path.join(DATA_DIR, 'hotels.json');
 
 async function readJson<T>(file: string): Promise<T[]> {
   try { return JSON.parse(await readFile(file, 'utf8')) as T[]; }
@@ -85,6 +86,32 @@ export const transportAdmin = {
     const all = await this.list();
     const next = all.filter((r) => r.id !== id);
     await writeAtomic(TRANSPORT, next);
+    return next.length !== all.length;
+  },
+};
+
+/* -------- Hotels -------- */
+export const hotelsAdmin = {
+  async list(): Promise<CatalogHotel[]> { return readJson<CatalogHotel>(HOTELS); },
+  async create(input: Omit<CatalogHotel, 'id'>): Promise<CatalogHotel> {
+    const all = await this.list();
+    const item = { ...input, id: newId('h') } as CatalogHotel;
+    await writeAtomic(HOTELS, [item, ...all]);
+    return item;
+  },
+  async update(id: string, patch: Partial<CatalogHotel>): Promise<CatalogHotel | null> {
+    const all = await this.list();
+    const i = all.findIndex((r) => r.id === id);
+    if (i < 0) return null;
+    const next = { ...all[i], ...patch, id: all[i]!.id } as CatalogHotel;
+    all[i] = next;
+    await writeAtomic(HOTELS, all);
+    return next;
+  },
+  async remove(id: string): Promise<boolean> {
+    const all = await this.list();
+    const next = all.filter((r) => r.id !== id);
+    await writeAtomic(HOTELS, next);
     return next.length !== all.length;
   },
 };
