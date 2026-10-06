@@ -1,19 +1,30 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
 import { cn } from '../../lib/cn';
 
+/**
+ * Toast system — SSR-safe.
+ *
+ * `useToast()` works without a React provider in its tree: it emits a browser
+ * event that any mounted <ToastProvider> listens for. This lets a page's
+ * islands call `useToast()` independently of where the ToastProvider island
+ * is mounted (Astro renders each client:load island with its own React root).
+ */
+
 type ToastVariant = 'success' | 'error' | 'warning' | 'info';
 interface ToastItem { id: number; message: string; variant: ToastVariant; duration: number }
-interface ToastContextType {
-  show: (message: string, variant?: ToastVariant, duration?: number) => void;
+interface ToastDetail { message: string; variant: ToastVariant; duration: number }
+
+const EVENT_NAME = 'qms:toast';
+
+export function showToast(message: string, variant: ToastVariant = 'info', duration = 3500) {
+  if (typeof window === 'undefined') return;
+  const detail: ToastDetail = { message, variant, duration };
+  window.dispatchEvent(new CustomEvent<ToastDetail>(EVENT_NAME, { detail }));
 }
 
-const ToastContext = createContext<ToastContextType | null>(null);
-
 export function useToast() {
-  const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error('useToast must be used inside <ToastProvider>');
-  return ctx;
+  return useMemo(() => ({ show: showToast }), []);
 }
 
 const iconMap = {
@@ -30,29 +41,33 @@ const variantStyles: Record<ToastVariant, string> = {
   info: 'border-sky-500/40 text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/50',
 };
 
-export function ToastProvider({ children }: { children: ReactNode }) {
+export function ToastProvider({ children }: { children?: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const idRef = useRef(0);
 
   const dismiss = useCallback((id: number) => setToasts((t) => t.filter((x) => x.id !== id)), []);
 
-  const show = useCallback((message: string, variant: ToastVariant = 'info', duration = 3500) => {
-    const id = ++idRef.current;
-    setToasts((t) => [...t, { id, message, variant, duration }]);
-    if (duration > 0) setTimeout(() => dismiss(id), duration);
+  useEffect(() => {
+    function onEvent(e: Event) {
+      const detail = (e as CustomEvent<ToastDetail>).detail;
+      if (!detail) return;
+      const id = ++idRef.current;
+      setToasts((t) => [...t, { id, message: detail.message, variant: detail.variant, duration: detail.duration }]);
+      if (detail.duration > 0) setTimeout(() => dismiss(id), detail.duration);
+    }
+    window.addEventListener(EVENT_NAME, onEvent as EventListener);
+    return () => window.removeEventListener(EVENT_NAME, onEvent as EventListener);
   }, [dismiss]);
 
-  const value = useMemo(() => ({ show }), [show]);
-
   return (
-    <ToastContext.Provider value={value}>
+    <>
       {children}
       <div className="pointer-events-none fixed top-4 right-4 z-[100] flex flex-col gap-2" role="region" aria-live="polite" aria-label="Notifications">
         {toasts.map((t) => (
           <div
             key={t.id}
             className={cn(
-              'pointer-events-auto flex items-start gap-3 rounded-xl border px-4 py-3 shadow-[var(--shadow-soft-lg)] min-w-[280px] max-w-sm animate-in slide-in-from-right',
+              'pointer-events-auto flex items-start gap-3 rounded-xl border px-4 py-3 shadow-[var(--shadow-soft-lg)] min-w-[280px] max-w-sm',
               variantStyles[t.variant],
             )}
             role="alert"
@@ -70,6 +85,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           </div>
         ))}
       </div>
-    </ToastContext.Provider>
+    </>
   );
 }

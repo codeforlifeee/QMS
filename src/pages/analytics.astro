@@ -1,0 +1,22 @@
+---
+import Shell from '../layouts/Shell.astro';
+import { StubPage } from '../components/StubPage.tsx';
+
+export const prerender = false;
+---
+
+<Shell title="Analytics">
+  <StubPage
+    iconName="analytics"
+    title="Analytics"
+    description="Deep insights into pipeline performance, conversion rates, and revenue trends."
+    bullets={[
+      'Lead conversion funnel over time with drill-down',
+      'Revenue by month, destination, and lead source',
+      'Agent performance leaderboard',
+      'Quote win-rate and average response time',
+      'Export charts to PDF or image',
+    ]}
+    client:load
+  />
+</Shell>

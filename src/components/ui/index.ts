@@ -6,7 +6,7 @@ export { Select, type SelectProps } from './Select';
 export { Textarea, type TextareaProps } from './Textarea';
 export { Modal, type ModalProps } from './Modal';
 export { Drawer, type DrawerProps } from './Drawer';
-export { ToastProvider, useToast } from './Toast';
+export { ToastProvider, useToast, showToast } from './Toast';
 export { Tooltip, type TooltipProps } from './Tooltip';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 export { Avatar, type AvatarProps } from './Avatar';

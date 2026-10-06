@@ -1,0 +1,22 @@
+---
+import Shell from '../layouts/Shell.astro';
+import { StubPage } from '../components/StubPage.tsx';
+
+export const prerender = false;
+---
+
+<Shell title="Invoices">
+  <StubPage
+    iconName="invoices"
+    title="Invoices"
+    description="Convert accepted quotations into invoices and track payments."
+    bullets={[
+      'One-click quote-to-invoice conversion',
+      'Payment schedule with partial payment tracking',
+      'Automated payment reminders',
+      'Export to PDF with branded template',
+      'Reconciliation with bank feeds',
+    ]}
+    client:load
+  />
+</Shell>

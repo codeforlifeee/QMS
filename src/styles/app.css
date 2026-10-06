@@ -1674,3 +1674,53 @@ textarea.list-editor:focus {
     flex-direction: column;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * Dark-mode remap for legacy --app-* tokens.
+ *
+ * Tailwind's class strategy adds `.dark` to <html>; mirror the token
+ * values so any legacy component that reads --app-* automatically
+ * picks up a dark surface + text pair.
+ * ------------------------------------------------------------------ */
+html.dark {
+  --app-orange: #ff6b1a;
+  --app-ink: #f1f5f9;
+  --app-muted: #94a3b8;
+  --app-teal: #0d9488;
+  --app-hairline: #1e293b;
+  --app-tint: #1e293b;
+  --app-canvas: #0b0f1a;
+  --app-good: #22c55e;
+  --app-bad: #ef4444;
+}
+html.dark body { background: #0b0f1a; color: #f1f5f9; }
+html.dark input, html.dark textarea, html.dark select {
+  background: #111827;
+  color: #f1f5f9;
+  border-color: #1e293b;
+}
+html.dark .btn, html.dark .pill, html.dark .crm-card,
+html.dark .crm-column, html.dark .crm-stat-card,
+html.dark .quotation-card, html.dark .filter-panel,
+html.dark .crm-table thead,
+html.dark .ai-chat-root, html.dark .ai-sources-root,
+html.dark .editor-root, html.dark .editor-form, html.dark .editor-preview {
+  background: #111827;
+  color: #f1f5f9;
+  border-color: #1e293b;
+}
+html.dark .crm-table tbody tr:hover,
+html.dark .crm-table-row:hover {
+  background: #1e293b;
+}
+html.dark .crm-loading,
+html.dark .empty,
+html.dark .crm-column-empty {
+  color: #94a3b8;
+}
+html.dark table { color: #f1f5f9; }
+html.dark .pill-draft { background: #78350f; color: #fde68a; }
+html.dark .pill-sent { background: #1e3a8a; color: #bfdbfe; }
+html.dark .pill-accepted { background: #14532d; color: #bbf7d0; }
+html.dark .pill-expired { background: #334155; color: #cbd5e1; }
+html.dark .pill-void { background: #7f1d1d; color: #fecaca; }
