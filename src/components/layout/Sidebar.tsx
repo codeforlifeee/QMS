@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Contact, FileText, Sparkles, BarChart3, Calendar,
-  Package, Receipt, Settings, PanelLeftClose, PanelLeftOpen,
+  Package, Receipt, Settings, PanelLeftClose, PanelLeftOpen, Layout,
 } from 'lucide-react';
 import { cn } from '../../lib/cn';
 
@@ -15,6 +15,7 @@ const groups: { label: string; items: NavItem[] }[] = [
       { href: '/leads', label: 'Leads', icon: Contact, matcher: (p) => p.startsWith('/leads') },
       { href: '/quotations', label: 'Quotations', icon: FileText, matcher: (p) => p === '/quotations' || p.startsWith('/edit') || p === '/new' },
       { href: '/quotations/generate', label: 'AI Generator', icon: Sparkles, matcher: (p) => p.startsWith('/quotations/generate') },
+      { href: '/templates', label: 'Templates', icon: Layout, matcher: (p) => p.startsWith('/templates') },
     ],
   },
   {
