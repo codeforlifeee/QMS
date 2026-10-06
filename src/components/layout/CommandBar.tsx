@@ -1,24 +1,35 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Search, LayoutDashboard, Contact, FileText, Sparkles, Settings, BarChart3, FilePlus, X } from 'lucide-react';
+import {
+  Search, LayoutDashboard, Contact, FileText, Sparkles, Settings, BarChart3, FilePlus, X,
+  Layout, Calendar, Package, Receipt, Users,
+} from 'lucide-react';
 import { cn } from '../../lib/cn';
 
 interface Command { id: string; label: string; description?: string; href: string; icon: any; group: string }
 
-const COMMANDS: Command[] = [
+const STATIC_COMMANDS: Command[] = [
   { id: 'go-dashboard', label: 'Dashboard', description: 'Overview and recent activity', href: '/', icon: LayoutDashboard, group: 'Navigate' },
   { id: 'go-leads', label: 'Leads', description: 'Pipeline and lead management', href: '/leads', icon: Contact, group: 'Navigate' },
   { id: 'go-quotes', label: 'Quotations', description: 'All quotations', href: '/quotations', icon: FileText, group: 'Navigate' },
   { id: 'go-ai', label: 'AI Generator', description: 'Generate a quote from lead data', href: '/quotations/generate', icon: Sparkles, group: 'Navigate' },
-  { id: 'go-analytics', label: 'Analytics', href: '/analytics', icon: BarChart3, group: 'Navigate' },
-  { id: 'go-settings', label: 'Settings', href: '/settings', icon: Settings, group: 'Navigate' },
+  { id: 'go-templates', label: 'Templates', description: 'Reusable quotation templates', href: '/templates', icon: Layout, group: 'Navigate' },
+  { id: 'go-analytics', label: 'Analytics', description: 'KPIs and pipeline insights', href: '/analytics', icon: BarChart3, group: 'Navigate' },
+  { id: 'go-calendar', label: 'Calendar', description: 'Follow-ups and tasks', href: '/calendar', icon: Calendar, group: 'Navigate' },
+  { id: 'go-catalog', label: 'Catalog', description: 'Suppliers and inventory', href: '/catalog', icon: Package, group: 'Navigate' },
+  { id: 'go-invoices', label: 'Invoices', description: 'Invoice list and payments', href: '/invoices', icon: Receipt, group: 'Navigate' },
+  { id: 'go-settings', label: 'Settings', description: 'Preferences and config', href: '/settings', icon: Settings, group: 'Navigate' },
   { id: 'new-quote', label: 'New Manual Quote', description: 'Create from scratch', href: '/new', icon: FilePlus, group: 'Create' },
   { id: 'ai-quote', label: 'Generate with AI', description: '4-step quote pipeline', href: '/quotations/generate', icon: Sparkles, group: 'Create' },
 ];
+
+const GROUP_ICON: Record<string, any> = { Leads: Users, Quotations: FileText, Templates: Layout };
 
 export function CommandBar() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(0);
+  const [dynamicResults, setDynamicResults] = useState<Command[]>([]);
+  const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -47,13 +58,39 @@ export function CommandBar() {
     }
   }, [open]);
 
+  // Server-side search (debounced) for leads / quotes / templates.
+  useEffect(() => {
+    if (!open) return;
+    const q = query.trim();
+    if (!q) { setDynamicResults([]); return; }
+    const ctrl = new AbortController();
+    setSearching(true);
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`, { signal: ctrl.signal });
+        const data = await res.json();
+        const rows: Command[] = (data.results || []).map((r: any) => ({
+          id: `dyn-${r.group}-${r.id}`,
+          label: r.label,
+          description: r.description,
+          href: r.href,
+          group: r.group,
+          icon: GROUP_ICON[r.group] || FileText,
+        }));
+        setDynamicResults(rows);
+      } catch { /* abort or network */ }
+      finally { setSearching(false); }
+    }, 160);
+    return () => { clearTimeout(t); ctrl.abort(); };
+  }, [query, open]);
+
   const results = useMemo(() => {
     const q = query.toLowerCase().trim();
-    if (!q) return COMMANDS;
-    return COMMANDS.filter((c) =>
-      c.label.toLowerCase().includes(q) || (c.description ?? '').toLowerCase().includes(q),
-    );
-  }, [query]);
+    const staticHits = !q
+      ? STATIC_COMMANDS
+      : STATIC_COMMANDS.filter((c) => c.label.toLowerCase().includes(q) || (c.description ?? '').toLowerCase().includes(q));
+    return [...staticHits, ...dynamicResults];
+  }, [query, dynamicResults]);
 
   const grouped = useMemo(() => {
     const m = new Map<string, Command[]>();
@@ -92,9 +129,10 @@ export function CommandBar() {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelected(0); }}
             onKeyDown={onKeyDown}
-            placeholder="Type a command or search…"
+            placeholder="Type a command or search leads, quotes, templates…"
             className="h-12 w-full bg-transparent text-sm text-[color:var(--color-ink)] placeholder:text-[color:var(--color-muted-ink)]/70 focus:outline-none"
           />
+          {searching && <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-[color:var(--color-muted-ink)]" aria-hidden="true" />}
           <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="rounded-md p-1 text-[color:var(--color-muted-ink)] hover:bg-[color:var(--color-tint)]">
             <X className="h-4 w-4" />
           </button>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Bell, Menu, Search, ChevronRight } from 'lucide-react';
+import { Menu, Search, ChevronRight } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { NotificationCenter } from './NotificationCenter';
 import { Avatar } from '../ui/Avatar';
 import { cn } from '../../lib/cn';
 
@@ -91,13 +92,7 @@ export function TopBar({ currentPath, userName = 'Traverse Globe' }: { currentPa
         <Search className="h-4.5 w-4.5" style={{ width: 18, height: 18 }} />
       </button>
 
-      <button
-        type="button"
-        aria-label="Notifications"
-        className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl text-[color:var(--color-muted-ink)] hover:bg-[color:var(--color-tint)] hover:text-[color:var(--color-ink)]"
-      >
-        <Bell className="h-[18px] w-[18px]" />
-      </button>
+      <NotificationCenter />
 
       <ThemeToggle />
 

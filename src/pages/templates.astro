@@ -1,0 +1,10 @@
+---
+import Shell from '../layouts/Shell.astro';
+import { TemplatesView } from '../components/templates/TemplatesView.tsx';
+
+export const prerender = false;
+---
+
+<Shell title="Templates" width="wide">
+  <TemplatesView client:load />
+</Shell>
