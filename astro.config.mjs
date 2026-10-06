@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import node from '@astrojs/node';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   // Server-rendered: /print and /q read a quotation at request time. The print route in
@@ -9,6 +10,9 @@ export default defineConfig({
   output: 'server',
   adapter: node({ mode: 'standalone' }),
   integrations: [react()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   server: { port: 4321 },
   devToolbar: { enabled: false },
   security: { checkOrigin: false }

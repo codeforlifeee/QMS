@@ -3,6 +3,16 @@ import type { Lead, PriorityBucket } from '../data/leadSchema.js';
 import { PRIORITY_BUCKETS, LEAD_SOURCES, CALL_STATUSES } from '../data/leadSchema.js';
 import { showToast } from '../components/Toast.js';
 import { AddLeadForm } from './AddLeadForm.js';
+import {
+  DndContext,
+  closestCenter,
+  type DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { useDraggable, useDroppable } from '@dnd-kit/core';
+import { GripVertical } from 'lucide-react';
 
 const BUCKET_COLORS: Record<PriorityBucket, string> = {
   'Untouched Leads': '#6366f1',
@@ -45,6 +55,33 @@ export default function PipelineView() {
   }, []);
 
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) return;
+    const leadId = String(active.id);
+    const newBucket = String(over.id) as PriorityBucket;
+    const lead = leads.find((l) => l.id === leadId);
+    if (!lead || lead.priority_bucket === newBucket) return;
+    const previous = lead.priority_bucket;
+    // Optimistic update
+    setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, priority_bucket: newBucket } : l)));
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ priority_bucket: newBucket }),
+      });
+      if (!res.ok) throw new Error('Update failed');
+      showToast(`Moved to ${newBucket}`, 'success');
+    } catch {
+      // Revert
+      setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, priority_bucket: previous } : l)));
+      showToast('Failed to move lead', 'error');
+    }
+  }
 
   const handleSync = async () => {
     setSyncing(true);
@@ -268,29 +305,25 @@ export default function PipelineView() {
       {loading ? (
         <div className="crm-loading">Loading leads...</div>
       ) : view === 'pipeline' ? (
-        <div className="crm-board">
-          {PRIORITY_BUCKETS.map((bucket) => {
-            const bl = bucketLeads(bucket);
-            return (
-              <div key={bucket} className="crm-column">
-                <div className="crm-column-header">
-                  <span
-                    className="crm-column-dot"
-                    style={{ background: BUCKET_COLORS[bucket] }}
-                  />
-                  <span className="crm-column-title">{bucket}</span>
-                  <span className="crm-column-count">{bl.length}</span>
-                </div>
-                <div className="crm-column-body">
-                  {bl.length === 0 && <div className="crm-column-empty">No leads</div>}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="crm-board">
+            {PRIORITY_BUCKETS.map((bucket) => {
+              const bl = bucketLeads(bucket);
+              return (
+                <DroppableColumn key={bucket} bucket={bucket} color={BUCKET_COLORS[bucket]} count={bl.length}>
+                  {bl.length === 0 && <div className="crm-column-empty">Drop here</div>}
                   {bl.map((lead) => (
-                    <LeadCard key={lead.id} lead={lead} />
+                    <DraggableLeadCard key={lead.id} lead={lead} />
                   ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                </DroppableColumn>
+              );
+            })}
+          </div>
+        </DndContext>
       ) : (
         <div className="crm-list-view">
           <table className="crm-table">
@@ -355,5 +388,69 @@ function LeadCard({ lead }: { lead: Lead }) {
         <div className="crm-card-tag" style={{ marginTop: 2 }}>{lead.travelling_month}</div>
       )}
     </a>
+  );
+}
+
+function DraggableLeadCard({ lead }: { lead: Lead }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: lead.id });
+  const style: React.CSSProperties = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0) rotate(${isDragging ? 1.5 : 0}deg)`,
+        opacity: isDragging ? 0.85 : 1,
+        boxShadow: isDragging ? '0 10px 20px rgba(0,0,0,0.15)' : undefined,
+        zIndex: isDragging ? 50 : undefined,
+      }
+    : {};
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ ...style, position: 'relative', touchAction: 'none' }}
+    >
+      <span
+        {...listeners}
+        {...attributes}
+        aria-label="Drag lead"
+        style={{
+          position: 'absolute',
+          top: 6,
+          right: 6,
+          cursor: 'grab',
+          color: '#94A3B8',
+          padding: 2,
+        }}
+      >
+        <GripVertical size={14} />
+      </span>
+      <LeadCard lead={lead} />
+    </div>
+  );
+}
+
+function DroppableColumn({
+  bucket, color, count, children,
+}: {
+  bucket: PriorityBucket;
+  color: string;
+  count: number;
+  children: React.ReactNode;
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id: bucket });
+  return (
+    <div
+      ref={setNodeRef}
+      className="crm-column"
+      style={{
+        outline: isOver ? `2px dashed ${color}` : undefined,
+        background: isOver ? `${color}0f` : undefined,
+        transition: 'background 0.15s, outline 0.15s',
+      }}
+    >
+      <div className="crm-column-header">
+        <span className="crm-column-dot" style={{ background: color }} />
+        <span className="crm-column-title">{bucket}</span>
+        <span className="crm-column-count">{count}</span>
+      </div>
+      <div className="crm-column-body">{children}</div>
+    </div>
   );
 }

@@ -1,11 +1,18 @@
 ---
+import '../styles/tailwind.css';
 import '../styles/app.css';
 import { COMPANY } from '../config/company.js';
+import { AppChrome } from '../components/layout/AppChrome.tsx';
+import { themeBootstrapScript } from '../lib/theme';
 
 interface Props {
   title?: string;
+  /** Use `wide` to let the page use the full content area (minus sidebar). */
+  width?: 'default' | 'wide' | 'full';
+  /** Set false to drop the standard chrome (sidebar/topbar), e.g. for public share pages. */
+  chrome?: boolean;
 }
-const { title = 'Quotations' } = Astro.props;
+const { title = 'Quotations', width = 'default', chrome = true } = Astro.props;
 const path = Astro.url.pathname;
 ---
 
@@ -15,24 +22,39 @@ const path = Astro.url.pathname;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#FF5B04" />
     <title>{title} — QMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline set:html={themeBootstrapScript} />
   </head>
-  <body>
-    <header class="topbar">
-      <div class="topbar-left">
-        <div class="topbar-brand">
-          <a href="/">QMS</a><small>{COMPANY.name}</small>
+  <body class="min-h-screen bg-[color:var(--color-canvas)] text-[color:var(--color-ink)] font-body antialiased">
+    {chrome ? (
+      <>
+        <AppChrome currentPath={path} client:load />
+        <div
+          class="transition-[padding] duration-200 pb-20 lg:pb-0"
+          style="padding-left: var(--sidebar-width, 240px);"
+        >
+          <div class:list={[
+            'mx-auto px-4 lg:px-6 py-6',
+            width === 'default' && 'max-w-7xl',
+            width === 'wide' && 'max-w-[1600px]',
+            width === 'full' && 'max-w-none',
+          ]}>
+            <slot />
+          </div>
         </div>
-        <nav class="topbar-nav">
-          <a href="/" class:list={['topbar-nav-link', { active: path === '/' }]}>Dashboard</a>
-          <a href="/leads" class:list={['topbar-nav-link', { active: path.startsWith('/leads') }]}>Leads</a>
-          <a href="/quotations" class:list={['topbar-nav-link', { active: path.startsWith('/quotations') || path.startsWith('/edit') }]}>Quotations</a>
-        </nav>
-      </div>
-      <div class="topbar-actions">
-        <slot name="actions" />
-      </div>
-    </header>
-    <slot />
+        <style is:global>
+          @media (max-width: 1023px) {
+            html { --sidebar-width: 0 !important; }
+          }
+        </style>
+      </>
+    ) : (
+      <slot />
+    )}
   </body>
 </html>

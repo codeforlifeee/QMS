@@ -1,0 +1,23 @@
+---
+import Shell from '../layouts/Shell.astro';
+import { COMPANY } from '../config/company.js';
+import { SettingsPanel } from '../components/SettingsPanel.tsx';
+
+export const prerender = false;
+---
+
+<Shell title="Settings">
+  <div class="mb-5">
+    <h1 class="font-heading text-2xl font-bold">Settings</h1>
+    <p class="text-sm text-[color:var(--color-muted-ink)] mt-1">Appearance, defaults, integrations, and data.</p>
+  </div>
+  <SettingsPanel
+    company={{
+      name: COMPANY.name,
+      email: COMPANY.email,
+      website: COMPANY.website,
+      phone: Array.isArray(COMPANY.whatsapp) ? COMPANY.whatsapp[0] : undefined,
+    }}
+    client:load
+  />
+</Shell>
