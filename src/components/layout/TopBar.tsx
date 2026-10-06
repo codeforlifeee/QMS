@@ -44,9 +44,10 @@ export function TopBar({ currentPath, userName = 'Traverse Globe' }: { currentPa
   return (
     <header
       className={cn(
-        'sticky top-0 z-30 h-14 border-b border-[color:var(--color-hairline)] px-4 lg:px-6 flex items-center gap-3 transition-colors',
+        'sticky top-0 z-30 h-14 border-b border-[color:var(--color-hairline)] px-4 lg:px-6 flex items-center gap-3 transition-all duration-200',
         scrolled ? 'glass' : 'bg-[color:var(--color-surface)]',
       )}
+      style={{ marginLeft: 'var(--sidebar-width, 240px)' }}
     >
       <button
         type="button"

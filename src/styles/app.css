@@ -7,15 +7,15 @@
  */
 
 :root {
-  --app-orange: #ff5b04;
-  --app-ink: #16232a;
-  --app-muted: #5a6b73;
-  --app-teal: #075056;
-  --app-hairline: #dfe8ea;
-  --app-tint: #f6f9fa;
-  --app-canvas: #eef3f5;
-  --app-good: #15803d;
-  --app-bad: #b91c1c;
+  --color-brand-orange: #ff5b04;
+  --color-ink: #16232a;
+  --color-muted-ink: #5a6b73;
+  --color-brand-teal: #075056;
+  --color-hairline: #dfe8ea;
+  --color-tint: #f6f9fa;
+  --color-canvas: #eef3f5;
+  --color-success: #15803d;
+  --color-danger: #b91c1c;
 }
 
 * {
@@ -26,15 +26,15 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--app-canvas);
+  background: var(--color-canvas);
   font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial,
     sans-serif;
-  color: var(--app-ink);
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: var(--app-orange);
+  color: var(--color-brand-teal);
   text-decoration: none;
 }
 a:hover {
@@ -43,7 +43,7 @@ a:hover {
 
 /* ---------- top bar ---------- */
 .topbar {
-  background: var(--app-ink);
+  background: var(--color-ink);
   color: #fff;
   padding: 0 20px;
   display: flex;
@@ -95,7 +95,7 @@ a:hover {
 }
 .topbar-nav-link.active {
   color: #fff;
-  border-bottom-color: var(--app-orange);
+  border-bottom-color: var(--color-brand-orange);
 }
 .topbar-actions {
   display: flex;
@@ -119,8 +119,8 @@ a:hover {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  background: var(--app-tint);
-  color: var(--app-ink);
+  background: var(--color-tint);
+  color: var(--color-ink);
   text-decoration: none;
   transition: background 0.12s, border-color 0.12s;
 }
@@ -129,7 +129,7 @@ a:hover {
   text-decoration: none;
 }
 .btn-primary {
-  background: var(--app-orange);
+  background: var(--color-brand-orange);
   color: #fff;
 }
 .btn-primary:hover {
@@ -148,9 +148,9 @@ a:hover {
   font-size: 12px;
 }
 .btn-sm.active {
-  background: var(--app-teal);
+  background: var(--color-brand-teal);
   color: #fff;
-  border-color: var(--app-teal);
+  border-color: var(--color-brand-teal);
 }
 
 /* ---------- index page ---------- */
@@ -170,8 +170,8 @@ a:hover {
   margin: 0;
 }
 .quotation-card {
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 10px;
   padding: 14px 18px;
   margin-bottom: 10px;
@@ -185,7 +185,7 @@ a:hover {
   box-shadow: 0 2px 10px rgba(22, 35, 42, 0.08);
 }
 .quotation-card .meta {
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 12px;
   margin-top: 2px;
 }
@@ -211,8 +211,8 @@ a:hover {
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  background: var(--app-tint);
-  color: var(--app-teal);
+  background: var(--color-tint);
+  color: var(--color-brand-teal);
 }
 .pill-draft {
   background: #fff4e6;
@@ -236,12 +236,12 @@ a:hover {
 }
 
 .empty {
-  background: #fff;
-  border: 1px dashed var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-hairline);
   border-radius: 10px;
   padding: 40px;
   text-align: center;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
 }
 
 /* ---------- editor layout ---------- */
@@ -251,12 +251,12 @@ a:hover {
   gap: 16px;
   padding: 16px;
   min-height: calc(100vh - 50px);
-  background: var(--app-canvas);
+  background: var(--color-canvas);
 }
 
 .editor-form {
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 10px;
   padding: 18px;
   overflow-y: auto;
@@ -264,7 +264,7 @@ a:hover {
 }
 
 .editor-preview {
-  background: var(--app-canvas);
+  background: var(--color-canvas);
   overflow-y: auto;
   max-height: calc(100vh - 82px);
   padding: 8px;
@@ -282,7 +282,7 @@ a:hover {
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 600;
 }
 .field input,
@@ -290,15 +290,15 @@ a:hover {
 .field textarea {
   font: inherit;
   padding: 7px 10px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
-  color: var(--app-ink);
-  background: #fff;
+  color: var(--color-ink);
+  background: var(--color-surface);
 }
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
-  outline: 2px solid var(--app-orange);
+  outline: 2px solid var(--color-brand-orange);
   outline-offset: -1px;
   border-color: transparent;
 }
@@ -322,11 +322,11 @@ a:hover {
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 700;
   margin: 18px 0 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid var(--app-hairline);
+  border-bottom: 1px solid var(--color-hairline);
 }
 .section-head:first-child {
   margin-top: 0;
@@ -334,7 +334,7 @@ a:hover {
 
 /* ---------- margin panel ---------- */
 .margin-panel {
-  background: var(--app-ink);
+  background: var(--color-ink);
   color: #fff;
   border-radius: 10px;
   padding: 14px 16px;
@@ -376,7 +376,7 @@ a:hover {
   grid-template-columns: 1fr auto auto;
   gap: 10px;
   padding: 8px 10px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   border-radius: 6px;
   align-items: center;
   font-size: 13px;
@@ -393,11 +393,11 @@ a:hover {
 }
 .line .margin {
   font-size: 11px;
-  color: var(--app-good);
+  color: var(--color-success);
   font-variant-numeric: tabular-nums;
 }
 .line .margin.bad {
-  color: var(--app-bad);
+  color: var(--color-danger);
 }
 .line.optional {
   opacity: 0.65;
@@ -406,8 +406,8 @@ a:hover {
   display: inline-block;
   padding: 1px 6px;
   border-radius: 3px;
-  background: #fff;
-  color: var(--app-muted);
+  background: var(--color-surface);
+  color: var(--color-muted-ink);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -440,10 +440,10 @@ a:hover {
 
 .save-status {
   font-size: 12px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
 }
 .save-status.saved {
-  color: var(--app-good);
+  color: var(--color-success);
 }
 
 /* make the preview sheet fit comfortably in the preview column */
@@ -467,20 +467,20 @@ a:hover {
   align-items: center;
   margin-bottom: 10px;
   font-size: 11px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
 }
 
 /* ---------- line (expandable) ---------- */
 .line-wrap {
-  background: var(--app-tint);
+  background: var(--color-tint);
   border: 1px solid transparent;
   border-radius: 7px;
   margin-bottom: 6px;
   transition: border-color 0.12s;
 }
 .line-wrap.expanded {
-  background: #fff;
-  border-color: var(--app-orange);
+  background: var(--color-surface);
+  border-color: var(--color-brand-orange);
   box-shadow: 0 2px 8px rgba(255, 91, 4, 0.08);
 }
 .line-wrap.optional {
@@ -517,7 +517,7 @@ a:hover {
 }
 .line-sub {
   display: block;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 11px;
   margin-top: 1px;
 }
@@ -528,11 +528,11 @@ a:hover {
 }
 .line-margin {
   font-size: 11px;
-  color: var(--app-good);
+  color: var(--color-success);
   font-variant-numeric: tabular-nums;
 }
 .line-margin.bad {
-  color: var(--app-bad);
+  color: var(--color-danger);
 }
 .line-move {
   display: flex;
@@ -542,19 +542,19 @@ a:hover {
   display: inline-block;
   margin-left: 5px;
   padding: 1px 5px;
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 3px;
   font-size: 10px;
   font-weight: 700;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .btn-icon {
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   width: 22px;
   height: 22px;
   border-radius: 4px;
@@ -565,19 +565,19 @@ a:hover {
   justify-content: center;
 }
 .btn-icon:hover:not(:disabled) {
-  background: var(--app-tint);
+  background: var(--color-tint);
 }
 .btn-icon:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 .btn-icon.btn-danger {
-  color: var(--app-bad);
+  color: var(--color-danger);
 }
 
 .btn-danger {
-  color: var(--app-bad);
-  background: #fff;
+  color: var(--color-danger);
+  background: var(--color-surface);
   border-color: #fecaca;
 }
 .btn-danger:hover {
@@ -586,7 +586,7 @@ a:hover {
 
 .line-body {
   padding: 10px 12px 12px;
-  border-top: 1px solid var(--app-hairline);
+  border-top: 1px solid var(--color-hairline);
 }
 .line-flags {
   display: flex;
@@ -594,7 +594,7 @@ a:hover {
   gap: 4px;
   margin: 10px 0;
   padding: 10px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   border-radius: 6px;
   font-size: 12px;
 }
@@ -616,7 +616,7 @@ a:hover {
   padding: 10px;
   background: #f3f7f8;
   border-radius: 6px;
-  border: 1px dashed var(--app-hairline);
+  border: 1px dashed var(--color-hairline);
 }
 .rooms-header {
   display: flex;
@@ -626,22 +626,22 @@ a:hover {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 700;
 }
 .rooms-empty {
   text-align: center;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 12px;
   padding: 12px;
   font-style: italic;
 }
 .room {
-  background: #fff;
+  background: var(--color-surface);
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 8px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
 }
 .room:last-child {
   margin-bottom: 0;
@@ -656,12 +656,12 @@ a:hover {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 700;
 }
 .day-card {
-  background: var(--app-tint);
-  border: 1px solid var(--app-hairline);
+  background: var(--color-tint);
+  border: 1px solid var(--color-hairline);
   border-radius: 7px;
   padding: 10px 12px;
   margin-bottom: 8px;
@@ -678,8 +678,8 @@ a:hover {
 
 /* ---------- discounts ---------- */
 .discount-row {
-  background: var(--app-tint);
-  border: 1px solid var(--app-hairline);
+  background: var(--color-tint);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   padding: 10px;
   margin-bottom: 8px;
@@ -692,13 +692,13 @@ a:hover {
 textarea.list-editor {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   font: inherit;
   resize: vertical;
 }
 textarea.list-editor:focus {
-  outline: 2px solid var(--app-orange);
+  outline: 2px solid var(--color-brand-orange);
   outline-offset: -1px;
   border-color: transparent;
 }
@@ -722,19 +722,19 @@ textarea.list-editor:focus {
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--app-teal);
+  color: var(--color-brand-teal);
   font-weight: 700;
 }
 .btn-link {
   background: none;
   border: 0;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 11px;
   cursor: pointer;
   padding: 0;
 }
 .btn-link:hover {
-  color: var(--app-ink);
+  color: var(--color-ink);
   text-decoration: underline;
 }
 .catalog-filters {
@@ -752,7 +752,7 @@ textarea.list-editor:focus {
 .chip-group-label {
   font-size: 10px;
   text-transform: uppercase;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   letter-spacing: 0.06em;
   margin-right: 4px;
   font-weight: 700;
@@ -761,20 +761,20 @@ textarea.list-editor:focus {
 .chip {
   display: inline-block;
   padding: 2px 8px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid #cde0e5;
   border-radius: 10px;
   font-size: 11px;
   cursor: pointer;
-  color: var(--app-ink);
+  color: var(--color-ink);
 }
 .chip:hover {
   background: #f6f9fa;
 }
 .chip-active {
-  background: var(--app-teal);
+  background: var(--color-brand-teal);
   color: #fff;
-  border-color: var(--app-teal);
+  border-color: var(--color-brand-teal);
 }
 .catalog-input-wrap {
   position: relative;
@@ -785,10 +785,10 @@ textarea.list-editor:focus {
   border: 1px solid #cde0e5;
   border-radius: 5px;
   font: inherit;
-  background: #fff;
+  background: var(--color-surface);
 }
 .catalog-input:focus {
-  outline: 2px solid var(--app-teal);
+  outline: 2px solid var(--color-brand-teal);
   outline-offset: -1px;
 }
 .catalog-spinner {
@@ -796,15 +796,15 @@ textarea.list-editor:focus {
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 14px;
 }
 .catalog-results {
   list-style: none;
   padding: 0;
   margin: 4px 0 0;
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 5px;
   max-height: 260px;
   overflow-y: auto;
@@ -817,7 +817,7 @@ textarea.list-editor:focus {
   padding: 7px 10px;
   background: none;
   border: 0;
-  border-bottom: 1px solid var(--app-tint);
+  border-bottom: 1px solid var(--color-tint);
   cursor: pointer;
   font: inherit;
 }
@@ -825,7 +825,7 @@ textarea.list-editor:focus {
   border-bottom: 0;
 }
 .catalog-result:hover {
-  background: var(--app-tint);
+  background: var(--color-tint);
 }
 .catalog-result-top {
   display: flex;
@@ -835,7 +835,7 @@ textarea.list-editor:focus {
 }
 .catalog-crumb {
   font-size: 10px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   font-weight: 600;
@@ -848,18 +848,18 @@ textarea.list-editor:focus {
 .catalog-result-name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--app-ink);
+  color: var(--color-ink);
 }
 .catalog-result-sub {
   font-size: 11px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   margin-top: 1px;
 }
 .catalog-empty {
   margin-top: 6px;
   padding: 8px;
   font-size: 12px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   text-align: center;
   font-style: italic;
 }
@@ -871,55 +871,55 @@ textarea.list-editor:focus {
   align-items: center;
   padding: 10px 0;
   margin-bottom: 4px;
-  border-bottom: 1px solid var(--app-hairline);
+  border-bottom: 1px solid var(--color-hairline);
 }
 .editor-toolbar-actions {
   display: flex;
   gap: 6px;
 }
 .editor-toggle-btn {
-  background: var(--app-tint);
-  color: var(--app-teal);
-  border: 1px solid var(--app-hairline);
+  background: var(--color-tint);
+  color: var(--color-brand-teal);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   transition: all 0.15s;
 }
 .editor-toggle-btn:hover {
   background: #e5f0f1;
-  border-color: var(--app-teal);
+  border-color: var(--color-brand-teal);
 }
 .editor-toggle-btn.active {
-  background: var(--app-teal);
+  background: var(--color-brand-teal);
   color: #fff;
-  border-color: var(--app-teal);
+  border-color: var(--color-brand-teal);
 }
 .editor-toggle-btn.sources {
-  color: var(--app-orange);
+  color: var(--color-brand-orange);
 }
 .editor-toggle-btn.sources:hover {
-  border-color: var(--app-orange);
+  border-color: var(--color-brand-orange);
   background: #fff5f0;
 }
 .editor-toggle-btn.sources.active {
-  background: var(--app-orange);
+  background: var(--color-brand-orange);
   color: #fff;
-  border-color: var(--app-orange);
+  border-color: var(--color-brand-orange);
 }
 
 /* ---------- inline panels (chat + sources inside left column) ---------- */
 .inline-panel {
   margin: 10px 0;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 10px;
   overflow: hidden;
-  background: #fff;
+  background: var(--color-surface);
 }
 .inline-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  border-bottom: 1px solid var(--app-hairline);
+  border-bottom: 1px solid var(--color-hairline);
 }
 .chat-header {
   background: linear-gradient(135deg, #075056 0%, #0a6a72 100%);
@@ -983,8 +983,8 @@ textarea.list-editor:focus {
   cursor: pointer;
 }
 .chat-provider-select option {
-  color: var(--app-ink);
-  background: #fff;
+  color: var(--color-ink);
+  background: var(--color-surface);
 }
 .chat-messages {
   max-height: 320px;
@@ -993,12 +993,12 @@ textarea.list-editor:focus {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: var(--app-tint);
+  background: var(--color-tint);
 }
 .chat-empty {
   text-align: center;
   padding: 24px 12px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 12px;
 }
 .chat-empty-icon {
@@ -1008,8 +1008,8 @@ textarea.list-editor:focus {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--app-hairline);
-  color: var(--app-muted);
+  background: var(--color-hairline);
+  color: var(--color-muted-ink);
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 8px;
@@ -1038,14 +1038,14 @@ textarea.list-editor:focus {
   word-break: break-word;
 }
 .chat-bubble.user {
-  background: var(--app-teal);
+  background: var(--color-brand-teal);
   color: #fff;
   border-bottom-right-radius: 3px;
 }
 .chat-bubble.assistant {
-  background: #fff;
-  color: var(--app-ink);
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1px solid var(--color-hairline);
   border-bottom-left-radius: 3px;
 }
 .chat-bubble-text {
@@ -1053,7 +1053,7 @@ textarea.list-editor:focus {
 }
 .chat-time {
   font-size: 10px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   margin-top: 3px;
   padding: 0 4px;
 }
@@ -1064,38 +1064,38 @@ textarea.list-editor:focus {
   gap: 6px;
 }
 .chat-change-card {
-  background: var(--app-tint);
-  border: 1px solid var(--app-hairline);
+  background: var(--color-tint);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   padding: 8px;
 }
 .chat-change-desc {
   font-size: 11px;
   font-weight: 600;
-  color: var(--app-teal);
+  color: var(--color-brand-teal);
   margin-bottom: 4px;
 }
 .chat-apply-btn {
   display: block;
   width: 100%;
   padding: 5px 8px;
-  border: 1px solid var(--app-teal);
+  border: 1px solid var(--color-brand-teal);
   border-radius: 5px;
   background: rgba(7, 80, 86, 0.06);
-  color: var(--app-teal);
+  color: var(--color-brand-teal);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.12s;
 }
 .chat-apply-btn:hover {
-  background: var(--app-teal);
+  background: var(--color-brand-teal);
   color: #fff;
 }
 .chat-applied {
   font-size: 11px;
   font-weight: 600;
-  color: var(--app-good);
+  color: var(--color-success);
   margin-top: 2px;
 }
 .chat-thinking {
@@ -1107,7 +1107,7 @@ textarea.list-editor:focus {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--app-muted);
+  background: var(--color-muted-ink);
   opacity: 0.4;
   animation: chatDots 1.2s ease-in-out infinite;
 }
@@ -1121,14 +1121,14 @@ textarea.list-editor:focus {
   display: flex;
   gap: 8px;
   padding: 10px 12px;
-  border-top: 1px solid var(--app-hairline);
-  background: #fff;
+  border-top: 1px solid var(--color-hairline);
+  background: var(--color-surface);
   align-items: flex-end;
 }
 .chat-input {
   flex: 1;
   padding: 7px 10px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   font: inherit;
   font-size: 13px;
@@ -1137,12 +1137,12 @@ textarea.list-editor:focus {
   outline: none;
 }
 .chat-input:focus {
-  border-color: var(--app-teal);
+  border-color: var(--color-brand-teal);
   box-shadow: 0 0 0 2px rgba(7, 80, 86, 0.1);
 }
 .chat-send-btn {
   padding: 7px 16px;
-  background: var(--app-teal);
+  background: var(--color-brand-teal);
   color: #fff;
   border: 0;
   border-radius: 6px;
@@ -1163,26 +1163,26 @@ textarea.list-editor:focus {
 /* ---------- sources panel ---------- */
 .sources-summary {
   padding: 10px 14px;
-  border-bottom: 1px solid var(--app-hairline);
-  background: #fff;
+  border-bottom: 1px solid var(--color-hairline);
+  background: var(--color-surface);
 }
 .sources-summary-text {
   font-size: 12px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   margin-bottom: 6px;
 }
 .sources-summary-text strong {
-  color: var(--app-ink);
+  color: var(--color-ink);
 }
 .sources-progress-bar {
   height: 4px;
-  background: var(--app-hairline);
+  background: var(--color-hairline);
   border-radius: 2px;
   overflow: hidden;
 }
 .sources-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--app-orange), #ff8a50);
+  background: linear-gradient(90deg, var(--color-brand-orange), #ff8a50);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -1193,20 +1193,20 @@ textarea.list-editor:focus {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: var(--app-tint);
+  background: var(--color-tint);
 }
 .sources-card {
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 8px;
   padding: 10px 12px;
   border-left: 3px solid transparent;
 }
 .sources-card.grounded {
-  border-left-color: var(--app-good);
+  border-left-color: var(--color-success);
 }
 .sources-card.manual {
-  border-left-color: var(--app-bad);
+  border-left-color: var(--color-danger);
 }
 .sources-card-header {
   display: flex;
@@ -1221,10 +1221,10 @@ textarea.list-editor:focus {
   flex-shrink: 0;
 }
 .sources-status-dot.grounded {
-  background: var(--app-good);
+  background: var(--color-success);
 }
 .sources-status-dot.manual {
-  background: var(--app-bad);
+  background: var(--color-danger);
 }
 .sources-card-label {
   font-size: 12px;
@@ -1235,14 +1235,14 @@ textarea.list-editor:focus {
 }
 .sources-citation {
   padding: 6px 8px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   border-radius: 5px;
   margin-top: 4px;
 }
 .sources-citation-name {
   font-size: 11px;
   font-weight: 600;
-  color: var(--app-teal);
+  color: var(--color-brand-teal);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1252,11 +1252,11 @@ textarea.list-editor:focus {
   gap: 8px;
   margin-top: 3px;
   font-size: 10px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   align-items: center;
 }
 .sources-citation-sheet {
-  background: var(--app-hairline);
+  background: var(--color-hairline);
   padding: 1px 5px;
   border-radius: 3px;
   font-weight: 600;
@@ -1285,7 +1285,7 @@ textarea.list-editor:focus {
 .sources-manual-tag {
   font-size: 10px;
   font-weight: 700;
-  color: var(--app-bad);
+  color: var(--color-danger);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -1310,23 +1310,23 @@ textarea.list-editor:focus {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   margin-bottom: 16px;
 }
 .breadcrumb a {
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   text-decoration: none;
   font-weight: 500;
 }
 .breadcrumb a:hover {
-  color: var(--app-orange);
+  color: var(--color-brand-orange);
   text-decoration: underline;
 }
 .breadcrumb .sep {
-  color: var(--app-hairline);
+  color: var(--color-hairline);
 }
 .breadcrumb .current {
-  color: var(--app-ink);
+  color: var(--color-ink);
   font-weight: 600;
 }
 
@@ -1415,21 +1415,21 @@ textarea.list-editor:focus {
   flex: 1;
   padding: 10px 14px;
   border-radius: 8px;
-  background: var(--app-tint);
-  border: 1px solid var(--app-hairline);
+  background: var(--color-tint);
+  border: 1px solid var(--color-hairline);
   font-size: 13px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   transition: background 0.15s, border-color 0.15s;
 }
 .pb-step-indicator.active {
-  background: #fff;
-  border-color: var(--app-orange);
-  color: var(--app-ink);
+  background: var(--color-surface);
+  border-color: var(--color-brand-orange);
+  color: var(--color-ink);
 }
 .pb-step-indicator.done {
-  background: #fff;
-  border-color: var(--app-hairline);
-  color: var(--app-ink);
+  background: var(--color-surface);
+  border-color: var(--color-hairline);
+  color: var(--color-ink);
 }
 .pb-step-num {
   display: inline-flex;
@@ -1438,18 +1438,18 @@ textarea.list-editor:focus {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--app-hairline);
+  background: var(--color-hairline);
   font-size: 12px;
   font-weight: 700;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   flex-shrink: 0;
 }
 .pb-step-indicator.active .pb-step-num {
-  background: var(--app-orange);
+  background: var(--color-brand-orange);
   color: #fff;
 }
 .pb-step-indicator.done .pb-step-num {
-  background: var(--app-good);
+  background: var(--color-success);
   color: #fff;
 }
 .pb-step-label {
@@ -1458,8 +1458,8 @@ textarea.list-editor:focus {
 }
 
 .pb-card {
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 10px;
   padding: 24px;
 }
@@ -1467,11 +1467,11 @@ textarea.list-editor:focus {
   font-size: 18px;
   font-weight: 700;
   margin: 0 0 4px;
-  color: var(--app-ink);
+  color: var(--color-ink);
 }
 .pb-card-desc {
   font-size: 14px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   margin: 0 0 16px;
 }
 
@@ -1490,35 +1490,35 @@ textarea.list-editor:focus {
   flex-direction: column;
   gap: 2px;
   padding: 8px 10px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   border-radius: 6px;
 }
 .pb-summary-label {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 700;
 }
 .pb-summary-value {
   font-size: 14px;
   font-weight: 600;
-  color: var(--app-ink);
+  color: var(--color-ink);
 }
 .pb-summary-full {
   padding: 8px 10px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   border-radius: 6px;
   margin-bottom: 8px;
 }
 .pb-summary-text {
   font-size: 13px;
-  color: var(--app-ink);
+  color: var(--color-ink);
   margin: 4px 0 0;
   line-height: 1.5;
 }
 .pb-no-data {
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 14px;
   font-style: italic;
   text-align: center;
@@ -1537,16 +1537,16 @@ textarea.list-editor:focus {
   width: 100%;
   min-height: 180px;
   padding: 12px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   font: inherit;
   font-size: 14px;
   line-height: 1.6;
-  color: var(--app-ink);
+  color: var(--color-ink);
   resize: vertical;
 }
 .pb-textarea:focus {
-  outline: 2px solid var(--app-orange);
+  outline: 2px solid var(--color-brand-orange);
   outline-offset: -1px;
   border-color: transparent;
 }
@@ -1590,13 +1590,13 @@ textarea.list-editor:focus {
   flex-direction: column;
   align-items: center;
   padding: 14px 8px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   border-radius: 8px;
 }
 .pb-result-stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: var(--app-ink);
+  color: var(--color-ink);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -1604,7 +1604,7 @@ textarea.list-editor:focus {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 600;
   margin-top: 4px;
 }
@@ -1621,14 +1621,14 @@ textarea.list-editor:focus {
   justify-content: center;
   gap: 12px;
   padding: 40px 20px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 14px;
 }
 .pb-spinner {
   width: 24px;
   height: 24px;
-  border: 3px solid var(--app-hairline);
-  border-top-color: var(--app-orange);
+  border: 3px solid var(--color-hairline);
+  border-top-color: var(--color-brand-orange);
   border-radius: 50%;
   animation: pbSpin 0.7s linear infinite;
   flex-shrink: 0;
@@ -1647,7 +1647,7 @@ textarea.list-editor:focus {
   padding: 20px;
 }
 .pb-error-text {
-  color: var(--app-bad);
+  color: var(--color-danger);
   font-size: 14px;
   font-weight: 500;
   margin: 0 0 16px;
@@ -1683,15 +1683,15 @@ textarea.list-editor:focus {
  * picks up a dark surface + text pair.
  * ------------------------------------------------------------------ */
 html.dark {
-  --app-orange: #ff6b1a;
-  --app-ink: #f1f5f9;
-  --app-muted: #94a3b8;
-  --app-teal: #0d9488;
-  --app-hairline: #1e293b;
-  --app-tint: #1e293b;
-  --app-canvas: #0b0f1a;
-  --app-good: #22c55e;
-  --app-bad: #ef4444;
+  --color-brand-orange: #ff6b1a;
+  --color-ink: #f1f5f9;
+  --color-muted-ink: #94a3b8;
+  --color-brand-teal: #0d9488;
+  --color-hairline: #1e293b;
+  --color-tint: #1e293b;
+  --color-canvas: #0b0f1a;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
 }
 html.dark body { background: #0b0f1a; color: #f1f5f9; }
 html.dark input, html.dark textarea, html.dark select {

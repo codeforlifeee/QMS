@@ -1,10 +1,15 @@
 import { leadRepo } from '../data/leadRepo.js';
+import { notificationRepo } from '../data/notificationRepo.js';
+import { getSupabase } from '../data/supabase.js';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const SHEET_ID = '1niYNMdUZsWGnH2BxsnmG8DtKUfI3gecWNKp4jkOGmPA';
 const TAB_NAME = 'reel_43000';
 
-export async function syncFromSheet(): Promise<{ imported: number; errors: string[] }> {
-  const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
+export async function syncFromSheet(source: string = 'webhook'): Promise<{ imported: number; errors: string[] }> {
+  // @ts-ignore
+  const apiKey = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.GOOGLE_SHEETS_API_KEY) || process.env.GOOGLE_SHEETS_API_KEY;
   if (!apiKey) throw new Error('GOOGLE_SHEETS_API_KEY not set');
 
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(TAB_NAME)}?key=${apiKey}`;
@@ -18,6 +23,7 @@ export async function syncFromSheet(): Promise<{ imported: number; errors: strin
   const headers = rows[0]!.map((h: string) => h.trim().toLowerCase().replace(/\s+/g, '_'));
   const errors: string[] = [];
   let imported = 0;
+  let newCount = 0;
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i]!;
@@ -29,8 +35,11 @@ export async function syncFromSheet(): Promise<{ imported: number; errors: strin
     if (!obj.customer_name && !obj.name && !obj.full_name) continue;
 
     try {
-      await leadRepo.upsertByExternalId({
-        external_id: obj.id || obj._rowid || `sheet_${i}`,
+      const extId = obj.id || obj._rowid || `sheet_${i}`;
+      const { data: existing } = await getSupabase().from('leads').select('id').eq('external_id', extId).maybeSingle();
+      
+      const lead = await leadRepo.upsertByExternalId({
+        external_id: extId,
         customer_name: obj.customer_name || obj.name || obj.full_name || 'Unknown',
         phone: obj.phone || obj.mobile || obj.phone_number,
         email: obj.email,
@@ -41,11 +50,38 @@ export async function syncFromSheet(): Promise<{ imported: number; errors: strin
         special_arrangements: obj.special_arrangements || obj.requirements || obj['any_special_arrangements(if_any)?'],
         priority_bucket: mapBucket(obj.priority_bucket || obj.lead_status) as any || 'Untouched Leads',
         latest_status: obj.latest_status || obj.lead_status,
+        ...(obj.created_time ? { created_at: new Date(obj.created_time).toISOString() } : {})
       });
       imported++;
+
+      if (!existing) {
+        newCount++;
+        await notificationRepo.create({
+          type: 'new_lead',
+          title: 'New Lead: ' + lead.customer_name,
+          message: `Arrived from Google Sheets (${lead.city || 'Unknown location'})`,
+          link: `/leads/${lead.id}`
+        });
+      }
     } catch (err: any) {
       errors.push(`Row ${i + 1}: ${err.message}`);
     }
+  }
+
+  if (newCount > 0) {
+    await notificationRepo.create({
+      type: 'sync_complete',
+      title: 'Sync Complete',
+      message: `Imported ${newCount} new leads from Google Sheets.`,
+    });
+  }
+
+  try {
+    const dataDir = path.resolve(process.cwd(), 'data');
+    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(path.join(dataDir, 'last_sync.json'), JSON.stringify({ time: new Date().toISOString(), source }));
+  } catch (err) {
+    console.error('Failed to save sync meta', err);
   }
 
   return { imported, errors };

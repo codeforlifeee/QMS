@@ -24,7 +24,7 @@
 }
 .crm-count {
   font-size: 13px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
 }
 .crm-toolbar-right {
   display: flex;
@@ -34,34 +34,34 @@
 }
 .crm-search {
   padding: 6px 12px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   font: inherit;
   font-size: 13px;
   width: 220px;
-  background: #fff;
+  background: var(--color-surface);
 }
 .crm-search:focus {
-  outline: 2px solid var(--app-orange);
+  outline: 2px solid var(--color-brand-orange);
   outline-offset: -1px;
   border-color: transparent;
 }
 .crm-view-toggle {
   display: flex;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   overflow: hidden;
 }
 .crm-view-toggle .btn {
   border-radius: 0;
   border: 0;
-  border-right: 1px solid var(--app-hairline);
+  border-right: 1px solid var(--color-hairline);
 }
 .crm-view-toggle .btn:last-child {
   border-right: 0;
 }
 .crm-view-toggle .btn.active {
-  background: var(--app-teal);
+  background: var(--color-brand-teal);
   color: #fff;
 }
 
@@ -85,8 +85,8 @@
 }
 
 .crm-column {
-  background: var(--app-tint);
-  border: 1px solid var(--app-hairline);
+  background: var(--color-tint);
+  border: 1px solid var(--color-hairline);
   border-radius: 10px;
   min-height: 200px;
   display: flex;
@@ -97,8 +97,8 @@
   align-items: center;
   gap: 6px;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--app-hairline);
-  background: #fff;
+  border-bottom: 1px solid var(--color-hairline);
+  background: var(--color-surface);
   border-radius: 10px 10px 0 0;
 }
 .crm-column-dot {
@@ -112,7 +112,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--app-ink);
+  color: var(--color-ink);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -121,8 +121,8 @@
 .crm-column-count {
   font-size: 11px;
   font-weight: 700;
-  background: var(--app-hairline);
-  color: var(--app-muted);
+  background: var(--color-hairline);
+  color: var(--color-muted-ink);
   padding: 1px 6px;
   border-radius: 8px;
 }
@@ -137,7 +137,7 @@
 }
 .crm-column-empty {
   text-align: center;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 12px;
   padding: 16px 8px;
   font-style: italic;
@@ -148,8 +148,8 @@
   display: block;
   width: 100%;
   text-align: left;
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 8px;
   padding: 10px 12px;
   cursor: pointer;
@@ -174,25 +174,29 @@
   flex-wrap: wrap;
   gap: 4px 8px;
   font-size: 11px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
 }
 .crm-card-tag {
   display: inline-block;
   margin-top: 4px;
   padding: 1px 6px;
   border-radius: 3px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   font-size: 10px;
   font-weight: 600;
-  color: var(--app-teal);
+  color: var(--color-brand-teal);
 }
 
 /* ---------- list view ---------- */
+.crm-list-view {
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
 .crm-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 10px;
   overflow: hidden;
   font-size: 13px;
@@ -203,28 +207,28 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 700;
-  background: var(--app-tint);
-  border-bottom: 1px solid var(--app-hairline);
+  background: var(--color-tint);
+  border-bottom: 1px solid var(--color-hairline);
 }
 .crm-table td {
   padding: 8px 12px;
-  border-bottom: 1px solid var(--app-tint);
+  border-bottom: 1px solid var(--color-tint);
 }
 .crm-table-row {
   cursor: pointer;
   transition: background 0.1s;
 }
 .crm-table-row:hover {
-  background: var(--app-tint);
+  background: var(--color-tint);
 }
 .crm-table-name {
   font-weight: 600;
 }
 .crm-table-date {
   font-size: 12px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
 }
 .crm-bucket-pill {
   display: inline-block;
@@ -240,13 +244,13 @@
 .crm-loading {
   text-align: center;
   padding: 40px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
 }
 
 /* ---------- lead detail ---------- */
 .crm-detail {
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -255,8 +259,8 @@
   align-items: center;
   gap: 12px;
   padding: 14px 18px;
-  border-bottom: 1px solid var(--app-hairline);
-  background: var(--app-tint);
+  border-bottom: 1px solid var(--color-hairline);
+  background: var(--color-tint);
 }
 .crm-detail-header h2 {
   margin: 0;
@@ -265,7 +269,7 @@
 }
 .crm-bucket-select {
   padding: 5px 10px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   font: inherit;
   font-size: 12px;
@@ -282,7 +286,7 @@
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   margin: 0 0 10px;
 }
 .crm-info-grid {
@@ -298,7 +302,7 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 600;
   margin-bottom: 2px;
 }
@@ -312,7 +316,7 @@
   gap: 8px;
   margin-bottom: 20px;
   padding: 12px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   border-radius: 8px;
 }
 
@@ -331,15 +335,15 @@
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   margin: 0 0 10px;
 }
 .crm-empty-calls {
   text-align: center;
   padding: 24px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-size: 13px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   border-radius: 8px;
 }
 .crm-call-timeline {
@@ -348,7 +352,7 @@
   gap: 8px;
 }
 .crm-call-card {
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -357,7 +361,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  background: var(--app-tint);
+  background: var(--color-tint);
   cursor: pointer;
   width: 100%;
   text-align: left;
@@ -374,7 +378,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--app-muted);
+  background: var(--color-muted-ink);
 }
 .crm-call-status-dot.status-warn { background: #f59e0b; }
 .crm-call-status-dot.status-info { background: #3b82f6; }
@@ -392,11 +396,11 @@
 }
 .crm-call-date {
   font-size: 12px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
 }
 .crm-call-expand {
   font-size: 10px;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
 }
 .crm-call-card-body {
   padding: 14px;
@@ -412,7 +416,7 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 600;
 }
 .crm-call-field span {
@@ -426,7 +430,7 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 600;
   margin-bottom: 2px;
 }
@@ -440,7 +444,7 @@
   gap: 6px;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid var(--app-hairline);
+  border-top: 1px solid var(--color-hairline);
 }
 
 /* ---------- modal ---------- */
@@ -456,7 +460,7 @@
   overflow-y: auto;
 }
 .crm-modal {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 12px;
   width: 100%;
   max-width: 680px;
@@ -467,7 +471,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--app-hairline);
+  border-bottom: 1px solid var(--color-hairline);
 }
 .crm-modal-header h3 {
   margin: 0;
@@ -478,7 +482,7 @@
   border: 0;
   font-size: 24px;
   cursor: pointer;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   line-height: 1;
   padding: 4px;
 }
@@ -492,7 +496,7 @@
   justify-content: flex-end;
   gap: 8px;
   padding: 14px 20px;
-  border-top: 1px solid var(--app-hairline);
+  border-top: 1px solid var(--color-hairline);
 }
 
 /* ---------- form elements ---------- */
@@ -509,7 +513,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 600;
   margin-bottom: 4px;
 }
@@ -518,11 +522,11 @@
 .crm-form-field select {
   width: 100%;
   padding: 7px 10px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   font: inherit;
   font-size: 13px;
-  color: var(--app-ink);
+  color: var(--color-ink);
 }
 .crm-form-field textarea {
   resize: vertical;
@@ -530,7 +534,7 @@
 }
 .crm-form-field input:focus,
 .crm-form-field textarea:focus {
-  outline: 2px solid var(--app-orange);
+  outline: 2px solid var(--color-brand-orange);
   outline-offset: -1px;
   border-color: transparent;
 }
@@ -542,29 +546,29 @@
 }
 .crm-segment-btn {
   padding: 4px 10px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 5px;
-  background: #fff;
+  background: var(--color-surface);
   font: inherit;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  color: var(--app-ink);
+  color: var(--color-ink);
   transition: all 0.1s;
 }
 .crm-segment-btn:hover {
-  background: var(--app-tint);
+  background: var(--color-tint);
 }
 .crm-segment-btn.active {
-  background: var(--app-teal);
+  background: var(--color-brand-teal);
   color: #fff;
-  border-color: var(--app-teal);
+  border-color: var(--color-brand-teal);
 }
 
 .crm-number-input {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -572,14 +576,14 @@
   width: 32px;
   height: 32px;
   border: 0;
-  background: var(--app-tint);
+  background: var(--color-tint);
   cursor: pointer;
   font-size: 16px;
   font-weight: 700;
-  color: var(--app-ink);
+  color: var(--color-ink);
 }
 .crm-number-input button:hover {
-  background: var(--app-hairline);
+  background: var(--color-hairline);
 }
 .crm-number-input span {
   padding: 0 14px;
@@ -597,8 +601,8 @@
   margin-bottom: 20px;
 }
 .crm-stat-card {
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 10px;
   padding: 14px 16px;
   text-align: center;
@@ -607,19 +611,19 @@
   font-size: 28px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--app-ink);
+  color: var(--color-ink);
 }
 .crm-stat-label {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 600;
   margin-top: 2px;
 }
 .crm-stat-card.highlight {
-  background: var(--app-orange);
-  border-color: var(--app-orange);
+  background: var(--color-brand-orange);
+  border-color: var(--color-brand-orange);
 }
 .crm-stat-card.highlight .crm-stat-value,
 .crm-stat-card.highlight .crm-stat-label {
@@ -633,8 +637,8 @@
 }
 /* ---------- filter panel ---------- */
 .filter-panel {
-  background: #fff;
-  border: 1px solid var(--app-hairline);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
   border-radius: 10px;
   padding: 16px;
   margin-bottom: 16px;
@@ -649,7 +653,7 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--app-muted);
+  color: var(--color-muted-ink);
   font-weight: 600;
   margin-bottom: 4px;
 }
@@ -657,23 +661,23 @@
 .filter-field input {
   width: 100%;
   padding: 6px 10px;
-  border: 1px solid var(--app-hairline);
+  border: 1px solid var(--color-hairline);
   border-radius: 6px;
   font: inherit;
   font-size: 13px;
-  color: var(--app-ink);
-  background: #fff;
+  color: var(--color-ink);
+  background: var(--color-surface);
 }
 .filter-field select:focus,
 .filter-field input:focus {
-  outline: 2px solid var(--app-orange);
+  outline: 2px solid var(--color-brand-orange);
   outline-offset: -1px;
   border-color: transparent;
 }
 .filter-clear {
   margin-top: 12px;
-  color: var(--app-bad);
-  border-color: var(--app-bad);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 @media (max-width: 900px) {
   .filter-grid {

@@ -17,6 +17,17 @@ let totalLeads = 0;
 let followUpCount = 0;
 let recentLeadsRaw: any[] = [];
 let allLeadsForSources: any[] = [];
+let lastSync: { time: string; source: string } | null = null;
+
+try {
+  const fs = await import('node:fs/promises');
+  const path = await import('node:path');
+  const syncFile = path.resolve(process.cwd(), 'data', 'last_sync.json');
+  const data = await fs.readFile(syncFile, 'utf8');
+  lastSync = JSON.parse(data);
+} catch {
+  // no sync file yet
+}
 
 try {
   const { leadRepo } = await import('../data/leadRepo.js');
@@ -74,6 +85,7 @@ const recentLeads = recentLeadsRaw.map((l: any) => ({
   city: l.city,
   priority_bucket: l.priority_bucket || 'Untouched',
   updated_at: l.updated_at,
+  created_at: l.created_at,
   source: l.source,
 }));
 ---
@@ -87,6 +99,7 @@ const recentLeads = recentLeadsRaw.map((l: any) => ({
     recentQuotes={quoteRows}
     totalQuotes={quotations.length}
     sources={sources}
+    lastSync={lastSync}
     client:load
   />
 </Shell>

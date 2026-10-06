@@ -19,10 +19,11 @@ export interface DashboardViewProps {
   stats: Record<string, number>;
   totalLeads: number;
   followUpCount: number;
-  recentLeads: Array<{ id: string; customer_name: string; city?: string | null; priority_bucket: string; updated_at: string; source?: string | null }>;
+  recentLeads: Array<{ id: string; customer_name: string; city?: string | null; priority_bucket: string; updated_at: string; created_at: string; source?: string | null }>;
   recentQuotes: Array<{ id: string; title: string; reference: string; clientName: string; nights: number; total: string }>;
   totalQuotes: number;
   sources: Array<{ name: string; value: number }>;
+  lastSync?: { time: string; source: string } | null;
 }
 
 const greet = () => {
@@ -54,7 +55,7 @@ const daysLabel = (iso: string) => {
 };
 
 export function DashboardView(props: DashboardViewProps) {
-  const { stats, totalLeads, followUpCount, recentLeads, recentQuotes, totalQuotes, sources } = props;
+  const { stats, totalLeads, followUpCount, recentLeads, recentQuotes, totalQuotes, sources, lastSync } = props;
   const toast = useToast();
   const [syncing, setSyncing] = useState(false);
 
@@ -76,7 +77,7 @@ export function DashboardView(props: DashboardViewProps) {
   async function syncLeads() {
     setSyncing(true);
     try {
-      const res = await fetch('/api/webhooks/sheets', { method: 'POST' });
+      const res = await fetch('/api/webhooks/sheets?source=manual', { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
         toast.show(`Imported ${data.imported} new leads from Google Sheets`, 'success');
@@ -101,13 +102,21 @@ export function DashboardView(props: DashboardViewProps) {
           </h1>
           <p className="text-sm text-[color:var(--color-muted-ink)] mt-0.5">{today}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" leftIcon={<RefreshCw className={syncing ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />} loading={syncing} onClick={syncLeads}>
-            Sync leads
-          </Button>
-          <Button size="sm" leftIcon={<Sparkles className="h-4 w-4" />} onClick={() => (window.location.href = '/quotations/generate')}>
-            Generate quote
-          </Button>
+        <div className="flex flex-col items-end gap-1">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" leftIcon={<RefreshCw className={syncing ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />} loading={syncing} onClick={syncLeads}>
+              Sync leads
+            </Button>
+            <Button size="sm" leftIcon={<Sparkles className="h-4 w-4" />} onClick={() => (window.location.href = '/quotations/generate')}>
+              Generate quote
+            </Button>
+          </div>
+          {lastSync && (
+            <span className="text-[10px] text-[color:var(--color-muted-ink)] mr-2">
+              Last synced: {new Date(lastSync.time).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}
+              {' '}({lastSync.source === 'manual' ? 'Manual' : 'Auto'})
+            </span>
+          )}
         </div>
       </div>
 
@@ -195,21 +204,21 @@ export function DashboardView(props: DashboardViewProps) {
             </div>
           </CardHeader>
           <div className="grid grid-cols-2 gap-2">
-            <a href="/leads" className="group flex flex-col gap-2 rounded-xl border border-[color:var(--color-hairline)] bg-[color:var(--color-surface)] p-3 hover:border-[color:var(--color-brand-orange)] hover:bg-[color:var(--color-brand-orange)]/5 transition-colors">
-              <ContactIcon className="h-5 w-5 text-[color:var(--color-brand-orange)]" />
-              <span className="text-sm font-semibold">View leads</span>
+            <a href="/leads" className="group flex flex-col gap-2 rounded-xl border border-[color:var(--color-hairline)] bg-[color:var(--color-surface)] p-3 hover:border-[#075056] hover:bg-[#075056]/5 transition-colors">
+              <ContactIcon className="h-5 w-5 text-[color:var(--color-brand-teal)]" />
+              <span className="text-sm font-semibold text-[color:var(--color-ink)]">View leads</span>
             </a>
-            <a href="/quotations/generate" className="group flex flex-col gap-2 rounded-xl border border-[color:var(--color-hairline)] bg-[color:var(--color-surface)] p-3 hover:border-[color:var(--color-brand-orange)] hover:bg-[color:var(--color-brand-orange)]/5 transition-colors">
-              <Sparkles className="h-5 w-5 text-[color:var(--color-brand-orange)]" />
-              <span className="text-sm font-semibold">AI generate</span>
+            <a href="/quotations/generate" className="group flex flex-col gap-2 rounded-xl border border-[color:var(--color-hairline)] bg-[color:var(--color-surface)] p-3 hover:border-[#075056] hover:bg-[#075056]/5 transition-colors">
+              <Sparkles className="h-5 w-5 text-[color:var(--color-brand-teal)]" />
+              <span className="text-sm font-semibold text-[color:var(--color-ink)]">AI generate</span>
             </a>
-            <a href="/new" className="group flex flex-col gap-2 rounded-xl border border-[color:var(--color-hairline)] bg-[color:var(--color-surface)] p-3 hover:border-[color:var(--color-brand-orange)] hover:bg-[color:var(--color-brand-orange)]/5 transition-colors">
-              <FilePlus className="h-5 w-5 text-[color:var(--color-brand-orange)]" />
-              <span className="text-sm font-semibold">Manual quote</span>
+            <a href="/new" className="group flex flex-col gap-2 rounded-xl border border-[color:var(--color-hairline)] bg-[color:var(--color-surface)] p-3 hover:border-[#075056] hover:bg-[#075056]/5 transition-colors">
+              <FilePlus className="h-5 w-5 text-[color:var(--color-brand-teal)]" />
+              <span className="text-sm font-semibold text-[color:var(--color-ink)]">Manual quote</span>
             </a>
-            <a href="/quotations" className="group flex flex-col gap-2 rounded-xl border border-[color:var(--color-hairline)] bg-[color:var(--color-surface)] p-3 hover:border-[color:var(--color-brand-orange)] hover:bg-[color:var(--color-brand-orange)]/5 transition-colors">
-              <FileText className="h-5 w-5 text-[color:var(--color-brand-orange)]" />
-              <span className="text-sm font-semibold">All quotes</span>
+            <a href="/quotations" className="group flex flex-col gap-2 rounded-xl border border-[color:var(--color-hairline)] bg-[color:var(--color-surface)] p-3 hover:border-[#075056] hover:bg-[#075056]/5 transition-colors">
+              <FileText className="h-5 w-5 text-[color:var(--color-brand-teal)]" />
+              <span className="text-sm font-semibold text-[color:var(--color-ink)]">All quotes</span>
             </a>
           </div>
         </Card>
@@ -223,7 +232,7 @@ export function DashboardView(props: DashboardViewProps) {
               <CardTitle>Recent leads</CardTitle>
               <p className="text-xs text-[color:var(--color-muted-ink)]">Latest additions and updates</p>
             </div>
-            <a href="/leads" className="text-xs font-semibold text-[color:var(--color-brand-orange)] hover:underline inline-flex items-center gap-1">
+            <a href="/leads" className="text-xs font-semibold text-ink hover:underline inline-flex items-center gap-1">
               View all <ArrowRight className="h-3 w-3" />
             </a>
           </CardHeader>
@@ -251,7 +260,14 @@ export function DashboardView(props: DashboardViewProps) {
                     </div>
                     <span className="shrink-0 text-xs text-[color:var(--color-muted-ink)] inline-flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      {daysLabel(l.updated_at)}
+                      {new Date(l.created_at).toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      })}
                     </span>
                   </a>
                 </li>
@@ -266,7 +282,7 @@ export function DashboardView(props: DashboardViewProps) {
               <CardTitle>Recent quotations</CardTitle>
               <p className="text-xs text-[color:var(--color-muted-ink)]">Latest drafts and sent quotes</p>
             </div>
-            <a href="/quotations" className="text-xs font-semibold text-[color:var(--color-brand-orange)] hover:underline inline-flex items-center gap-1">
+            <a href="/quotations" className="text-xs font-semibold text-ink hover:underline inline-flex items-center gap-1">
               View all <ArrowRight className="h-3 w-3" />
             </a>
           </CardHeader>

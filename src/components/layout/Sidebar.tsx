@@ -76,7 +76,7 @@ export function Sidebar({ currentPath }: { currentPath: string }) {
     <>
       <div className="flex items-center justify-between px-4 h-14 border-b border-[color:var(--color-hairline)]">
         <a href="/" className="flex items-center gap-2 min-w-0">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-brand-orange)] text-white font-heading font-bold">T</span>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#075056] text-white font-heading font-bold">T</span>
           {!collapsed && (
             <span className="min-w-0">
               <div className="font-heading text-sm font-bold text-[color:var(--color-ink)] truncate">Traverse Globe</div>
@@ -105,17 +105,15 @@ export function Sidebar({ currentPath }: { currentPath: string }) {
                       title={collapsed ? item.label : undefined}
                       className={cn(
                         'relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
-                        active
-                          ? 'bg-[color:var(--color-brand-orange)]/10 text-[color:var(--color-brand-orange)]'
-                          : 'text-[color:var(--color-muted-ink)] hover:bg-[color:var(--color-tint)] hover:text-[color:var(--color-ink)]',
+                        active ? 'bg-[#075056]/10' : 'hover:bg-tint',
                         collapsed && 'justify-center',
                       )}
                     >
                       {active && (
-                        <span aria-hidden="true" className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-[color:var(--color-brand-orange)]" />
+                        <span aria-hidden="true" className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-[#075056]" />
                       )}
-                      <Icon className="h-[18px] w-[18px] shrink-0" />
-                      {!collapsed && <span className="truncate">{item.label}</span>}
+                      <Icon className="h-[18px] w-[18px] shrink-0 text-[color:var(--color-brand-teal)]" />
+                      {!collapsed && <span className="truncate text-[color:var(--color-ink)]">{item.label}</span>}
                     </a>
                   </li>
                 );

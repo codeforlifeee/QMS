@@ -331,7 +331,9 @@ export default function PipelineView() {
               <tr>
                 <th>Name</th>
                 <th>Phone</th>
+                <th>Email</th>
                 <th>City</th>
+                <th>Pax</th>
                 <th>Month</th>
                 <th>Source</th>
                 <th>Status</th>
@@ -348,7 +350,9 @@ export default function PipelineView() {
                 >
                   <td className="crm-table-name">{lead.customer_name}</td>
                   <td>{lead.phone || '-'}</td>
+                  <td>{lead.email || '-'}</td>
                   <td>{lead.city || '-'}</td>
+                  <td>{lead.pax_summary || '-'}</td>
                   <td>{lead.travelling_month || '-'}</td>
                   <td>{lead.source || '-'}</td>
                   <td>
@@ -361,7 +365,14 @@ export default function PipelineView() {
                   </td>
                   <td>{lead.latest_status || '-'}</td>
                   <td className="crm-table-date">
-                    {new Date(lead.created_at).toLocaleDateString()}
+                    {new Date(lead.created_at).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true
+                    })}
                   </td>
                 </tr>
               ))}

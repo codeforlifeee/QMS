@@ -4,19 +4,18 @@ import { getStoredTheme, setTheme, type Theme } from '../../lib/theme';
 import { cn } from '../../lib/cn';
 
 export function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setLocal] = useState<Theme>('system');
+  const [theme, setLocal] = useState<Theme>('light');
 
   useEffect(() => { setLocal(getStoredTheme()); }, []);
 
   const cycle = () => {
-    const order: Theme[] = ['light', 'dark', 'system'];
-    const next = order[(order.indexOf(theme) + 1) % order.length] ?? 'system';
+    const next = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
     setLocal(next);
   };
 
-  const Icon = theme === 'light' ? Sun : theme === 'dark' ? Moon : Monitor;
-  const labels: Record<Theme, string> = { light: 'Light', dark: 'Dark', system: 'System' };
+  const Icon = theme === 'light' ? Sun : Moon;
+  const labels: Record<Theme, string> = { light: 'Light', dark: 'Dark' };
 
   return (
     <button
