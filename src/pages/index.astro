@@ -89,7 +89,39 @@ const quoteRows = recentQuotes.map((q) => {
         <span class="dash-action-icon">&#128203;</span>
         <span class="dash-action-label">All Quotations</span>
       </a>
+      <button id="syncLeadsBtn" class="dash-action-card" style="border: none; cursor: pointer; font-family: inherit; width: 100%;">
+        <span class="dash-action-icon">&#8635;</span>
+        <span class="dash-action-label">Sync Leads Now</span>
+      </button>
     </div>
+
+    <script>
+      const btn = document.getElementById('syncLeadsBtn');
+      if (btn) {
+        btn.addEventListener('click', async () => {
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = '<span class="dash-action-icon">&#8987;</span><span class="dash-action-label">Syncing...</span>';
+          btn.style.opacity = '0.7';
+          btn.style.pointerEvents = 'none';
+          try {
+            const res = await fetch('/api/webhooks/sheets', { method: 'POST' });
+            if (res.ok) {
+              const data = await res.json();
+              alert(`✅ Sync complete! Safely imported ${data.imported} new leads from Google Sheets.`);
+              window.location.reload();
+            } else {
+              alert('❌ Error syncing leads. Check the console.');
+            }
+          } catch (e) {
+            alert('❌ Network error syncing leads.');
+          } finally {
+            btn.innerHTML = originalHTML;
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+          }
+        });
+      }
+    </script>
 
     <!-- Recent Activity -->
     <div class="dash-grid">
