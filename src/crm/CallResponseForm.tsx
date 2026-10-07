@@ -12,36 +12,43 @@ import {
 interface Props {
   lead: Lead;
   latestCall: CallResponse | null;
+  editCall?: CallResponse | null;
   onSave: () => void;
   onCancel: () => void;
 }
 
-export function CallResponseForm({ lead, latestCall, onSave, onCancel }: Props) {
+export function CallResponseForm({ lead, latestCall, editCall, onSave, onCancel }: Props) {
   const now = new Date();
   const nowStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
+  const formatDateTime = (isoString?: string) => {
+    if (!isoString) return nowStr;
+    const d = new Date(isoString);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  };
+
   const [form, setForm] = useState({
-    call_date_time: nowStr,
-    called_by: latestCall?.called_by || '',
-    call_status: '' as string,
-    call_progress: '',
-    wa_status: 'WA Not sent',
-    destination_city: latestCall?.destination_city || '',
-    travel_date: latestCall?.travel_date || '',
-    total_adults: latestCall?.total_adults || 2,
-    total_children: latestCall?.total_children || 0,
-    child_ages: (latestCall?.child_ages || []).join(', '),
-    total_nights: latestCall?.total_nights || 0,
-    hotel_category: latestCall?.hotel_category || '',
-    visa: latestCall?.visa || '',
-    flights: latestCall?.flights || '',
-    transfers_type: latestCall?.transfers_type || '',
-    requirements: '',
-    remarks: '',
-    budget: latestCall?.budget || '',
-    next_follow_up: '',
-    lead_source: latestCall?.lead_source || '',
-    priority: latestCall?.priority || '',
+    call_date_time: formatDateTime(editCall?.call_date_time),
+    called_by: editCall?.called_by || latestCall?.called_by || '',
+    call_status: editCall?.call_status || '',
+    call_progress: editCall?.call_progress || '',
+    wa_status: editCall?.wa_status || 'WA Not sent',
+    destination_city: editCall?.destination_city || latestCall?.destination_city || '',
+    travel_date: editCall?.travel_date || latestCall?.travel_date || '',
+    total_adults: editCall?.total_adults ?? latestCall?.total_adults ?? 2,
+    total_children: editCall?.total_children ?? latestCall?.total_children ?? 0,
+    child_ages: ((editCall?.child_ages || latestCall?.child_ages) || []).join(', '),
+    total_nights: editCall?.total_nights ?? latestCall?.total_nights ?? 0,
+    hotel_category: editCall?.hotel_category || latestCall?.hotel_category || '',
+    visa: editCall?.visa || latestCall?.visa || '',
+    flights: editCall?.flights || latestCall?.flights || '',
+    transfers_type: editCall?.transfers_type || latestCall?.transfers_type || '',
+    requirements: editCall?.requirements || '',
+    remarks: editCall?.remarks || '',
+    budget: editCall?.budget || latestCall?.budget || '',
+    next_follow_up: editCall?.next_follow_up || '',
+    lead_source: editCall?.lead_source || latestCall?.lead_source || '',
+    priority: editCall?.priority || latestCall?.priority || '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -67,8 +74,14 @@ export function CallResponseForm({ lead, latestCall, onSave, onCancel }: Props) 
         priority: form.priority || null,
       };
 
-      const res = await fetch(`/api/leads/${lead.id}/calls`, {
-        method: 'POST',
+      const url = editCall 
+        ? `/api/leads/${lead.id}/calls/${editCall.id}`
+        : `/api/leads/${lead.id}/calls`;
+        
+      const method = editCall ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(payload),
       });

@@ -75,6 +75,8 @@ export function LeadPage({ leadId }: Props) {
     }
   };
 
+  const [editingCallId, setEditingCallId] = useState<string | null>(null);
+
   const toggleCall = (callId: string) => {
     setExpandedCalls((prev) => {
       const next = new Set(prev);
@@ -85,6 +87,21 @@ export function LeadPage({ leadId }: Props) {
       }
       return next;
     });
+  };
+
+  const handleDeleteCall = async (callId: string) => {
+    if (!confirm('Are you sure you want to delete this call record?')) return;
+    try {
+      const res = await fetch(`/api/leads/${leadId}/calls/${callId}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || 'Failed to delete call');
+      }
+      showToast('Call deleted successfully', 'success');
+      fetchData();
+    } catch (e: any) {
+      showToast(e.message, 'error');
+    }
   };
 
   if (loading) {
@@ -264,7 +281,20 @@ export function LeadPage({ leadId }: Props) {
                         </div>
                       </button>
 
-                      {expandedCalls.has(call.id) && (
+                      {editingCallId === call.id ? (
+                        <div className="crm-call-card-body" style={{ padding: 0 }}>
+                          <CallResponseForm
+                            lead={lead}
+                            latestCall={latestCall}
+                            editCall={call}
+                            onSave={() => {
+                              setEditingCallId(null);
+                              fetchData();
+                            }}
+                            onCancel={() => setEditingCallId(null)}
+                          />
+                        </div>
+                      ) : expandedCalls.has(call.id) ? (
                         <div className="crm-call-card-body">
                           <div className="crm-call-grid">
                             {call.destination_city && (
@@ -348,7 +378,7 @@ export function LeadPage({ leadId }: Props) {
                             </div>
                           )}
 
-                          <div className="crm-call-card-actions">
+                          <div className="crm-call-card-actions" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                             <button
                               className="btn btn-sm"
                               onClick={() => {
@@ -357,9 +387,22 @@ export function LeadPage({ leadId }: Props) {
                             >
                               Generate Quote from this Call
                             </button>
+                            <button
+                              className="btn btn-sm"
+                              onClick={() => setEditingCallId(call.id)}
+                            >
+                              Edit Call
+                            </button>
+                            <button
+                              className="btn btn-sm btn-danger"
+                              onClick={() => handleDeleteCall(call.id)}
+                              style={{ color: 'var(--color-danger)' }}
+                            >
+                              Delete Call
+                            </button>
                           </div>
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   ))}
                 </div>
