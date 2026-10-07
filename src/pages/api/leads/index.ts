@@ -25,20 +25,25 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (!body.customer_name) return json({ error: 'customer_name is required' }, 400);
 
-  const lead = await leadRepo.create({
-    customer_name: body.customer_name,
-    phone: body.phone,
-    email: body.email,
-    city: body.city,
-    travelling_month: body.travelling_month,
-    planning_with: body.planning_with,
-    pax_summary: body.pax_summary,
-    special_arrangements: body.special_arrangements,
-    source: body.source,
-    priority_bucket: body.priority_bucket || 'Untouched Leads',
-  });
+  try {
+    const lead = await leadRepo.create({
+      date: new Date().toISOString().split('T')[0], // Providing default date
+      customer_name: body.customer_name,
+      phone: body.phone || null,
+      email: body.email || null,
+      city: body.city || null,
+      travelling_month: body.travelling_month || null,
+      planning_with: body.planning_with || null,
+      pax_summary: body.pax_summary || null,
+      special_arrangements: body.special_arrangements || null,
+      source: body.source || null,
+      priority_bucket: body.priority_bucket || 'Untouched Leads',
+    });
 
-  return json({ ok: true, lead }, 201);
+    return json({ ok: true, lead }, 201);
+  } catch (error: any) {
+    return json({ error: error.message || 'Failed to create lead' }, 500);
+  }
 };
 
 function json(body: unknown, status = 200): Response {
