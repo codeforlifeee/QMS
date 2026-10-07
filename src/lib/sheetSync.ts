@@ -4,15 +4,32 @@ import { getSupabase } from '../data/supabase.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const SHEET_ID = '1niYNMdUZsWGnH2BxsnmG8DtKUfI3gecWNKp4jkOGmPA';
-const TAB_NAME = 'reel_43000';
+const DEFAULT_SHEET_ID = '1niYNMdUZsWGnH2BxsnmG8DtKUfI3gecWNKp4jkOGmPA';
+const DEFAULT_TAB_NAME = 'Custom+Deals';
+
+function getSheetConfig() {
+  try {
+    const configPath = path.resolve(process.cwd(), 'data', 'sheet_config.json');
+    if (fs.existsSync(configPath)) {
+      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      if (config.sheetId && config.tabName) {
+        return { sheetId: config.sheetId, tabName: config.tabName };
+      }
+    }
+  } catch (err) {
+    console.error('Failed to read sheet config', err);
+  }
+  return { sheetId: DEFAULT_SHEET_ID, tabName: DEFAULT_TAB_NAME };
+}
 
 export async function syncFromSheet(source: string = 'webhook'): Promise<{ imported: number; errors: string[] }> {
+  const { sheetId, tabName } = getSheetConfig();
+
   // @ts-ignore
   const apiKey = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.GOOGLE_SHEETS_API_KEY) || process.env.GOOGLE_SHEETS_API_KEY;
   if (!apiKey) throw new Error('GOOGLE_SHEETS_API_KEY not set');
 
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(TAB_NAME)}?key=${apiKey}`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(tabName)}?key=${apiKey}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Sheets API ${res.status}: ${await res.text()}`);
 

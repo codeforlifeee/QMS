@@ -3,8 +3,9 @@ import type { Lead, PriorityBucket } from '../data/leadSchema.js';
 import { PRIORITY_BUCKETS, LEAD_SOURCES, CALL_STATUSES } from '../data/leadSchema.js';
 import { showToast } from '../components/Toast.js';
 import { AddLeadForm } from './AddLeadForm.js';
-import { Filter, RefreshCw, Plus, X, Trash2 } from 'lucide-react';
+import { Filter, RefreshCw, Plus, X, Trash2, Settings } from 'lucide-react';
 import { formatPhone, copyAndToast } from '../lib/contact.js';
+import { SheetSettingsModal } from './SheetSettingsModal.js';
 
 const BUCKET_COLORS: Record<PriorityBucket, string> = {
   'Untouched Leads': '#6366f1',
@@ -24,6 +25,7 @@ export default function PipelineView() {
   const [syncing, setSyncing] = useState(false);
   const [showAddLead, setShowAddLead] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showSheetSettings, setShowSheetSettings] = useState(false);
 
   const [bucketFilter, setBucketFilter] = useState<PriorityBucket | ''>('');
   const [sourceFilter, setSourceFilter] = useState('');
@@ -188,6 +190,9 @@ export default function PipelineView() {
             <RefreshCw size={14} style={{ marginRight: 4 }} />
             {syncing ? 'Syncing...' : 'Sync Sheet'}
           </button>
+          <button className="btn btn-sm" onClick={() => setShowSheetSettings(true)} title="Sheet Settings">
+            <Settings size={14} />
+          </button>
           <button className="btn btn-sm btn-primary" onClick={() => setShowAddLead(true)}>
             <Plus size={14} style={{ marginRight: 4 }} />
             Add Lead
@@ -267,6 +272,10 @@ export default function PipelineView() {
           onSave={() => { setShowAddLead(false); fetchLeads(); }}
           onClose={() => setShowAddLead(false)}
         />
+      )}
+
+      {showSheetSettings && (
+        <SheetSettingsModal onClose={() => setShowSheetSettings(false)} />
       )}
 
       {/* ── Table ── */}
