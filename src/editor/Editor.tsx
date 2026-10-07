@@ -20,7 +20,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Download, Link } from 'lucide-react';
+import { GripVertical, Download, Link, MessageCircle } from 'lucide-react';
 
 /**
  * The editor.
@@ -298,14 +298,28 @@ export default function Editor({ initial }: Props) {
     }
     return map;
   }, [priced]);
-  const handleCopyLink = () => {
-    const url = `${window.location.origin}/q/${q.token}`;
-    navigator.clipboard.writeText(url);
-    showToast('Client link copied to clipboard!', 'success');
+  const handleWhatsAppShare = () => {
+    // 1. Download the PDF
+    window.location.href = `/api/pdf/${q.token}`;
+
+    // 2. Open WhatsApp Web
+    const whatsappNumber = q.client.phone ? q.client.phone.replace(/\D/g, '') : '';
+    const headline = formatMoney(priced.ok ? priced.result.grandTotal : 0n, { showDecimals: false });
+    const text = encodeURIComponent(
+      `Hi ${q.client.name}, your quotation "${q.title}" (${q.reference}) is ready — ${headline}. Please find the PDF attached.`
+    );
+    const waUrl = whatsappNumber 
+      ? `https://wa.me/${whatsappNumber}?text=${text}`
+      : `https://web.whatsapp.com/send?text=${text}`;
+
+    setTimeout(() => {
+      window.open(waUrl, '_blank');
+      showToast('PDF downloading. Please attach it in WhatsApp.', 'success');
+    }, 500);
   };
 
   const handleDownloadPdf = () => {
-    window.open(`/api/pdf/${q.token}`, '_blank');
+    window.open(`/api/pdf/${q.token}`, '_self');
   };
 
   return (
@@ -325,11 +339,11 @@ export default function Editor({ initial }: Props) {
             </button>
             <button
               className="btn btn-sm"
-              onClick={handleCopyLink}
-              title="Copy Client Link"
+              onClick={handleWhatsAppShare}
+              title="Download PDF and share via WhatsApp"
             >
-              <Link size={14} style={{ marginRight: 6 }} />
-              Share Link
+              <MessageCircle size={14} style={{ marginRight: 6 }} />
+              WhatsApp
             </button>
             <div style={{ width: '1px', height: '20px', background: 'var(--color-hairline)', margin: '0 8px' }} />
             <button
