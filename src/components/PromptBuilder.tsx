@@ -269,8 +269,8 @@ export default function PromptBuilder({ leadId, callId }: PromptBuilderProps) {
                 <span>Generating your quotation...</span>
                 <span>{Math.round(progress)}%</span>
               </div>
-              <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--border-color)', borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${progress}%`, height: '100%', backgroundColor: 'var(--color-primary)', transition: 'width 0.5s ease-out' }} />
+              <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--color-hairline)', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: `${progress}%`, height: '100%', backgroundColor: 'var(--color-brand-teal)', transition: 'width 0.5s ease-out' }} />
               </div>
             </div>
           )}

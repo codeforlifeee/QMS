@@ -3,7 +3,7 @@ import type { Lead, PriorityBucket } from '../data/leadSchema.js';
 import { PRIORITY_BUCKETS, LEAD_SOURCES, CALL_STATUSES } from '../data/leadSchema.js';
 import { showToast } from '../components/Toast.js';
 import { AddLeadForm } from './AddLeadForm.js';
-import { Filter, RefreshCw, Plus, X } from 'lucide-react';
+import { Filter, RefreshCw, Plus, X, Trash2 } from 'lucide-react';
 import { formatPhone, copyAndToast } from '../lib/contact.js';
 
 const BUCKET_COLORS: Record<PriorityBucket, string> = {
@@ -60,6 +60,20 @@ export default function PipelineView() {
       showToast(`Sync failed: ${err.message}`, 'error');
     }
     setSyncing(false);
+  };
+
+  const handleDeleteLead = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this lead? This action cannot be undone.')) return;
+    
+    try {
+      const res = await fetch(`/api/leads/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete lead');
+      showToast('Lead deleted successfully', 'success');
+      fetchLeads();
+    } catch (err: any) {
+      showToast(err.message, 'error');
+    }
   };
 
   const uniqueCities = useMemo(() => {
@@ -273,6 +287,7 @@ export default function PipelineView() {
                 <th>Status</th>
                 <th>Latest Status</th>
                 <th>Created</th>
+                <th style={{ textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -334,6 +349,16 @@ export default function PipelineView() {
                       minute: '2-digit',
                       hour12: true
                     })}
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button
+                      className="btn btn-sm crm-delete-btn"
+                      onClick={(e) => handleDeleteLead(e, lead.id)}
+                      title="Delete Lead"
+                      style={{ color: 'var(--color-danger)', border: 'none', background: 'transparent', padding: '4px' }}
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))}

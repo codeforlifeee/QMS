@@ -38,6 +38,14 @@ export const leadRepo = {
     return data as Lead;
   },
 
+  async delete(id: string): Promise<void> {
+    const sb = getSupabase();
+    // First delete associated call responses due to FK constraint (if not CASCADE)
+    await sb.from('call_responses').delete().eq('lead_id', id);
+    const { error } = await sb.from('leads').delete().eq('id', id);
+    if (error) throw error;
+  },
+
   async upsertByExternalId(lead: Partial<Lead> & { external_id: string }): Promise<Lead> {
     const sb = getSupabase();
     const { data, error } = await sb

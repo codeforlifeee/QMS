@@ -26,6 +26,15 @@ export const PUT: APIRoute = async ({ params, request }) => {
   return json({ ok: true, lead: updated });
 };
 
+export const DELETE: APIRoute = async ({ params }) => {
+  try {
+    await leadRepo.delete(params.id!);
+    return json({ ok: true });
+  } catch (err: any) {
+    return json({ error: err.message || 'Failed to delete lead' }, 500);
+  }
+};
+
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
