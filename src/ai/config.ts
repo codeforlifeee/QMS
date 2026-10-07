@@ -27,10 +27,11 @@ export function getProvider(name?: string): LlmProvider {
     return new GroqProvider(key);
   }
 
-  if (providerName === 'openai') {
+  if (providerName.startsWith('openai')) {
     const key = import.meta.env.OPENAI_API_KEY;
     if (!key) throw new Error('OPENAI_API_KEY is not set');
-    return new OpenAIProvider(key);
+    const model = providerName.includes('mini') ? 'gpt-4o-mini' : 'gpt-4o';
+    return new OpenAIProvider(key, model);
   }
 
   if (providerName.startsWith('gemini')) {

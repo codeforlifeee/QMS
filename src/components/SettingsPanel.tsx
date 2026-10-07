@@ -79,10 +79,12 @@ export function SettingsPanel({ company }: { company: { name: string; email?: st
           </Select>
           <Input label="Default markup (%)" type="number" min={0} max={100} value={markup} onChange={(e) => setMarkup(e.target.value)} />
           <Select label="Default AI provider" value={provider} onChange={(e) => setProvider(e.target.value)}>
-            <option value="claude">Claude (Anthropic)</option>
-            <option value="openai">GPT (OpenAI)</option>
-            <option value="groq">Groq</option>
-            <option value="gemini">Gemini (Google)</option>
+            <option value="openai">OpenAI (GPT-4o)</option>
+            <option value="openai-mini">OpenAI (GPT-4o Mini)</option>
+            <option value="groq">Groq (Qwen 3.8 27B)</option>
+            <option value="claude">Claude</option>
+            <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+            <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite</option>
           </Select>
           <Button size="sm" leftIcon={<Save className="h-4 w-4" />} onClick={saveDefaults}>Save defaults</Button>
         </div>

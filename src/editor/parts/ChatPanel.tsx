@@ -50,8 +50,9 @@ export function ChatPanel({ session, onSend, onApplyChange, onClose }: ChatPanel
             onChange={(e) => setProvider(e.target.value)}
             className="chat-provider-select"
           >
-            <option value="groq">Groq (Llama)</option>
-            <option value="openai">OpenAI (ChatGPT)</option>
+            <option value="groq">Groq (Qwen 3.8 27B)</option>
+            <option value="openai">OpenAI (GPT-4o)</option>
+            <option value="openai-mini">OpenAI (GPT-4o Mini)</option>
             <option value="claude">Claude</option>
             <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
             <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite</option>

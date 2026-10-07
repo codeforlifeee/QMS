@@ -3,9 +3,11 @@ import type { LlmProvider, ChatMessage, LlmOptions, LlmResponse } from '../provi
 
 export class OpenAIProvider implements LlmProvider {
   private client: OpenAI;
+  private modelName: string;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, modelName: string = 'gpt-4o') {
     this.client = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+    this.modelName = modelName;
   }
 
   async chat(messages: ChatMessage[], opts: LlmOptions): Promise<LlmResponse> {
@@ -49,7 +51,7 @@ export class OpenAIProvider implements LlmProvider {
 
     const useJsonMode = !!opts.jsonSchema && !tools;
     const response = await this.client.chat.completions.create({
-      model: 'gpt-4o',
+      model: this.modelName,
       messages: formattedMessages,
       max_completion_tokens: opts.maxTokens || 4096,
       temperature: opts.temperature ?? 0,
@@ -88,7 +90,7 @@ export class OpenAIProvider implements LlmProvider {
     }));
 
     const stream = await this.client.chat.completions.create({
-      model: 'gpt-4o',
+      model: this.modelName,
       messages: formattedMessages,
       max_completion_tokens: opts.maxTokens || 4096,
       temperature: opts.temperature ?? 0,
