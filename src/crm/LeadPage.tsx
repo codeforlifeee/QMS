@@ -5,6 +5,7 @@ import { CallResponseForm } from './CallResponseForm.js';
 import { generateWALink } from '../lib/whatsapp.js';
 import { showToast } from '../components/Toast.js';
 import { EmailComposer } from '../components/email/EmailComposer.js';
+import { WhatsAppComposer } from '../components/whatsapp/WhatsAppComposer.js';
 import { formatPhone, copyAndToast } from '../lib/contact.js';
 
 interface Quotation {
@@ -27,6 +28,7 @@ export function LeadPage({ leadId }: Props) {
   const [showCallForm, setShowCallForm] = useState(false);
   const [expandedCalls, setExpandedCalls] = useState<Set<string>>(new Set());
   const [showEmail, setShowEmail] = useState(false);
+  const [showWhatsApp, setShowWhatsApp] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -237,16 +239,12 @@ export function LeadPage({ leadId }: Props) {
             >
               Manual Quote
             </button>
-            {waLink && (
-              <a href={waLink} target="_blank" rel="noopener" className="btn btn-wa">
+            {cleanPhone && (
+              <button className="btn btn-wa" onClick={() => setShowWhatsApp(true)}>
                 WhatsApp
-              </a>
-            )}
-            {lead.email && (
-              <button className="btn" onClick={() => setShowEmail(true)}>
-                Email
               </button>
             )}
+            {/* Email logic is retained but the UI button is removed as per user request */}
           </div>
 
           {/* Two-column content area */}
@@ -466,6 +464,17 @@ export function LeadPage({ leadId }: Props) {
         defaultSubject={`Following up — ${lead.city || 'Traverse Globe'}`}
         defaultBody={`Hi ${lead.customer_name || 'there'},\n\nThanks for your interest in travelling with Traverse Globe. I'd love to help plan the perfect trip for you.\n\n— Traverse Globe`}
       />
+      {lead && (
+        <WhatsAppComposer
+          open={showWhatsApp}
+          onClose={() => setShowWhatsApp(false)}
+          defaultPhone={cleanPhone || ''}
+          vars={{
+            name: lead.customer_name || '',
+            destination: latestCall?.destination_city || lead.city || '',
+          }}
+        />
+      )}
     </div>
   );
 }
