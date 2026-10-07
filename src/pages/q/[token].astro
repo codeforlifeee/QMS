@@ -12,10 +12,16 @@ const loaded = await loadByToken(Astro.params.token);
 if (!loaded) return new Response('Quotation not found', { status: 404 });
 const { q, result } = loaded;
 
-const whatsappNumber = COMPANY.whatsapp[0];
+// Use the client's phone number if available; otherwise fallback to the company number
+const whatsappNumber = q.client.phone ? q.client.phone.replace(/\D/g, '') : COMPANY.whatsapp[0].replace(/\D/g, '');
 const headline = formatMoney(result.grandTotal, { showDecimals: false });
+
+// Fix localhost issue by checking if an environment variable is set for the actual domain
+const baseDomain = import.meta.env.PUBLIC_SITE_URL || import.meta.env.SITE_URL || (Astro.url.origin.includes('localhost') ? 'https://qms-traverse-globe.onrender.com' : Astro.url.origin);
+const shareUrl = `${baseDomain}/q/${q.token}`;
+
 const shareText = encodeURIComponent(
-  `Hi ${q.client.name}, your quotation "${q.title}" (${q.reference}) is ready — ${headline}. View here: ${Astro.url.href}`,
+  `Hi ${q.client.name}, your quotation "${q.title}" (${q.reference}) is ready — ${headline}. View here: ${shareUrl}`,
 );
 ---
 

@@ -203,7 +203,12 @@ export default function PromptBuilder({ leadId, callId }: PromptBuilderProps) {
               </button>
             </>
           ) : (
-            <p className="pb-no-data">No call data found for this lead.</p>
+            <div style={{ textAlign: 'center' }}>
+              <p className="pb-no-data" style={{ marginBottom: '16px' }}>No call data found for this lead.</p>
+              <button className="btn btn-primary" onClick={() => setStep(2)}>
+                Write Prompt Manually
+              </button>
+            </div>
           )}
         </div>
       )}

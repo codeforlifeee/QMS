@@ -4,6 +4,7 @@ import { paxSummary, toEngineInput, tripDuration } from '../data/schema.js';
 import { priceQuotation, PricingError } from '../pricing/engine.js';
 import { formatMoney, formatPct } from '../pricing/money.js';
 import type { LineType, QuoteResult } from '../pricing/types.js';
+import { showToast } from '../components/Toast.js';
 import QuotationDocument from '../document/QuotationDocument.js';
 import { defaultLineOf, LINE_TYPES, moveItem } from './factories.js';
 import DayEditor from './parts/DayEditor.js';
@@ -19,7 +20,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Download, Link } from 'lucide-react';
 
 /**
  * The editor.
@@ -297,6 +298,15 @@ export default function Editor({ initial }: Props) {
     }
     return map;
   }, [priced]);
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/q/${q.token}`;
+    navigator.clipboard.writeText(url);
+    showToast('Client link copied to clipboard!', 'success');
+  };
+
+  const handleDownloadPdf = () => {
+    window.open(`/api/pdf/${q.token}`, '_blank');
+  };
 
   return (
     <div className="editor flex h-screen">
@@ -305,6 +315,23 @@ export default function Editor({ initial }: Props) {
         <div className="editor-toolbar">
           <SaveBadge state={saveState} error={saveError} />
           <div className="editor-toolbar-actions">
+            <button
+              className="btn btn-sm"
+              onClick={handleDownloadPdf}
+              title="Open Print View to Download PDF"
+            >
+              <Download size={14} style={{ marginRight: 6 }} />
+              Download PDF
+            </button>
+            <button
+              className="btn btn-sm"
+              onClick={handleCopyLink}
+              title="Copy Client Link"
+            >
+              <Link size={14} style={{ marginRight: 6 }} />
+              Share Link
+            </button>
+            <div style={{ width: '1px', height: '20px', background: 'var(--color-hairline)', margin: '0 8px' }} />
             <button
               className={`btn btn-sm editor-toggle-btn${chatOpen ? ' active' : ''}`}
               onClick={() => { setChatOpen(!chatOpen); if (!chatOpen) setShowSources(false); }}
