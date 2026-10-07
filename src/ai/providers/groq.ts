@@ -53,7 +53,7 @@ export class GroqProvider implements LlmProvider {
     // json_object + tools is not a supported combination — tools take precedence.
     const useJsonMode = !!opts.jsonSchema && !tools;
     const response = await this.client.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'qwen/qwen3.8-27b',
       messages: formattedMessages,
       max_completion_tokens: opts.maxTokens || 4096,
       temperature: opts.temperature ?? 0,
@@ -92,7 +92,7 @@ export class GroqProvider implements LlmProvider {
     }));
 
     const stream = await this.client.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'qwen/qwen3.8-27b',
       messages: formattedMessages,
       max_completion_tokens: opts.maxTokens || 4096,
       temperature: opts.temperature ?? 0,

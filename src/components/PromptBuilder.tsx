@@ -38,6 +38,22 @@ export default function PromptBuilder({ leadId, callId }: PromptBuilderProps) {
 
   // Current step
   const [step, setStep] = useState<Step>(hasLead ? 1 : 2);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (generating) {
+      setProgress(0);
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          const next = prev + (95 - prev) * 0.05;
+          return next > 95 ? 95 : next;
+        });
+      }, 500);
+      return () => clearInterval(interval);
+    } else if (result || genError) {
+      setProgress(100);
+    }
+  }, [generating, result, genError]);
 
   // Fetch lead data when leadId is present
   useEffect(() => {
@@ -245,6 +261,18 @@ export default function PromptBuilder({ leadId, callId }: PromptBuilderProps) {
               )}
             </button>
           </div>
+
+          {(generating || progress > 0) && progress < 100 && (
+            <div className="pb-progress-container" style={{ marginTop: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--app-muted)', marginBottom: '4px' }}>
+                <span>Generating your quotation...</span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+              <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--border-color)', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: `${progress}%`, height: '100%', backgroundColor: 'var(--color-primary)', transition: 'width 0.5s ease-out' }} />
+              </div>
+            </div>
+          )}
 
           {hasLead && (
             <button className="btn pb-btn-back" onClick={() => setStep(1)}>
