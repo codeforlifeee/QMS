@@ -54,7 +54,11 @@ export default function PipelineView() {
       const data = await res.json();
       if (data.ok) {
         await fetchLeads();
-        showToast(`Synced ${data.imported} leads from Google Sheet`, 'success');
+        if (data.errors && data.errors.length > 0) {
+          showToast(`Synced ${data.imported} leads. Errors: ${data.errors[0]}`, 'error');
+        } else {
+          showToast(`Synced ${data.imported} leads from Google Sheet`, 'success');
+        }
       } else {
         showToast(`Sync error: ${data.error}`, 'error');
       }
