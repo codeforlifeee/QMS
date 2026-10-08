@@ -227,14 +227,21 @@
   background: var(--color-tint);
   border-bottom: 1px solid var(--color-hairline);
   white-space: nowrap;
+  position: relative;
 }
-.crm-th-resize {
-  resize: horizontal;
-  overflow: hidden;
-  display: inline-flex;
-  align-items: center;
-  min-width: 20px;
-  padding-right: 4px; /* Space for resize handle */
+.crm-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  user-select: none;
+  background: transparent;
+  z-index: 10;
+}
+.crm-resizer:hover, .crm-resizer:active {
+  background: var(--color-brand-teal);
 }
 .crm-table td {
   padding: 6px 6px;

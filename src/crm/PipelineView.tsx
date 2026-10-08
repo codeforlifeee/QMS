@@ -45,6 +45,32 @@ export default function PipelineView() {
     setLoading(false);
   }, []);
 
+  const [colWidths, setColWidths] = useState<Record<string, number>>({});
+  
+  const handleResizeStart = (e: React.MouseEvent, colKey: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const startX = e.pageX;
+    const th = (e.target as HTMLElement).closest('th');
+    const startWidth = th ? th.getBoundingClientRect().width : 100;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const newWidth = Math.max(30, startWidth + (moveEvent.pageX - startX));
+      setColWidths(prev => ({ ...prev, [colKey]: newWidth }));
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = 'default';
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = 'col-resize';
+  };
+
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
 
   const handleSync = async () => {
@@ -290,19 +316,19 @@ export default function PipelineView() {
           <table className="crm-table">
             <thead>
               <tr>
-                <th><div className="crm-th-resize">Name</div></th>
-                <th><div className="crm-th-resize">Phone</div></th>
-                <th><div className="crm-th-resize">Email</div></th>
-                <th><div className="crm-th-resize">City</div></th>
-                <th><div className="crm-th-resize">Pax</div></th>
-                <th><div className="crm-th-resize">Month</div></th>
-                <th><div className="crm-th-resize">Source</div></th>
-                <th><div className="crm-th-resize">Budget</div></th>
-                <th><div className="crm-th-resize">Call Time</div></th>
-                <th><div className="crm-th-resize">Status</div></th>
-                <th><div className="crm-th-resize">Latest Status</div></th>
-                <th><div className="crm-th-resize">Created</div></th>
-                <th style={{ textAlign: 'right' }}><div className="crm-th-resize" style={{ justifyContent: 'flex-end' }}>Actions</div></th>
+                <th style={{ width: colWidths.name, minWidth: colWidths.name, maxWidth: colWidths.name }}>Name<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'name')} /></th>
+                <th style={{ width: colWidths.phone, minWidth: colWidths.phone, maxWidth: colWidths.phone }}>Phone<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'phone')} /></th>
+                <th style={{ width: colWidths.email, minWidth: colWidths.email, maxWidth: colWidths.email }}>Email<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'email')} /></th>
+                <th style={{ width: colWidths.city, minWidth: colWidths.city, maxWidth: colWidths.city }}>City<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'city')} /></th>
+                <th style={{ width: colWidths.pax, minWidth: colWidths.pax, maxWidth: colWidths.pax }}>Pax<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'pax')} /></th>
+                <th style={{ width: colWidths.month, minWidth: colWidths.month, maxWidth: colWidths.month }}>Month<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'month')} /></th>
+                <th style={{ width: colWidths.source, minWidth: colWidths.source, maxWidth: colWidths.source }}>Source<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'source')} /></th>
+                <th style={{ width: colWidths.budget, minWidth: colWidths.budget, maxWidth: colWidths.budget }}>Budget<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'budget')} /></th>
+                <th style={{ width: colWidths.callTime, minWidth: colWidths.callTime, maxWidth: colWidths.callTime }}>Call Time<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'callTime')} /></th>
+                <th style={{ width: colWidths.status, minWidth: colWidths.status, maxWidth: colWidths.status }}>Status<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'status')} /></th>
+                <th style={{ width: colWidths.latestStatus, minWidth: colWidths.latestStatus, maxWidth: colWidths.latestStatus }}>Latest Status<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'latestStatus')} /></th>
+                <th style={{ width: colWidths.created, minWidth: colWidths.created, maxWidth: colWidths.created }}>Created<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'created')} /></th>
+                <th style={{ textAlign: 'right', width: colWidths.actions, minWidth: colWidths.actions, maxWidth: colWidths.actions }}>Actions<div className="crm-resizer" onMouseDown={(e) => handleResizeStart(e, 'actions')} /></th>
               </tr>
             </thead>
             <tbody>
@@ -318,8 +344,9 @@ export default function PipelineView() {
                   onClick={() => { window.location.href = `/leads/${lead.id}`; }}
                   className="crm-table-row"
                 >
-                  <td className="crm-table-name">{lead.customer_name}</td>
+                  <td style={{ width: colWidths.name, minWidth: colWidths.name, maxWidth: colWidths.name }} className="crm-table-name">{lead.customer_name}</td>
                   <td
+                    style={{ width: colWidths.phone, minWidth: colWidths.phone, maxWidth: colWidths.phone }}
                     onClick={(e) => {
                       const p = formatPhone(lead.phone);
                       if (!p) return;
@@ -332,6 +359,7 @@ export default function PipelineView() {
                     {formatPhone(lead.phone) || '-'}
                   </td>
                   <td
+                    style={{ width: colWidths.email, minWidth: colWidths.email, maxWidth: colWidths.email }}
                     onClick={(e) => {
                       if (!lead.email) return;
                       e.stopPropagation();
@@ -342,13 +370,13 @@ export default function PipelineView() {
                   >
                     {lead.email || '-'}
                   </td>
-                  <td>{lead.city || '-'}</td>
-                  <td>{lead.pax_summary || '-'}</td>
-                  <td>{lead.travelling_month || '-'}</td>
-                  <td>{lead.source || '-'}</td>
-                  <td>{lead.budget || '-'}</td>
-                  <td>{lead.preferred_call_time || '-'}</td>
-                  <td>
+                  <td style={{ width: colWidths.city, minWidth: colWidths.city, maxWidth: colWidths.city }}>{lead.city || '-'}</td>
+                  <td style={{ width: colWidths.pax, minWidth: colWidths.pax, maxWidth: colWidths.pax }}>{lead.pax_summary || '-'}</td>
+                  <td style={{ width: colWidths.month, minWidth: colWidths.month, maxWidth: colWidths.month }}>{lead.travelling_month || '-'}</td>
+                  <td style={{ width: colWidths.source, minWidth: colWidths.source, maxWidth: colWidths.source }}>{lead.source || '-'}</td>
+                  <td style={{ width: colWidths.budget, minWidth: colWidths.budget, maxWidth: colWidths.budget }}>{lead.budget || '-'}</td>
+                  <td style={{ width: colWidths.callTime, minWidth: colWidths.callTime, maxWidth: colWidths.callTime }}>{lead.preferred_call_time || '-'}</td>
+                  <td style={{ width: colWidths.status, minWidth: colWidths.status, maxWidth: colWidths.status }}>
                     <span
                       className="crm-bucket-pill"
                       style={{ background: BUCKET_COLORS[lead.priority_bucket] }}
@@ -356,8 +384,8 @@ export default function PipelineView() {
                       {lead.priority_bucket}
                     </span>
                   </td>
-                  <td>{lead.latest_status || '-'}</td>
-                  <td className="crm-table-date">
+                  <td style={{ width: colWidths.latestStatus, minWidth: colWidths.latestStatus, maxWidth: colWidths.latestStatus }}>{lead.latest_status || '-'}</td>
+                  <td style={{ width: colWidths.created, minWidth: colWidths.created, maxWidth: colWidths.created }} className="crm-table-date">
                     {new Date(lead.created_at).toLocaleString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -367,7 +395,7 @@ export default function PipelineView() {
                       hour12: true
                     })}
                   </td>
-                  <td style={{ textAlign: 'right' }}>
+                  <td style={{ textAlign: 'right', width: colWidths.actions, minWidth: colWidths.actions, maxWidth: colWidths.actions }}>
                     <button
                       className="btn btn-sm crm-delete-btn"
                       onClick={(e) => handleDeleteLead(e, lead.id)}
