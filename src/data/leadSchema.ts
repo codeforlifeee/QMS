@@ -61,6 +61,8 @@ export interface Lead {
   source?: string;
   priority_bucket: PriorityBucket;
   latest_status?: string;
+  budget?: string;
+  preferred_call_time?: string;
   created_at: string;
   updated_at: string;
 }

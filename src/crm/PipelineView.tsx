@@ -293,6 +293,8 @@ export default function PipelineView() {
                 <th>Pax</th>
                 <th>Month</th>
                 <th>Source</th>
+                <th>Budget</th>
+                <th>Call Time</th>
                 <th>Status</th>
                 <th>Latest Status</th>
                 <th>Created</th>
@@ -340,6 +342,8 @@ export default function PipelineView() {
                   <td>{lead.pax_summary || '-'}</td>
                   <td>{lead.travelling_month || '-'}</td>
                   <td>{lead.source || '-'}</td>
+                  <td>{lead.budget || '-'}</td>
+                  <td>{lead.preferred_call_time || '-'}</td>
                   <td>
                     <span
                       className="crm-bucket-pill"

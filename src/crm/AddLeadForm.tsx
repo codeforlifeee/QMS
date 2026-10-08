@@ -16,6 +16,8 @@ export function AddLeadForm({ onSave, onClose }: Props) {
     travelling_month: '',
     planning_with: '',
     pax_summary: '',
+    budget: '',
+    preferred_call_time: '',
     special_arrangements: '',
     source: '',
   });
@@ -140,6 +142,26 @@ export function AddLeadForm({ onSave, onClose }: Props) {
                   <option key={s} value={s}>{s}</option>
                 ))}
               </select>
+            </div>
+
+            <div className="crm-form-field">
+              <label>Budget</label>
+              <input
+                type="text"
+                value={form.budget}
+                onChange={(e) => set('budget', e.target.value)}
+                placeholder="e.g. 50k - 1 lakh"
+              />
+            </div>
+
+            <div className="crm-form-field">
+              <label>Preferred Call Time</label>
+              <input
+                type="text"
+                value={form.preferred_call_time}
+                onChange={(e) => set('preferred_call_time', e.target.value)}
+                placeholder="e.g. 2pm - 5pm"
+              />
             </div>
 
             <div className="crm-form-field full-width">

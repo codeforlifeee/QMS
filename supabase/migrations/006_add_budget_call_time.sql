@@ -1,0 +1,3 @@
+ALTER TABLE leads
+ADD COLUMN IF NOT EXISTS budget TEXT,
+ADD COLUMN IF NOT EXISTS preferred_call_time TEXT;

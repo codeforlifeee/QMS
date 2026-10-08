@@ -209,6 +209,14 @@ export function LeadPage({ leadId }: Props) {
                 <label>Source</label>
                 <span>{lead.source || '-'}</span>
               </div>
+              <div className="crm-info-item">
+                <label>Budget</label>
+                <span>{lead.budget || '-'}</span>
+              </div>
+              <div className="crm-info-item">
+                <label>Call Time</label>
+                <span>{lead.preferred_call_time || '-'}</span>
+              </div>
               {lead.special_arrangements && (
                 <div className="crm-info-item full-width">
                   <label>Special Arrangements</label>
