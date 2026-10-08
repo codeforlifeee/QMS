@@ -290,19 +290,19 @@ export default function PipelineView() {
           <table className="crm-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>City</th>
-                <th>Pax</th>
-                <th>Month</th>
-                <th>Source</th>
-                <th>Budget</th>
-                <th>Call Time</th>
-                <th>Status</th>
-                <th>Latest Status</th>
-                <th>Created</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th><div className="crm-th-resize">Name</div></th>
+                <th><div className="crm-th-resize">Phone</div></th>
+                <th><div className="crm-th-resize">Email</div></th>
+                <th><div className="crm-th-resize">City</div></th>
+                <th><div className="crm-th-resize">Pax</div></th>
+                <th><div className="crm-th-resize">Month</div></th>
+                <th><div className="crm-th-resize">Source</div></th>
+                <th><div className="crm-th-resize">Budget</div></th>
+                <th><div className="crm-th-resize">Call Time</div></th>
+                <th><div className="crm-th-resize">Status</div></th>
+                <th><div className="crm-th-resize">Latest Status</div></th>
+                <th><div className="crm-th-resize">Created</div></th>
+                <th style={{ textAlign: 'right' }}><div className="crm-th-resize" style={{ justifyContent: 'flex-end' }}>Actions</div></th>
               </tr>
             </thead>
             <tbody>
